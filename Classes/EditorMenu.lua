@@ -16,8 +16,8 @@ function EditorMenu:init(load)
 		create_items = ClassClbk(self, "create_items"),
         scroll_speed = BLE.Options:GetValue("Scrollspeed"),
 	})
-    MenuCallbackHandler.BeardLibEditorMenu = ClassClbk(self, "set_enabled", true)
-    local node = MenuHelperPlus:GetNode(nil, "options")
+    --MenuCallbackHandler.BeardLibEditorMenu = ClassClbk(self, "set_enabled", true)
+    --[[local node = MenuHelperPlus:GetNode(nil, "options")
     if not node:item("BeardLibEditorMenu") then
         MenuHelperPlus:AddButton({
             id = "BeardLibEditorMenu",
@@ -26,7 +26,15 @@ function EditorMenu:init(load)
             position = managers.menu._is_start_menu and 9 or 7,
             callback = "BeardLibEditorMenu",
         })
-    end
+    end]]--
+    RaidMenuHelper:MakeClbk("BeardLibMenu", ClassClbk(BeardLib.Menus.Mods, "SetEnabled", true))
+
+    RaidMenuHelper:InjectButtons("raid_menu_left_options", "network", {
+        {
+            text = managers.localization:text("BeardLibEditorMenu"),
+            callback = "BeardLibEditorMenu"
+        }
+    }, true)
 end
 
 function EditorMenu:Load(data)

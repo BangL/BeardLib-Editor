@@ -33,11 +33,11 @@ function DebugTool:build_menu()
 
     local list = {}
     local continents = managers.worlddefinition._continents
-    for _, continent in ipairs(managers.editor._continents) do
+    --[[for _, continent in ipairs(managers.editor._continents) do
         if continents[continent] and continents[continent].editor_only then
             table.insert(list, continent)
         end
-    end
+    end]]
     self._sorter = self._holder:group("EditorUnitSorter", groups_opt)
     self._sorter:combobox("TargetContinent", nil, list, 1)
     self._sorter:tickbox("Coverpoints", nil, true, {size_by_text = true})

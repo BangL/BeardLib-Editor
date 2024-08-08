@@ -1,6 +1,6 @@
 local UNIT_LOAD = "unit_load"
 local ADD = "add"
-
+BLE = BLE or {}
 BLE.Updaters = {}
 BLE.DBPaths = {}
 BLE.Prefabs = {}
@@ -17,7 +17,7 @@ function BLE:Init()
 
 	self.PrefabsDirectory = Path:CombineDir(BeardLib.config.maps_dir, "prefabs")
 	self.ElementsDir = Path:CombineDir(self.MapClassesDir, "Elements")
-    self.HasFix = not FileIO:Exists("mods/saves/BLEDisablePhysicsFix") and FileIO:Exists(self.ModPath.."supermod.xml")
+    self.HasFix = not FileIO:Exists("mods/saves/BLEDisablePhysicsFix") --and FileIO:Exists(self.ModPath.."supermod.xml")
     self.UsableAssets = {"unit", "effect", "environment", "scene"}
 
     Hooks:Add("MenuUpdate", "BeardLibEditorMenuUpdate", ClassClbk(BLE, "Update"))
@@ -26,8 +26,7 @@ function BLE:Init()
     Hooks:Add("LocalizationManagerPostInit", "BeardLibEditorLocalization", function(loc)
         LocalizationManager:add_localized_strings({BeardLibEditorMenu = "BeardLibEditor Menu"})
     end)
-    Hooks:Add("MenuManagerPopulateCustomMenus", "BeardLibEditorInitManagers", ClassClbk(BLE, "InitManagers"))
-
+    Hooks:Add("SetupInitManagers", "BeardLibEditorInitManagers", ClassClbk(BLE, "InitManagers"))
     local packages_file = Path:Combine(self.ModPath, "packages.txt")
     if FileIO:Exists(packages_file) then
         self:GeneratePackageData()
@@ -141,13 +140,13 @@ function BLE:InitManagers(data)
         table.insert(self.Updaters, self.MapEditor)
     end
 
-    if not self.FileWatcher and FileIO:Exists("mods/developer.txt") then --Code refresh is only for developers!
-        self.FileWatcher = FileWatcher:new({
-            path = Path:Combine(self.ClassDirectory),
-            callback = ClassClbk(self, "MapEditorCodeReload"),
-            scan_t = 0.5
-        })
-    end
+    --if not self.FileWatcher and FileIO:Exists("mods/developer.txt") then --Code refresh is only for developers!
+        --self.FileWatcher = FileWatcher:new({
+          --  path = Path:Combine(self.ClassDirectory),
+            --callback = ClassClbk(self, "MapEditorCodeReload"),
+            --scan_t = 0.5
+        --})
+    --end
 
     self.Menu = EditorMenu:new()
     self.ScriptDataConverter = ScriptDataConverterManager:new(data.script_data)
@@ -284,7 +283,7 @@ function BLE:LoadHashlist()
         self.WorldSounds = FileIO:ReadScriptData(Path:Combine(self.DataDirectory, "WorldSounds.bin"), "binary")
         self.Brushes = string.split(FileIO:ReadFrom(Path:Combine(self.DataDirectory, "Brushes.txt"), "r"), "\n")
         self.DefaultAssets = FileIO:ReadScriptData(Path:Combine(self.DataDirectory, "DefaultAssets.bin"), "binary")
-
+        self:log(tostring(self.DBPaths))
         self:log("Successfully loaded DBPaths, It took %.2f seconds", os.clock() - t)
         Global.DBPaths = self.DBPaths
         Global.DBPackages = self.DBPackages

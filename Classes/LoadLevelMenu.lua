@@ -17,19 +17,19 @@ function LoadLevelMenu:init(data)
 	self._menu = menu:make_page("Levels", nil, {scrollbar = false, index = 2, auto_align = false})
 	ItemExt:add_funcs(self)
 	local filters = self:holder("Filters", {align_method = "grid", inherit_values = {size_by_text = true, offset = 0}})
-	local w = filters:tickbox("Vanilla", ClassClbk(self, "load_levels"), data.vanilla):Width()
-	w = w + filters:tickbox("Custom", ClassClbk(self, "load_levels"), NotNil(data.custom, true)):Width()
-	w = w + filters:tickbox("Narratives", ClassClbk(self, "load_levels"), NotNil(data.narratives, true)):Width()
+	local w = filters:tickbox("Vanilla", ClassClbk(self, "load_levels")):Width()
+	w = w + filters:tickbox("Custom", ClassClbk(self, "load_levels"), true):Width()
+	--w = w + filters:tickbox("Narratives", ClassClbk(self, "load_levels"), true):Width()
 	filters:textbox("Search", ClassClbk(self, "search_levels"), nil, {w = filters:ItemsWidth() - w, index = 1, control_slice = 0.85, offset = 0})
 
 	local load_options = self:pan("LoadOptions", {align_method = "grid", auto_height = true, inherit_values = {offset = 0}})
     local third_w = load_options:ItemsWidth() / 3
 	load_options:combobox("Difficulty", nil, difficulty_loc, 1, {items_localized = true, items_pretty = true, w = third_w, offset = 0})
 	load_options:numberbox("MissionFilter", nil, nil, {w = third_w, floats = 0, offset = 0, help = "Set a mission filter to be forced on the level, 0 uses the default filter."})
-	load_options:tickbox("OneDown", nil, data.one_down, {w = third_w, offset = 0})
-    load_options:tickbox("Safemode", nil, data.safemode, {w = third_w})
-    load_options:tickbox("CheckLoadTime", nil, data.load_time, {w = third_w})
-	load_options:tickbox("LogSpawnedUnits", nil, data.log_spawned, {w = third_w})
+	--load_options:tickbox("OneDown", nil, false, {w = third_w, offset = 0})
+    load_options:tickbox("Safemode", nil, false, {w = third_w})
+    load_options:tickbox("CheckLoadTime", nil, false, {w = third_w})
+	load_options:tickbox("LogSpawnedUnits", nil, false, {w = third_w})
 
 	self._levels = self:pan("LevelList", {auto_align = false, offset = 8, h = self._menu:ItemsHeight() - load_options:Bottom() - 16, auto_height = false})
 	self:load_levels()
@@ -46,7 +46,7 @@ function LoadLevelMenu:Destroy()
 	return {
 		vanilla = filters:GetItemValue("Vanilla"),
 		custom = filters:GetItemValue("Custom"),
-		narratives = filters:GetItemValue("Narratives"),
+		--narratives = filters:GetItemValue("Narratives"),
 		difficulty = load_options:GetItemValue("Difficulty"),
 		one_down = load_options:GetItemValue("OneDown"),
 		safemode = load_options:GetItemValue("Safemode"),
@@ -59,7 +59,7 @@ function LoadLevelMenu:search_levels(item)
 	item = item or self:GetItem("Search")
 	local search = item:Value():escape_special():lower()
 	local searching = search:len() > 0
-	if self:GetItemValue("Narratives") then
+	--[[if self:GetItemValue("Narratives") then
 		for _, menu in pairs(self._levels:Items()) do
 			if menu.type_name == "Holder" then
 				for _, item in pairs(menu:Items()) do
@@ -79,7 +79,7 @@ function LoadLevelMenu:search_levels(item)
 				end
 			end
 		end
-	else
+	else]]
 		for _, btn in pairs(self._levels:Items()) do
 			if not searching or btn.text:lower():find(search) then
 				btn:SetVisible(true)
@@ -87,18 +87,18 @@ function LoadLevelMenu:search_levels(item)
 				btn:SetVisible(false)
 			end
 		end
-	end
+	--end
 	self._levels:AlignItems(true)
 end
 
 local texture_ids = Idstring("texture")
 
 function LoadLevelMenu:load_levels()
-	if self:GetItemValue("Narratives") then
-		self:do_load_narratives()
-	else
+	--if self:GetItemValue("Narratives") then
+		--self:do_load_narratives()
+	--else
 		self:do_load_levels()
-	end
+	--end
 end
 
 function LoadLevelMenu:do_load_levels()
@@ -248,7 +248,7 @@ function LoadLevelMenu:load_level(item)
     local safe_mode = self:GetItem("Safemode"):Value()
     local check_load = self:GetItem("CheckLoadTime"):Value()
     local log_on_spawn = self:GetItem("LogSpawnedUnits"):Value()
-    local one_down = self:GetItem("OneDown"):Value()
+    --local one_down = self:GetItem("OneDown"):Value()
     local difficulty = self:GetItem("Difficulty"):Value()
 	local filter = self:GetItem("MissionFilter"):Value()
 
@@ -269,7 +269,7 @@ function LoadLevelMenu:load_level(item)
         Global.current_level_id = item.real_id or level_id
         Global.game_settings.mission = "none"
 		Global.game_settings.difficulty = difficulty_ids[difficulty] or "normal"
-		Global.game_settings.one_down = one_down
+		--Global.game_settings.one_down = one_down
         Global.game_settings.world_setting = nil
         self:start_the_game()
         BLE.Menu:set_enabled(false)

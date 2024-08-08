@@ -39,13 +39,13 @@ function ProjectLevelEditor:build_menu(menu, data)
     menu:numberbox("GhostBonus", up, data.data or 0, {max = 1, min = 0, step = 0.1})
     menu:numberbox("MaxBags", up, data.max_bags, {max = 999, min = 0, floats = 0})
 
-    local aitype = table.map_keys(tweak_data.levels.ai_groups)
-    menu:combobox("AiGroupType", up, aitype, table.get_key(aitype, data.ai_group_type) or 1)
+    --local aitype = table.map_keys(tweak_data.levels.ai_groups)
+    --menu:combobox("AiGroupType", up, aitype, table.get_key(aitype, data.ai_group_type) or 1)
 
-    local styles = table.map_keys(tweak_data.scene_poses.player_style)
-    menu:combobox("PlayerStyle", up, styles, table.get_key(styles, data.player_style or "generic") or data.player_style, {
-        help = "Set the player style for the map, make sure the packages for the suits are loaded!", free_typing = true
-    })
+    --local styles = table.map_keys(tweak_data.scene_poses.player_style)
+    --menu:combobox("PlayerStyle", up, styles, table.get_key(styles, data.player_style or "generic") or data.player_style, {
+    --    help = "Set the player style for the map, make sure the packages for the suits are loaded!", free_typing = true
+    --})
     menu:tickbox("TeamAiOff", up, data.team_ai_off)
     menu:tickbox("RetainBags", up, data.repossess_bags)
     menu:tickbox("PlayerInvulnerable", up, data.player_invulnerable)
@@ -171,10 +171,10 @@ function ProjectLevelEditor:clone_level(create_data)
     local name = create_data.name
 
     --Clone preplanning
-    local preplanning = tweak_data.preplanning.locations[clone_id]
-    if preplanning then
-        level.preplanning = deep_clone(preplanning)
-    end
+    --local preplanning = tweak_data.preplanning.locations[clone_id]
+    --if preplanning then
+    --    level.preplanning = deep_clone(preplanning)
+    --end
 
     local function extra_package(p)
         level.packages = level.packages or {}
@@ -185,7 +185,7 @@ function ProjectLevelEditor:clone_level(create_data)
 
     --Search for the narrative package if exists, some levels may depend on it.
     local found_narr = false
-    for _, narr in pairs(tweak_data.narrative.jobs) do
+--[[   for _, narr in pairs(tweak_data.narrative.jobs) do
         if found_narr then
             break
         end
@@ -211,7 +211,7 @@ function ProjectLevelEditor:clone_level(create_data)
                 end
             end
         end
-    end
+    end]]
 
     local dir = self._parent:get_dir()
     local custom_level_dir = Path:Combine(dir, self.LEVELS_DIR, name)

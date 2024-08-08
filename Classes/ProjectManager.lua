@@ -350,17 +350,17 @@ end
 --- @param name string
 function ProjectManager:create_new_map(name)
     self:create_new_map_clean(name)
-    ProjectNarrativeEditor:new(self._project, nil, {name = name, no_reload = true, final_callback = function(success, data)
-        if success then
-            ProjectLevelEditor:new(self._project, nil, {name = name, chain = data.chain, final_callback = function(success)
+    --ProjectNarrativeEditor:new(self._project, nil, {name = name, no_reload = true, final_callback = function(success, data)
+        --if success then
+            ProjectLevelEditor:new(self._project, nil, {name = name, final_callback = function(success)
                 if success then
                     self:load_mods()
                 else
                     self._project:reload_mod()
                 end
             end})
-        end
-    end})
+        --end
+    --end})
 end
 
 --- Creates a new map project by cloning

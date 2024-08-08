@@ -3,7 +3,7 @@ if not Global.editor_mode then
 end
 
 local mvec3_cpy = mvector3.copy
-function NavigationManager:init()
+--[[function NavigationManager:init()
 	self._debug = SystemInfo:platform() == Idstring("WIN32")
 	self._builder = NavFieldBuilder:new()
 	self._get_room_height_at_pos = self._builder._get_room_height_at_pos
@@ -19,6 +19,7 @@ function NavigationManager:init()
 	self._dir_str_to_vec = self._builder._dir_str_to_vec
 	self._geog_segment_size = self._builder._geog_segment_size
 	self._grid_size = self._builder._grid_size
+	self._worlds = {}
 	self._rooms = {}
 	self._room_doors = {}
 	self._geog_segments = {}
@@ -39,6 +40,42 @@ function NavigationManager:init()
 	if self._debug then
 		self._pos_reservations = {}
 	end
+end]]--
+
+function NavigationManager:init()
+	Application:trace("[NavigationManager][init]")
+
+	self._debug = SystemInfo:platform() == Idstring("WIN32") and Application:production_build()
+	self._builder = NavFieldBuilder:new()
+	self._get_room_height_at_pos = self._builder._get_room_height_at_pos
+	self._check_room_overlap_bool = self._builder._check_room_overlap_bool
+	self._door_access_types = self._builder._door_access_types
+	self._neg_dir_str_map = self._builder._neg_dir_str_map
+	self._dir_str_to_vec = self._builder._dir_str_to_vec
+	self._grid_size = self._builder._grid_size
+	self._worlds = {}
+	self._nav_segments = {}
+	self._nav_stitcher_counter = 0
+	self._coarse_searches = {}
+	self._covers = {}
+	self._next_pos_rsrv_expiry = false
+
+	if self._debug then
+		self._nav_links = {}
+	end
+
+	self._quad_field = World:quad_field()
+
+	self._quad_field:set_nav_link_filter(NavigationManager.ACCESS_FLAGS)
+
+	self._pos_rsrv_filters = {}
+	self._obstacles = {}
+	self._pos_reservations = {}
+
+	self:_init_draw_data()
+
+	self._data_ready = false
+	self._listener_holder = QueuedEventListenerHolder:new()
 end
 
 function NavigationManager:update(t, dt)
@@ -106,7 +143,7 @@ function NavigationManager:_init_draw_data()
 		blocked = Draw:brush(Color(1, 1, 1, 1))
 	}
 
-	brush.blocked:set_font(Idstring("fonts/font_medium"), 30)
+	brush.blocked:set_font(Idstring("fonts/font_medium_buttons"), 30)
 
 	data.brush = brush
 	local offsets = {
@@ -123,7 +160,7 @@ function NavigationManager:_init_draw_data()
 	self._draw_data = data
 end
 
-function NavigationManager:set_debug_draw_state(options)
+--[[function NavigationManager:set_debug_draw_state(options)
     local temp = {}
 	local fast_drawing = true
     if type(options) == "table" then
@@ -149,6 +186,26 @@ function NavigationManager:set_debug_draw_state(options)
         self._draw_data.start_t = TimerManager:game():time()
     end
     self._draw_enabled = options
+end]]
+
+function NavigationManager:set_debug_draw_state(options)
+	self._debug_draw_options = options
+
+	if options then
+		options.selected_segment = nil
+
+		if self._selected_segment_id then
+			for unique_id, segment in pairs(self._nav_segments) do
+				if segment.id == self._selected_segment_id then
+					options.selected_segment = Idstring(unique_id)
+
+					break
+				end
+			end
+		end
+	end
+
+	self._quad_field:set_draw_state(options)
 end
 
 function NavigationManager:build_complete_clbk(draw_options)

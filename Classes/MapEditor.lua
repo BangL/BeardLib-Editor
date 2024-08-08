@@ -75,7 +75,7 @@ function Editor:init(data)
 	}
 
 	self._brush = Draw:brush()
-    self._brush:set_font(Idstring("fonts/font_medium"), 32)
+    self._brush:set_font(Idstring("fonts/font_medium_buttons"), 32)
     self._brush:set_render_template(Idstring("OverlayVertexColorTextured"))
 
     self:_init_post_effects()
@@ -249,7 +249,7 @@ function Editor:_init_post_effects()
 		POSTFX_ssao = {
 			enable = true,
 			on = function ()
-				managers.environment_controller:set_ao_setting(managers.user:get_setting("video_ao"), self._vp:vp())
+				--managers.environment_controller:set_ao_setting(managers.user:get_setting("video_ao"), self._vp:vp())
 			end,
 			off = function ()
 				managers.environment_controller:set_ao_setting("off", self._vp:vp())
@@ -258,7 +258,7 @@ function Editor:_init_post_effects()
 		POSTFX_aa = {
 			enable = true,
 			on = function ()
-				managers.environment_controller:set_aa_setting(managers.user:get_setting("video_aa"), self._vp:vp())
+				--managers.environment_controller:set_aa_setting(managers.user:get_setting("video_aa"), self._vp:vp())
 			end,
 			off = function ()
 				managers.environment_controller:set_aa_setting("off", self._vp:vp())

@@ -13,7 +13,7 @@ Hooks:PreHook(Setup, "start_loading_screen", "BeardLibEditorStartLoadingScreen",
 			})
 			Global.LoadingText = panel:text({
 				name = "Loading",
-				font = "fonts/font_large_mf",
+				font = "fonts/font_large_buttons",
 				font_size = 32,
 				layer = 99999,
 				color = bgcolor:contrast(),

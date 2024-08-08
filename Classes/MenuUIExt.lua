@@ -22,7 +22,7 @@ ItemExt.get_value = Item.Value
 ItemExt.set_value = Item.SetValue
 ItemExt.set_enabled = Item.SetEnabled
 ItemExt.set_visible = Item.SetVisible
-
+BeardLib:log("HELLO")
 ItemExt.DEFAULT_OFFSET = {BLE.Options:GetValue("BoxesXOffset"), BLE.Options:GetValue("BoxesYOffset")}
 ItemExt.ITEMS_OFFSET = {BLE.Options:GetValue("ItemsXOffset"), BLE.Options:GetValue("ItemsYOffset")}
 local SIZE = BLE.Options:GetValue("MapEditorFontSize")
@@ -114,10 +114,12 @@ function ItemExt:Pasta1(name, callback, o)
 end
 
 function ItemExt:Pasta2(name, callback, value, o)
+	--BeardLib:log("help me")
 	return table.merge({name = name, on_callback = callback, text = string.pretty2(name), value = value}, o)
 end
 
 function ItemExt:tickbox(...)
+	--BeardLib:log("hewwo")
 	return self:Toggle(ItemExt:Pasta2(...))
 end
 

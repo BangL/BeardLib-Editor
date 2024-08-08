@@ -188,7 +188,7 @@ function Instance:_draw_instance(instance_name, r, g, b)
             
     local name_brush = Draw:brush(Color(r, g, b))
 
-    name_brush:set_font(Idstring("fonts/font_medium"), 8)
+    name_brush:set_font(Idstring("fonts/font_medium_buttons"), 8)
     name_brush:set_render_template(Idstring("OverlayVertexColorTextured"))
 
     for _, element in pairs(managers.world_instance:prepare_mission_data_by_name(instance_name).default.elements) do

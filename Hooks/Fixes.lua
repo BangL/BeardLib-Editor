@@ -122,9 +122,9 @@ elseif F == "levelstweakdata" then
 				name_id = "none",
 				briefing_id = "none",
 				world_name = instance._levels_less_path,
-				ai_group_type = self.ai_groups.default,
-				intro_event = "nothing",
-				outro_event = "nothing",
+				--ai_group_type = self.ai_groups.default,
+				--intro_event = "nothing",
+				--outro_event = "nothing",
 				custom = true
 			})
 		end

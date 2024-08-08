@@ -112,7 +112,7 @@ function Part:init_basic(parent, name)
     self._parent = parent    
     self._pen = Draw:pen(Color(1, 1, 1))
     self._brush = Draw:brush(Color(1, 1, 1))
-    self._brush:set_font(Idstring("fonts/font_large_mf"), 16)
+    self._brush:set_font(Idstring("fonts/font_large_buttons"), 16)
     self._brush:set_render_template(Idstring("OverlayVertexColorTextured"))
 
     self._axis_controls = {"x", "y", "z", "yaw", "pitch", "roll"}

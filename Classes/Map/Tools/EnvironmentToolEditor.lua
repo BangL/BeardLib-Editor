@@ -157,7 +157,7 @@ function EnvTool:choose_effects(item)
         table.insert(self._environment_effects, name)
     end
     item:SetBorder({left = table.contains(self._environment_effects, name)})
-    managers.environment_effects:set_active_effects(self._environment_effects)
+    --managers.environment_effects:set_active_effects(self._environment_effects)
 end
 
 function EnvTool:set_post_effects_enabled(item)
@@ -232,7 +232,7 @@ function EnvTool:load_env(env)
         for _, btn in pairs(self._holder:GetItem("Effects"):Items()) do
             btn:SetBorder({left = table.contains(self._environment_effects, btn.name)})
         end
-        managers.environment_effects:set_active_effects(self._environment_effects)
+        --managers.environment_effects:set_active_effects(self._environment_effects)
     end
 end
 
@@ -392,10 +392,10 @@ function EnvTool:add_post_processors_param(pro, effect, mod, gui)
     local processor = managers.viewport:first_active_viewport():vp():get_post_processor_effect("World", Idstring(pro))
     if processor then
         local key = Idstring("post_effect/" .. pro .. "/" .. effect .. "/" .. mod .. "/" .. gui.name):key()
-        local value = managers.viewport:first_active_viewport():get_environment_default_value(key)
-        if value then
-            gui:SetValue(value)
-        else
+        --local value = managers.viewport:first_active_viewport():get_environment_default_value(key)
+        --if value then
+            --gui:SetValue(value)
+        --else
             local modifier = processor:modifier(Idstring(mod))
             if modifier and modifier:material():variable_exists(Idstring(gui.name)) then
                 local value = modifier:material():get_variable(Idstring(gui.name))
@@ -403,7 +403,7 @@ function EnvTool:add_post_processors_param(pro, effect, mod, gui)
                     gui:SetValue(value)
                 end
             end
-        end
+        --end
     end
     return gui
 end
@@ -480,7 +480,7 @@ end
 
 function EnvTool:shadow_feed_params(feed_params)
     local interface_params = self._posteffect.post_processors.shadow_processor.effects.shadow_rendering.modifiers.shadow_modifier.params
-    local fov_ratio = managers.environment_controller:fov_ratio()
+    local fov_ratio = 1 --managers.environment_controller:fov_ratio()
     local d0 = interface_params.d0:Value() * fov_ratio
     local d1 = interface_params.d1:Value() * fov_ratio
     local d2 = interface_params.d2:Value() * fov_ratio

@@ -376,7 +376,8 @@ function Utils:ParseXmlFromAssets(typ, path, scriptdata, assets_dir)
 end
 
 function Utils:ParseXml(typ, path, scriptdata)
-    if not blt.asset_db.has_file(path, typ) then
+    --Need to figure out why asset_db causes crashes
+    --[[if not blt.asset_db.has_file(path, typ) then
         local asset = BeardLibFileManager:Get(typ, path)
         if asset and FileIO:Exists(asset.file) then
             return SystemFS:parse_xml(asset.file, "r")
@@ -387,7 +388,7 @@ function Utils:ParseXml(typ, path, scriptdata)
         else
             return Node.from_xml(blt.asset_db.read_file(path, typ))
         end
-    end
+   --end]]--
 end
 
 function Utils:FilterList(a,b)

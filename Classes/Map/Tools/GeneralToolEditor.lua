@@ -129,7 +129,7 @@ function GenTool:build_level_breakdown()
 
     local cont_id = managers.worlddefinition._start_id
     local continents = managers.worlddefinition._continent_definitions
-    for _, continent in ipairs(managers.editor._continents) do
+    --[[for _, continent in ipairs(managers.editor._continents) do
         if continents[continent] then
             local statics = continents[continent].statics and #continents[continent].statics or 0
             units_group:divider(continent, {text = continent..": "..statics.." / "..cont_id})
@@ -144,7 +144,7 @@ function GenTool:build_level_breakdown()
                 total_instances = total_instances + instances
             end
         end
-    end
+    end]]
     units_group:SetText("Total Units: "..total_units)
     elements_group:SetText("Total Elements: "..total_elements)
     instances_group:SetText("Total Instances: "..total_instances)
