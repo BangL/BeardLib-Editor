@@ -195,7 +195,10 @@ function BLE:InitManagers(data)
             table.insert(self.ConstPackages, "packages/" .. (difficulty or "normal"))
         end
         for path, _ in pairs(self.Utils.core_units) do
-            Global.DBPaths.unit[path] = true
+            if Global.DBPaths and  Global.DBPaths.unit then
+                Global.DBPaths.unit[path] = true
+            end
+
         end
         self:LoadCustomAssets()
     end
@@ -533,10 +536,16 @@ function BLE:LoadCustomAssetsToHashList(add, directory, package_id)
                 else
                     local file_path = dir ..".".. typ
                     if from_db or FileIO:Exists(file_path) then
+                        if not self.DBPaths then
+                            self.DBPaths = {}
+                        end
                         self.DBPaths[typ] = self.DBPaths[typ] or {}
                         self.DBPaths[typ][path] = true
 
                         if package_id then
+                            if not self.DBPackages then
+                                self.DBPackages = {}
+                            end
                             self.DBPackages[package_id] = self.DBPackages[package_id] or {}
                             local package = self.DBPackages[package_id]
                             package[typ] = package[typ] or {}
