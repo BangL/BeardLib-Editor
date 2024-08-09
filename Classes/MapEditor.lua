@@ -249,19 +249,19 @@ function Editor:_init_post_effects()
 		POSTFX_ssao = {
 			enable = true,
 			on = function ()
-				--managers.environment_controller:set_ao_setting(managers.user:get_setting("video_ao"), self._vp:vp())
+				managers.environment_controller:set_ssao_setting(managers.user:get_setting("ssao_setting"))
 			end,
 			off = function ()
-				managers.environment_controller:set_ao_setting("off", self._vp:vp())
+				managers.environment_controller:set_ssao_setting("off")
 			end
 		},
 		POSTFX_aa = {
 			enable = true,
 			on = function ()
-				--managers.environment_controller:set_aa_setting(managers.user:get_setting("video_aa"), self._vp:vp())
+				managers.environment_controller:set_AA_setting(managers.user:get_setting("AA_setting"), self._vp:vp())
 			end,
 			off = function ()
-				managers.environment_controller:set_aa_setting("off", self._vp:vp())
+				managers.environment_controller:set_AA_setting("off", self._vp:vp())
 			end
 		}
 	}

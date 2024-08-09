@@ -27,7 +27,7 @@ function EditorMenu:init(load)
             callback = "BeardLibEditorMenu",
         })
     end]]--
-    RaidMenuHelper:MakeClbk("BeardLibMenu", ClassClbk(BeardLib.Menus.Mods, "SetEnabled", true))
+    RaidMenuHelper:MakeClbk("BeardLibEditorMenu", ClassClbk(self, "set_enabled", true))
 
     RaidMenuHelper:InjectButtons("raid_menu_left_options", "network", {
         {

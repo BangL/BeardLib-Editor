@@ -90,16 +90,43 @@ function EnvTool:build_menu()
     local ambient = self._holder:group("Ambient")
     self:add_post_processors_param("deferred", "deferred_lighting", "apply_ambient", ambient:colorbox("ambient_color", nil, nil, {text = "Color", ret_vec = true}))
     self:add_post_processors_param("deferred", "deferred_lighting", "apply_ambient", ambient:slider("ambient_color_scale", nil, 1, {text = "Color scale", step = 0.1, min = 0, max = 10}))
-    self:add_post_processors_param("deferred", "deferred_lighting", "apply_ambient", ambient:slider("ambient_scale", nil, 1, {text = "Scale", step = 0.1, min = 0, max = 1}))
+    -- self:add_post_processors_param("deferred", "deferred_lighting", "apply_ambient", ambient:slider("ambient_scale", nil, 1, {text = "Scale", step = 0.1, min = 0, max = 1}))
     self:add_post_processors_param("deferred", "deferred_lighting", "apply_ambient", ambient:slider("ambient_falloff_scale", nil, 1, {text = "Falloff scale", step = 0.1, min = 0, max = 10}))
     self:add_post_processors_param("deferred", "deferred_lighting", "apply_ambient", ambient:slider("effect_light_scale", nil, 1, {text = "Effect lighting scale", step = 0.1, min = 0, max = 10}))
 
+     -- SPEC / GLOSS
+     local sepcgloss = self._holder:group("Spec / Gloss")
+     self:add_post_processors_param("deferred", "deferred_lighting", "apply_ambient", sepcgloss:slider("spec_factor", nil, 1, {text = "Specular factor", step = 0.1, min = 0, max = 1}))
+     self:add_post_processors_param("deferred", "deferred_lighting", "apply_ambient", sepcgloss:slider("gloss_factor", nil, 1, {text = "Glossiness factor", step = 0.1, min = -1, max = 1}))
+
     -- BLOOM
     local bloom = self._holder:group("Bloom")
-    self:add_post_processors_param("deferred", "deferred_lighting", "apply_ambient", bloom:slider("bloom_threshold", nil, 1, {text = "Threshold", min = 0, max = 1, floats = 2}))
-    self:add_post_processors_param("bloom_combine_post_processor", "bloom_combine", "bloom_lense", bloom:slider("bloom_intensity", nil, 1, {text = "Intensity", min = 0, max = 10, floats = 2}))
-    self:add_post_processors_param("bloom_combine_post_processor", "bloom_combine", "bloom_lense", bloom:slider("bloom_blur_size", nil, 1, {text = "Blur size", min = 1, max = 4, floats = 0}))
-    self:add_post_processors_param("bloom_combine_post_processor", "bloom_combine", "bloom_lense", bloom:slider("lense_intensity", nil, 1, {text = "Lense intensity", min = 0, max = 1, floats = 2}))
+    -- self:add_post_processors_param("deferred", "deferred_lighting", "apply_ambient", bloom:slider("bloom_threshold", nil, 1, {text = "Threshold", min = 0, max = 1, floats = 2}))
+    self:add_post_processors_param("bloom_combine_post_processor", "bloom_DOF_combine", "post_DOF",    bloom:slider("bloom_intensity", nil, 1, {text = "Intensity", min = 0, max = 1, floats = 2}))
+    -- self:add_post_processors_param("bloom_combine_post_processor", "bloom_DOF_combine", "bloom_lense", bloom:slider("bloom_intensity", nil, 1, {text = "Intensity", min = 0, max = 10, floats = 2}))
+    -- self:add_post_processors_param("bloom_combine_post_processor", "bloom_DOF_combine", "bloom_lense", bloom:slider("bloom_blur_size", nil, 1, {text = "Blur size", min = 1, max = 4, floats = 0}))
+    -- self:add_post_processors_param("bloom_combine_post_processor", "bloom_DOF_combine", "bloom_lense", bloom:slider("lense_intensity", nil, 1, {text = "Lense intensity", min = 0, max = 1, floats = 2}))
+
+    -- VOLUMETRIC LIGHT SCATTERING
+    local volume_matt = self._holder:group("Volumemetric Light Scattering")
+    self:add_post_processors_param("volumetric_light_scatter", "volumetric_light_scatter", "post_volumetric_light_scatter", volume_matt:slider("light_scatter_density", nil, 1, {text = "Density", step = 0.1, min = 0, max = 1}))
+    self:add_post_processors_param("volumetric_light_scatter", "volumetric_light_scatter", "post_volumetric_light_scatter", volume_matt:slider("light_scatter_weight", nil, 1, {text = "Weight", step = 0.01, min = 0, max = 0.1}))
+    self:add_post_processors_param("volumetric_light_scatter", "volumetric_light_scatter", "post_volumetric_light_scatter", volume_matt:slider("light_scatter_decay", nil, 1, {text = "Decay", step = 0.1, min = 0, max = 1}))
+    self:add_post_processors_param("volumetric_light_scatter", "volumetric_light_scatter", "post_volumetric_light_scatter", volume_matt:slider("light_scatter_exposure", nil, 1, {text = "Exposure", help = w, step = 0.1, min = 0, max = 2}))
+    
+    -- LENS FLARES
+    local lens_flares = self._holder:group("Lens Flares")
+    self:add_post_processors_param("lens_flare_post_processor", "lens_flare_effect", "lens_flare_material", lens_flares:slider("ghost_dispersal", nil, 1, {text = "Ghost dispersal", step = 0.1, min = 0, max = 1}))
+    self:add_post_processors_param("lens_flare_post_processor", "lens_flare_effect", "lens_flare_material", lens_flares:slider("halo_width", nil, 1, {text = "Halo width", step = 0.1, min = 0, max = 2}))
+    self:add_post_processors_param("lens_flare_post_processor", "lens_flare_effect", "lens_flare_material", lens_flares:slider("chromatic_distortion", nil, 1, {text = "Chromatic distortion", min = 0, max = 30}))
+    self:add_post_processors_param("lens_flare_post_processor", "lens_flare_effect", "lens_flare_material", lens_flares:slider("weight_exponent", nil, 1, {text = "Weight exponent", min = 0, max = 50}))
+    self:add_post_processors_param("lens_flare_post_processor", "lens_flare_effect", "lens_flare_material", lens_flares:slider("downsample_scale", nil, 1, {text = "Downsample scale", min = 0, max = 10}))
+    self:add_post_processors_param("lens_flare_post_processor", "lens_flare_effect", "lens_flare_material", lens_flares:slider("downsample_bias", nil, 1, {text = "Downssample bias", help = "value of 1 turns off the effect", step = 0.1, min = 0, max = 1}))
+
+    -- SSAO APPLY
+    local ssao_apply = self._holder:group("SSAO")
+    self:add_post_processors_param("SSAO_post_processor", "SSAO", "apply_SSAO",    ssao_apply:slider("ssao_intensity", nil, 0, {text = "Intensity", min = 1000, max = 10000}))
+    self:add_post_processors_param("SSAO_post_processor", "SSAO", "apply_SSAO",    ssao_apply:slider("ssao_radius", nil, 1, {text = "Radius", min = 1, max = 100}))
 
     -- SKY
 	local sky = self._holder:group("Sky")
