@@ -160,7 +160,7 @@ function NavigationManager:_init_draw_data()
 	self._draw_data = data
 end
 
---[[function NavigationManager:set_debug_draw_state(options)
+function NavigationManager:set_debug_draw_state(options)
     local temp = {}
 	local fast_drawing = true
     if type(options) == "table" then
@@ -186,26 +186,6 @@ end
         self._draw_data.start_t = TimerManager:game():time()
     end
     self._draw_enabled = options
-end]]
-
-function NavigationManager:set_debug_draw_state(options)
-	self._debug_draw_options = options
-
-	if options then
-		options.selected_segment = nil
-
-		if self._selected_segment_id then
-			for unique_id, segment in pairs(self._nav_segments) do
-				if segment.id == self._selected_segment_id then
-					options.selected_segment = Idstring(unique_id)
-
-					break
-				end
-			end
-		end
-	end
-
-	self._quad_field:set_draw_state(options)
 end
 
 function NavigationManager:build_complete_clbk(draw_options)

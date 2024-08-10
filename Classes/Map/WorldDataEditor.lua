@@ -29,7 +29,6 @@ end
 
 function WData:loaded_continents(continents, current_continent)
     self:GetPart("mission"):set_elements_vis()
-
     for name, manager in pairs(self.layers) do
         if manager.loaded_continents then
             manager:loaded_continents()

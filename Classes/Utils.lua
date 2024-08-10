@@ -377,6 +377,7 @@ end
 
 function Utils:ParseXml(typ, path, scriptdata)
     --Need to figure out why asset_db causes crashes
+    --The answer is the bundles are different and doesn't work with the compression.
     --[[if not blt.asset_db.has_file(path, typ) then
         local asset = BeardLibFileManager:Get(typ, path)
         if asset and FileIO:Exists(asset.file) then

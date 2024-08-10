@@ -84,7 +84,10 @@ function UnitSelectList:init(parent)
 end
 
 function UnitSelectList:do_search_list()
-    local continents = 1 --#managers.editor._continents
+    local continents = 1
+    if managers.editor and managers.editor._continents then
+        continents = #managers.editor._continents
+    end
     local used_continents = continents - #self._filtered_continents
     self._filter:GetItem("Count"):SetText(used_continents.."/"..continents)
 
@@ -322,15 +325,17 @@ end
 
 function GroupSelectList:do_search_list()
     local continents = managers.worlddefinition._continent_definitions
-    --[[for _, continent in pairs(managers.editor._continents) do
-        if continents[continent].editor_groups then
-            for _, editor_group in pairs(continents[continent].editor_groups) do
-                if editor_group.units then
-                    self:insert_object(editor_group)
+    if managers.editor and managers.editor._continents then
+        for _, continent in pairs(managers.editor._continents) do
+            if continents[continent].editor_groups then
+                for _, editor_group in pairs(continents[continent].editor_groups) do
+                    if editor_group.units then
+                        self:insert_object(editor_group)
+                    end
                 end
             end
         end
-    end]]
+    end
 end
 
 function GroupSelectList:insert_object(editor_group)

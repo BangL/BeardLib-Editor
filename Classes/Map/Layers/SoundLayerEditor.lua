@@ -121,31 +121,31 @@ end
 
 function SndLayer:ambience_events()
 	local events = {}
-	for _, sound in pairs(Global.WorldSounds) do
+	--[[for _, sound in pairs(Global.WorldSounds) do
 		if string.begins(sound, "ambience_") then
 			table.insert(events, sound)
 		end
-	end
+	end]]
 	return events
 end
 
 function SndLayer:occasional_events()
 	local events = {}
-	for _, sound in pairs(Global.WorldSounds) do
+	--[[for _, sound in pairs(Global.WorldSounds) do
 		if string.begins(sound, "occasionals_") then
 			table.insert(events, sound)
 		end
-	end
+	end]]
 	return events
 end
 
 function SndLayer:emitter_events()
 	local events = {}
-	for _, sound in pairs(Global.WorldSounds) do
+	--[[for _, sound in pairs(Global.WorldSounds) do
 		if string.begins(sound, "emitter_") then
 			table.insert(events, sound)
 		end
-	end
+	end]]
 	return events
 end
 

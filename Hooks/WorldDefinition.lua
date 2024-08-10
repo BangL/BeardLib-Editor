@@ -728,7 +728,7 @@ function WorldDef:assign_unit_data(unit, data)
 	self:_setup_editor_unit_data(unit, data)
 	self:_setup_unit_id(unit, data)
 	if unit:unit_data().helper_type and unit:unit_data().helper_type ~= "none" then
-		managers.helper_unit:add_unit(unit, unit:unit_data().helper_type)
+		--managers.helper_unit:add_unit(unit, unit:unit_data().helper_type)
 	end
 	self:_setup_lights(unit, data)
 	self:_setup_variations(unit, data)
