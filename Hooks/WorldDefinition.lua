@@ -245,6 +245,10 @@ end
 
 
 function WorldDef:_create_massunit(data, offset)
+	if not data.file then
+		BeardLib:DevLog("[_create_massunit] Map is missing Massunit file! ")
+		return
+	end
 	local path = self:world_dir() .. data.file
 
 	if data and data.preload_units then

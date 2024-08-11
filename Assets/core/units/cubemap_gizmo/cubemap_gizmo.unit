@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
-<unit name="cubemap_gizmo" type="environment" slot="10">
+<unit name="cubemap_gizmo" type="environment" slot="19">
   <object file="core/units/cubemap_gizmo/cubemap_gizmo" />
   <movers />
   <dependencies />
   <extensions>
-    <extension name="unit_data" class="ScriptUnitData" >
-	</extension>
+    <extension name="unit_data" class="ScriptUnitData">
+      <var name="only_exists_in_editor" value="true" />
+    </extension>
   </extensions>
   <sounds>
     <default_soundsource />

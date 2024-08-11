@@ -9,7 +9,8 @@ function WData:init(parent, menu)
         sound = SoundLayerEditor:new(self), 
         portal = PortalLayerEditor:new(self),
         ai = AiLayerEditor:new(self),
-        brush = BrushLayerEditor:new(self),
+        --Disabled until massunits are figured out
+        --brush = BrushLayerEditor:new(self),
     }
 end
 

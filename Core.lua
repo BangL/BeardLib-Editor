@@ -17,7 +17,10 @@ function BLE:Init()
 
 	self.PrefabsDirectory = Path:CombineDir(BeardLib.config.maps_dir, "prefabs")
 	self.ElementsDir = Path:CombineDir(self.MapClassesDir, "Elements")
-    self.HasFix = not FileIO:Exists("mods/saves/BLEDisablePhysicsFix") --and FileIO:Exists(self.ModPath.."supermod.xml")
+    self.HasFix = not FileIO:Exists("mods/saves/BLEDisablePhysicsFix")
+    if self.HasFix then
+        Application:set_force_editor_physics_bodies(true)
+    end
     self.UsableAssets = {"unit", "effect", "environment", "scene"}
 
     Hooks:Add("MenuUpdate", "BeardLibEditorMenuUpdate", ClassClbk(BLE, "Update"))

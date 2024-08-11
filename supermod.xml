@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<!-- Causes RAID to crash on launch.
-<mod>
-	<tweak definition="physics.xml" />
-    <wren>
-        <init file="PhysicsPatcher"/>
-    </wren>
-	<native_module platform="mswindows" filename="Tools/lfs_sblt.dll" />
-</mod>-->
