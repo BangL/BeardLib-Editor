@@ -691,13 +691,13 @@ function WorldDef:make_unit(data, offset)
 		else
 			local failed = false
 			if not PackageManager:has(unit_ids, Idstring(name)) then
-				if blt.asset_db.has_file(name, "unit") then
-					table.insert(self._werent_loaded, name)
-					managers.editor.parts.assets:quick_load_from_db("unit", name)
-				else
+				--if blt.asset_db.has_file(name, "unit") then
+				--	table.insert(self._werent_loaded, name)
+				--	managers.editor.parts.assets:quick_load_from_db("unit", name)
+				--else
 					failed = true
 					table.insert(self._failed_to_load, name)
-				end
+				--end
 			end
 			if not failed then
 				unit = CoreUnit.safe_spawn_unit(name, data.position, data.rotation)

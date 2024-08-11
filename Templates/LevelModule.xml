@@ -1,11 +1,7 @@
-<level ai_group_type="america" id="map" max_bags="54">
-	<packages/>
-	<assets>
-		<asset name="ammo_bag"/>
-		<asset name="health_bag"/>
-		<asset name="grenade_crate"/>
-		<asset name="bodybags_bag"/>
-	</assets>
+<level id="map" max_bags="54">
+	<packages>
+		<value_node value="levels/instances/germany/sto/sto_vehicle/editor_only/editor_only"/>
+	</packages>
 	<script_data_mods directory="scriptdata">
 		<mod replacement="objectives.objective" replacement_type="custom_xml" target_ext="objective" target_path="gamedata/objectives">
 			<options merge_mode="add" mode="add"/>
