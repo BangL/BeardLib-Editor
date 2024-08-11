@@ -730,7 +730,7 @@ function WorldDef:assign_unit_data(unit, data)
 	if unit:unit_data().helper_type and unit:unit_data().helper_type ~= "none" then
 		--managers.helper_unit:add_unit(unit, unit:unit_data().helper_type)
 	end
-	self:_setup_lights(unit, data)
+	-- self:_setup_lights(unit, data)
 	self:_setup_variations(unit, data)
 	self:_setup_editable_gui(unit, data)
 	self:add_trigger_sequence(unit, data.triggers)
@@ -748,7 +748,7 @@ function WorldDef:assign_unit_data(unit, data)
 	self:_setup_ladder(unit, data)
 	self:_setup_zipline(unit, data)
 	self:_project_assign_unit_data(unit, data)
-	self:_setup_cubemaps(unit, data)
+	-- self:_setup_cubemaps(unit, data)
 end
 
 function WorldDef:_setup_unit_id(unit, data)
