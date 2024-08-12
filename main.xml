@@ -132,6 +132,7 @@
     	<hook source_file="lib/network/matchmaking/networkmatchmakingsteam" file="NetworkMatchMakingSteam.lua"/>
     	<hook source_file="lib/tweak_data/levelstweakdata" file="Fixes.lua"/>
     	<hook source_file="lib/managers/jobmanager" file="Fixes.lua"/>
+        <hook source_file="lib/managers/menu/raid_menu/raidmenuscenemanager" file="Fixes.lua"/>
         <hook source_file="core/lib/managers/coreworldcameramanager" file="Fixes.lua"/>
         <hook source_file="core/lib/managers/mission/coreelementworldcamera" file="Fixes.lua"/>
         <hook source_file="lib/managers/group_ai_states/groupaistatebesiege" file="GroupAIStateBase.lua"/>

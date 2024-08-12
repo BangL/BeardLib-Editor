@@ -22,7 +22,6 @@ ItemExt.get_value = Item.Value
 ItemExt.set_value = Item.SetValue
 ItemExt.set_enabled = Item.SetEnabled
 ItemExt.set_visible = Item.SetVisible
-BeardLib:log("HELLO")
 ItemExt.DEFAULT_OFFSET = {BLE.Options:GetValue("BoxesXOffset"), BLE.Options:GetValue("BoxesYOffset")}
 ItemExt.ITEMS_OFFSET = {BLE.Options:GetValue("ItemsXOffset"), BLE.Options:GetValue("ItemsYOffset")}
 local SIZE = BLE.Options:GetValue("MapEditorFontSize")

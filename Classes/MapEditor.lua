@@ -96,7 +96,7 @@ function Editor:init(data)
     self._toggle_trigger = BeardLib.Utils.Input:GetTriggerData(tostring(BLE.Options:GetValue("Input/ToggleMapEditor")))
     local normal = not self._safemode
     self._menu = MenuUI:new({
-        layer = 100,
+        layer = -100,
         scroll_speed = BLE.Options:GetValue("Scrollspeed"),
         allow_full_input = true,
         highlight_image = true,

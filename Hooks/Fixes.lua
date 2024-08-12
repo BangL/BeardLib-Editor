@@ -166,4 +166,12 @@ elseif F == "coreworldcameramanager" then
 			key.roll = key.roll or 0
 		end
 	end
+elseif F == "raidmenuscenemanager" then
+	Hooks:PostHook(RaidMenuSceneManager, "close_menu", "EditorHideHUD", function(self)
+		if not managers.editor and not managers.editor:enabled() then
+			return
+		else
+			managers.hud:set_disabled()
+		end
+	end)
 end
