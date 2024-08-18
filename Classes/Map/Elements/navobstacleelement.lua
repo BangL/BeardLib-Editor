@@ -50,7 +50,7 @@ end
 
 function EditorNavObstacle:update_selected()
 	for _, obstacle in pairs(self._element.values.obstacle_list) do
-		local unit = managers.worlddefinition:get_unit(obstacle.unit_id)
+		local unit = managers.worlddefinition:get_unit_by_id(obstacle.unit_id)
 		if alive(unit) then
 			self:draw_link({
 				from_unit = self._unit,

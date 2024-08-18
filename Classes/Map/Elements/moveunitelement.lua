@@ -10,7 +10,7 @@ end
 
 function EditorMoveUnit:update_selected()
 	for _, id in pairs(self._element.values.unit_ids) do
-		local unit = managers.worlddefinition:get_unit(id)
+		local unit = managers.worlddefinition:get_unit_by_id(id)
 		if alive(unit) then
 			self:draw_link({
 				from_unit = self._unit,
@@ -165,7 +165,7 @@ end
 
 function EditorRotateUnit:update_selected()
 	for _, id in pairs(self._element.values.unit_ids) do
-		local unit = managers.worlddefinition:get_unit(id)
+		local unit = managers.worlddefinition:get_unit_by_id(id)
 		if alive(unit) then
 			self:draw_link({
 				from_unit = self._unit,

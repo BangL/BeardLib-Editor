@@ -34,7 +34,7 @@ end
 function EditorTimer:update_selected(t, dt)
     if self._element.values.digital_gui_unit_ids then
         for _, id in ipairs(self._element.values.digital_gui_unit_ids) do
-			local unit = managers.worlddefinition:get_unit(id)
+			local unit = managers.worlddefinition:get_unit_by_id(id)
             if alive(unit) then
                 self:draw_link(
                     {

@@ -826,7 +826,7 @@ function Static:select_group(editor_group)
     self._selected_group = editor_group
     self:build_positions_items(false)
     for _, unit_id in pairs(editor_group.units) do
-        local unit = managers.worlddefinition:get_unit(unit_id)
+        local unit = managers.worlddefinition:get_unit_by_id(unit_id)
         self:set_selected_unit(unit, true)
     end
 end
@@ -836,7 +836,7 @@ function Static:toggle_group_visibility(editor_group)
 
     editor_group.visible = not editor_group.visible
     for _, unit_id in pairs(editor_group.units) do
-        local unit = managers.worlddefinition:get_unit(unit_id)
+        local unit = managers.worlddefinition:get_unit_by_id(unit_id)
         if alive(unit) then unit:set_visible(editor_group.visible) end
     end
 end
@@ -1024,7 +1024,7 @@ function Static:set_selected_unit(unit, add, skip_menu, skip_recalc)
                         if group.units then
                             if table.contains(group.units, unit:unit_data().unit_id) then
                                 for _, unit_id in pairs(group.units) do
-                                    local u = managers.worlddefinition:get_unit(unit_id)
+                                    local u = managers.worlddefinition:get_unit_by_id(unit_id)
                                     if alive(u) and not table.contains(units, u) then
                                         table.insert(units, u)
                                     end

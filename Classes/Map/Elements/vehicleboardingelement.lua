@@ -44,7 +44,7 @@ end
 
 function EditorVehicleBoarding:set_vehicle()
     local id = self._element.values.vehicle
-    local vehicle_unit = managers.worlddefinition:get_unit(id)
+    local vehicle_unit = managers.worlddefinition:get_unit_by_id(id)
     if self._vehicle_unit == vehicle_unit then
 		return
     end
@@ -148,7 +148,7 @@ end
 
 function EditorVehicleBoarding:vehicle_unit()
 	if not self._vehicle_unit or self._vehicle_unit:unit_data().unit_id ~= self._element.values.vehicle then
-		self._vehicle_unit = managers.worlddefinition:get_unit(self._element.values.vehicle)
+		self._vehicle_unit = managers.worlddefinition:get_unit_by_id(self._element.values.vehicle)
 	end
 
 	return self._vehicle_unit

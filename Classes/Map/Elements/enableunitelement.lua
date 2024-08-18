@@ -11,7 +11,7 @@ function EditorEnableUnit:get_units()
     end
     self._units = {}
     for _, unit_id in pairs(self._element.values.unit_ids) do
-        local unit = managers.worlddefinition:get_unit(unit_id)
+        local unit = managers.worlddefinition:get_unit_by_id(unit_id)
         if alive(unit) then
             table.insert(self._units, unit)
         end

@@ -195,7 +195,7 @@ function MissionScriptEditor:update_draw_units(draw)
 			id = id[draw.id_key]
 		end
 		if type(id) == "number" then
-			local unit = managers.worlddefinition:get_unit(id)
+			local unit = managers.worlddefinition:get_unit_by_id(id)
 			if alive(unit) then
 				draw.units[unit:unit_data().unit_id] = unit
 			else
@@ -650,7 +650,7 @@ end
 
 function MissionScriptEditor:OpenUnitsManageDialog(params)
 	local units = World:find_units_quick("disabled", "all")
-	units = table.filter_list(units, function(unit)
+	units = BLE.Utils:filter_list(units, function(unit)
 		local ud = unit:unit_data()
 		if not ud then
 			return false

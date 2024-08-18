@@ -389,7 +389,7 @@ function Utils:ParseXml(typ, path, scriptdata)
         else
             return Node.from_xml(blt.asset_db.read_file(path, typ))
         end
-   --end]]--
+   end]]
 end
 
 function Utils:FilterList(a,b)
@@ -635,6 +635,18 @@ function Utils:HasAnyProjectionLight(unit)
         return nil
     end
     return self:HasProjectionLight(unit, "shadow_projection") or self:HasProjectionLight(unit, "projection")
+end
+
+function Utils:filter_list(t, func)
+	local res = {}
+
+	for _, value in pairs(t) do
+		if func(value) then
+			table.insert(res, value)
+		end
+	end
+
+	return res
 end
 
 function Utils:HasProjectionLight(unit, type)

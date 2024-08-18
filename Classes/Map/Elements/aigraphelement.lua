@@ -14,7 +14,7 @@ end
 
 function EditorAIGraph:update_selected(t, dt)
 	for _, id in pairs(self._element.values.graph_ids) do
-		local unit = managers.worlddefinition:get_unit(id)
+		local unit = managers.worlddefinition:get_unit_by_id(id)
 		if alive(unit) then
 			self:draw_link({
 				from_unit = self._unit,

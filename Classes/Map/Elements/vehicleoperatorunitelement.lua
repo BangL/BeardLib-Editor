@@ -26,7 +26,7 @@ function EditorVehicleOperator:draw_links()
 	EditorVehicleOperator.super.draw_links(self)
 
 	for _, id in pairs(self._element.values.elements) do
-		local unit = managers.worlddefinition:get_unit(id)
+		local unit = managers.worlddefinition:get_unit_by_id(id)
 		if alive(unit) then
 			self:draw_link({
 				g = 0.75,

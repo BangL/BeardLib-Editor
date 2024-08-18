@@ -161,7 +161,7 @@ function WData:build_groups_layer_menu()
                     end, nil, icons.eye, {enabled_alpha = editor_group.visible ~= nil and (editor_group.visible and 1 or 0.5) or 1})
 
                     for _, unit_id in pairs(editor_group.units) do
-                        local unit = managers.worlddefinition:get_unit(unit_id)
+                        local unit = managers.worlddefinition:get_unit_by_id(unit_id)
                         if alive(unit) then
                             group:button(tostring(unit_id), ClassClbk(self._parent, "select_unit", unit), {text = unit:unit_data().name_id  .. "(" .. tostring(unit_id) .. ")"})
                         end

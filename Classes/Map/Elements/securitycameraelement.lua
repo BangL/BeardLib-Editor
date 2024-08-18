@@ -31,7 +31,7 @@ end
 function EditorSecurityCamera:update_selected(t, dt)
 	Application:draw_cone(self._unit:position(), self._unit:position() + self._unit:rotation():y() * 75, 35, 1, 1, 1)
 
-	local unit = managers.worlddefinition:get_unit(self._element.values.camera_u_id)
+	local unit = managers.worlddefinition:get_unit_by_id(self._element.values.camera_u_id)
 	if alive(unit) then
 		self:draw_link({
 			g = 0.75,

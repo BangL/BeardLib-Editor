@@ -23,7 +23,7 @@ function EditorAccessCamera:get_unit()
     if not self._element.values.camera_u_id then
         return
     end
-	local unit = managers.worlddefinition:get_unit(self._element.values.camera_u_id)
+	local unit = managers.worlddefinition:get_unit_by_id(self._element.values.camera_u_id)
 	if alive(unit) then
 		self._camera_unit = unit
 	end

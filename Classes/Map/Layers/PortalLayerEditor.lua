@@ -138,7 +138,7 @@ function PortalLayer:update(t, dt)
     if self._holder:GetItemValue("HighlightUnitsInPortal") then
         if portal then
             for unit_id in pairs(portal._ids) do  
-                local unit = managers.worlddefinition:get_unit(unit_id)
+                local unit = managers.worlddefinition:get_unit_by_id(unit_id)
                 if alive(unit) then
                     Application:draw(unit, 1, 0, 0)
                 end
@@ -177,7 +177,7 @@ function PortalLayer:load_portal_units()
     --units:ClearItems()
     --if self._selected_portal then
     --    for unit_id, _ in pairs(self._selected_portal._ids) do
-    --        local unit = managers.worlddefinition:get_unit(unit_id)
+    --        local unit = managers.worlddefinition:get_unit_by_id(unit_id)
     --        if unit then
     --            local btn = units:button(unit_id, function() managers.editor:select_unit(unit) end, {text = string.format("%s[%s]", unit:unit_data().name_id, unit_id)})
     --            btn:tb_imgbtn("Remove", ClassClbk(self, "remove_unit_from_portal", unit, btn), nil, BLE.Utils.EditorIcons.cross, {highlight_color = Color.red})
@@ -192,7 +192,7 @@ function PortalLayer:manage_units(item)
     end
 
     local units = World:find_units_quick("disabled", "all")
-	units = table.filter_list(units, function(unit)
+	units = BLE.Utils:filter_list(units, function(unit)
 		local ud = unit:unit_data()
 		if not ud then
 			return false
@@ -226,7 +226,7 @@ function PortalLayer:clbk_manage_units(items)
         all_units[ud.unit_id] = data.unit
     end
     for unit_id, _ in pairs(self._selected_portal._ids) do
-        local unit = managers.worlddefinition:get_unit(unit_id)
+        local unit = managers.worlddefinition:get_unit_by_id(unit_id)
         all_units[unit_id] = not all_units[unit_id] and unit or nil
     end
 
@@ -428,7 +428,7 @@ function PortalLayer:toggle_units_visible(item)
 
     self._units_visible = not self._units_visible
     for unit_id, _ in pairs(self._selected_portal._ids) do
-        local unit = managers.worlddefinition:get_unit(unit_id)
+        local unit = managers.worlddefinition:get_unit_by_id(unit_id)
         if unit and alive(unit) then
             unit:set_enabled(self._units_visible)
         end
@@ -442,7 +442,7 @@ function PortalLayer:select_portalled_units(item)
 
     local select = {}
     for unit_id, _ in pairs(self._selected_portal._ids) do
-        local unit = managers.worlddefinition:get_unit(unit_id)
+        local unit = managers.worlddefinition:get_unit_by_id(unit_id)
         if unit and alive(unit) then
            table.insert(select, unit)
         end

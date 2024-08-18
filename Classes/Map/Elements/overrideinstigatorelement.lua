@@ -10,7 +10,7 @@ function EditorOverrideInstigator:_build_panel()
 end
 
 function EditorOverrideInstigator:update_selected(t, dt)
-    local unit = managers.worlddefinition:get_unit(self._element.values.unit_id)
+    local unit = managers.worlddefinition:get_unit_by_id(self._element.values.unit_id)
     if alive(unit) then
         self:draw_link({
             from_unit = unit,
