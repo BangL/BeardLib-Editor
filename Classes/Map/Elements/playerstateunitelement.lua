@@ -9,7 +9,8 @@ end
 function EditorPlayerState:_build_panel()
 	self:_create_panel()
 	self:ComboCtrl("state", mixin_add(managers.player:player_states(), {
-		"electrocution"
+		"electrocution",
+		"dead"
 	}), {help = "Select a state from the combobox"})
 	self:BooleanCtrl("use_instigator", {text = "On instigator"})
 	self:Text("Set the state the players should change to.")

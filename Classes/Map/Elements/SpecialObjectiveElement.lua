@@ -1,4 +1,4 @@
-EditorSpecialObjective = EditorSpecialObjective or class(MissionScriptEditor) --wip
+EditorSpecialObjective = EditorSpecialObjective or class(MissionScriptEditor) --wip (how long has this been wip also needs updating to u22)
 EditorSpecialObjective.INSTANCE_VAR_NAMES = {
 	{
 		type = "special_objective_action",
@@ -13,6 +13,7 @@ EditorSpecialObjective._AI_SO_types = {
 	"AI_idle",
 	"AI_escort",
 	"AI_sniper",
+    "AI_turret",
 	"AI_phalanx"
 }
 EditorSpecialObjective._enemies = {}

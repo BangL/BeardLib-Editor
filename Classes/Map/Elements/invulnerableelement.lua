@@ -11,6 +11,7 @@ function EditorInvulnerable:create_element(...)
 	self._element.class = "ElementInvulnerable"
 	self._element.values.invulnerable = true
 	self._element.values.immortal = false
+	self._element.values.apply_instigator = false
 	self._element.values.elements = {}
 end
 
@@ -37,5 +38,6 @@ function EditorInvulnerable:_build_panel()
 	self:BuildElementsManage("elements", nil, self.ELEMENT_FILTER)
 	self:BooleanCtrl("invulnerable")
 	self:BooleanCtrl("immortal")
+	self:BooleanCtrl("apply_instigator")
 	self:Text("Makes a unit invulnerable or immortal.")
 end

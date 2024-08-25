@@ -11,6 +11,7 @@ function EditorEnemyDummyTrigger:_build_panel()
 	self:_create_panel()
 	self:BuildElementsManage("elements", nil, self.ELEMENT_FILTER)
 	self:ComboCtrl("event", {
+		"marked",
 		"alerted",
 		"death",
 		"fire_death",

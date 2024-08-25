@@ -7,5 +7,5 @@ end
 
 function EditorSlowMotion:_build_panel()
 	self:_create_panel()
-	self:ComboCtrl("eff_name", table.map_keys(tweak_data.timespeed.mission_effects), {help = "Choose effect for slow motion"})
+	self:ComboCtrl("eff_name", table.map_keys(tweak_data.timespeed), {help = "Choose effect. Descriptions in lib/TimeSpeedEffectTweakData.lua"})
 end

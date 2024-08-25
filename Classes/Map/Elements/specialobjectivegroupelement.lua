@@ -47,8 +47,8 @@ end
 
 function EditorSpecialObjectiveGroup:_build_panel()
 	self:_create_panel()
-	self:ComboCtrl("mode", {"randomizer","forced_spawn","recurring_cloaker_spawn","recurring_spawn_1"}, {
-		help = "Randomizer: assigns SOs to instigators. Forced Spawn: Will spawn a new group of choice. Recurring: Spawns new group. After failure, a new group will be spawned with a delay."
+	self:ComboCtrl("mode", {"randomizer","patrol_group", "forced_spawn","recurring_cloaker_spawn","recurring_spawn_1"}, {
+		help = "Randomizer: assigns SOs to instigators. PATROL GROUP: Assigns random SO in a way that will repeat the same path from this group. Forced Spawn: Will spawn a new group of choice. Recurring: Spawns new group. After failure, a new group will be spawned with a delay."
 	})
 	self:BooleanCtrl("use_instigator")
 	self:NumberCtrl("base_chance", {min = 0, max = 1, floats = 2, help = "Used to specify chance to happen (1==absolutely!)"})
