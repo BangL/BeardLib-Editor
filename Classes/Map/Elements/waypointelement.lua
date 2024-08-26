@@ -49,11 +49,19 @@ EditorWaypoint._icon_options = {
 	"raid_wp_wait",
 	"raid_prisoner"
 }
-
+EditorWaypoint._map_display_options = {
+	"point",
+	"square",
+	"circle"
+}
 function EditorWaypoint:create_element()
 	self.super.create_element(self)
 	self._element.class = "ElementWaypoint"	
-	self._element.values.icon = "pd2_goto"
+	self._element.values.map_display = "point"
+	self._element.values.width = 100
+	self._element.values.depth = 100
+	self._element.values.radius = 150
+	self._element.values.icon = "map_waypoint_pov_in"
 	self._element.values.text_id = "debug_none"
 	self._element.values.only_in_civilian = false	
 end
@@ -73,8 +81,12 @@ function EditorWaypoint:_build_panel()
 	self:_create_panel()
 	self:BooleanCtrl("only_in_civilian", {help = "This waypoint will only be visible for players that are in civilian mode"})
 	self:BooleanCtrl("only_on_instigator", {help = "This waypoint will only be visible for the player that triggers it"})
+	self:ComboCtrl("map_display", self._map_display_options, {help = "Select a map display type", free_typing = true})
 	self:ComboCtrl("icon", self._icon_options, {help = "Select an icon", free_typing = true})
 	self:StringCtrl("text_id")
+	self:NumberCtrl("width", {help = "If map display type is \"square,\" this specifies the width of the element on the map (in pixels)."})
+	self:NumberCtrl("depth", {help = "If map display type is \"square,\" this specifies the depth of the element on the map (in pixels)."})
+	self:NumberCtrl("radius", {help = "If map display type is \"circle,\" this specifies the radius of the element on the map (in pixels)."})
 	self._text = self._class_group:divider("")
 	self:_set_text()
 	self:Info("You can use any id from HudIconsTweakData as a waypoint icon if you type them in.")

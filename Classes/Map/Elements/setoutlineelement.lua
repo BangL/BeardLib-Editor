@@ -5,8 +5,8 @@ function EditorSetOutline:create_element()
 	self._element.class = "ElementSetOutline"
 	self._element.values.elements = {}
 	self._element.values.set_outline = true
-	self._element.values.use_instigator = false
-	self._element.values.clear_previous = false
+	self._element.values.outline_type = "highlight_character"
+	self._element.values.instigator_only = false
 end
 function EditorSetOutline:_build_panel()
 	self:_create_panel()
@@ -17,6 +17,5 @@ function EditorSetOutline:_build_panel()
 	self:BuildElementsManage("elements", nil, self.ELEMENT_FILTER)
 	self:BooleanCtrl("set_outline", {text = "Enable outline"})
 	self:ComboCtrl("outline_type", ContourExt.indexed_types)
-	self:BooleanCtrl("use_instigator", {text = "Instigator only"})
-	self:BooleanCtrl("clear_previous", {text = "Clear previous outlines"})
+	self:BooleanCtrl("instigator_only", {text = "Outline Instigator only"})
 end
