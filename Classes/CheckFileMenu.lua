@@ -161,7 +161,7 @@ function CheckFileMenu:DoCheckFile(file)
 end
 
 function CheckFileMenu:Load(data)
-    self._last_dir = data.last_dir or "assets/mod_overrides/"
+    self._last_dir = data.last_dir or "mods/"
 end
 
 function CheckFileMenu:OpneFileBrowser(folder_browser)
