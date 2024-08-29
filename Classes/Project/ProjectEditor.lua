@@ -167,7 +167,7 @@ function ProjectEditor:set_data_callback()
     local new_name = name_item:Value()
     local title = "Project Name"
     if data.id ~= new_name then
-        if new_name == "" or (data.orig_id ~= new_name and BeardLib.managers.MapFramework._loaded_mods[new_name]) then
+        if new_name == "" or (data.orig_id ~= new_name and BeardLib.Frameworks.Map._loaded_mods[new_name]) then
             title = title .. "[!]"
         else
             data.name = new_name
@@ -212,7 +212,7 @@ function ProjectEditor:reload_mod(old_name, new_name)
     new_name = new_name or self._data.orig_id
 
     BLE.MapProject:reload_mod(old_name)
-    BLE.MapProject:select_project(BeardLib.managers.MapFramework._loaded_mods[new_name])
+    BLE.MapProject:select_project(BeardLib.Frameworks.Map._loaded_mods[new_name])
 end
 
 --- Closes the previous module, if open.

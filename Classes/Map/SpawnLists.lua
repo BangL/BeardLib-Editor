@@ -185,7 +185,7 @@ end
 
 function InstanceSpawnList:do_search_list()
     self._filtered = {}
-    for _, path in pairs(table.merge(BLE.Utils:GetEntries({type = "world"}), table.map_keys(BeardLib.managers.MapFramework._loaded_instances))) do
+    for _, path in pairs(table.merge(BLE.Utils:GetEntries({type = "world"}), table.map_keys(BeardLib.Frameworks.Map._loaded_instances))) do
         if path:match("levels/instances") and self:check_search(path) then
             self:insert_item_to_filtered_list({name = path:gsub("levels/instances/", ""), object = path, fav_id = path})
         end

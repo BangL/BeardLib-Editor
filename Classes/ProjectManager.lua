@@ -198,7 +198,7 @@ end
 --- @return table
 function ProjectManager:get_projects_list()
     local list = {}
-    for _, mod in pairs(BeardLib.managers.MapFramework._loaded_mods) do
+    for _, mod in pairs(BeardLib.Frameworks.Map._loaded_mods) do
         table.insert(list, {name = mod._clean_config.name, mod = mod})
     end
     return list
@@ -270,22 +270,22 @@ end
 --- Reloads a mod by unloading it and letting BeardLib load it again.
 --- @param mod_name string
 function ProjectManager:reload_mod(mod_name)
-    local mod = BeardLib.managers.MapFramework:GetModByName(mod_name)
+    local mod = BeardLib.Frameworks.Map:GetModByName(mod_name)
     if mod and mod._modules then
         for _, module in pairs(mod._modules) do
             module.Registered = false
         end
     end
-    BeardLib.managers.MapFramework:RemoveMod(mod_name)
+    BeardLib.Frameworks.Map:RemoveMod(mod_name)
     self:load_mods(mod_name)
 end
 
 --- Loads BeardLib mods again (MapFramework).
 function ProjectManager:load_mods(mod_name)
-    BeardLib.managers.MapFramework:Load()
-    BeardLib.managers.MapFramework:RegisterHooks()
+    BeardLib.Frameworks.Map:Load()
+    BeardLib.Frameworks.Map:RegisterHooks()
     if mod_name then
-        BeardLib.managers.MapFramework:GetModByName(mod_name):PreInitModules(true) --this is a mess
+        BeardLib.Frameworks.Map:GetModByName(mod_name):PreInitModules(true) --this is a mess
     end
     BLE.LoadLevel:load_levels()
 end
@@ -310,7 +310,7 @@ function ProjectManager:create_new_map_dialog(clbk)
         text = "",
         check_value = function(name)
             local warn
-            for k in pairs(BeardLib.managers.MapFramework._loaded_mods) do
+            for k in pairs(BeardLib.Frameworks.Map._loaded_mods) do
                 if string.lower(k) == name:lower() then
                     warn = string.format("A project with the id %s already exists! Please use a unique id", k)
                 end
@@ -343,7 +343,7 @@ function ProjectManager:create_new_map_clean(name)
     FileIO:MakeDir(Path:Combine(path, "levels"))
     FileIO:WriteTo(Path:Combine(path, "main.xml"), FileIO:ConvertToScriptData(data, CXML, true))
     self:load_mods()
-    self:select_project(BeardLib.managers.MapFramework._loaded_mods[name])
+    self:select_project(BeardLib.Frameworks.Map._loaded_mods[name])
 end
 
 --- Creates a new map project

@@ -118,7 +118,7 @@ function LoadLevelMenu:do_load_levels()
 	end
 
 	if custom then
-		for path, instance in pairs(BeardLib.managers.MapFramework._loaded_instances) do
+		for path, instance in pairs(BeardLib.Frameworks.Map._loaded_instances) do
 			local id = instance._config.id
 			path = path:gsub("levels/", ""):gsub("/world", "")
 			levels:button(path, ClassClbk(self, "load_level"), {text = path, instance = true})

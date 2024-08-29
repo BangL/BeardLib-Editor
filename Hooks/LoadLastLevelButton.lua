@@ -53,7 +53,7 @@ function BLTNotificationsGui:mouse_pressed(o, button, x, y)
             local data = BLE.Options:GetValue("LastLoaded")
             if data and data.name then
                 -- Why one place we levels/../world and in other we don't? Honestly dunno right now lol
-                if tweak_data.levels[data.name] or (data.instance and BeardLib.managers.MapFramework._loaded_instances["levels/"..data.name.."/world"]) then
+                if tweak_data.levels[data.name] or (data.instance and BeardLib.Frameworks.Map._loaded_instances["levels/"..data.name.."/world"]) then
                     BLE.LoadLevel:load_level(data)
                 else
                     BeardLib.Managers.Dialog:Simple():Show({title = managers.localization:text("mod_assets_error"), message = "Level \"" .. data.name .. "\" not found.", force = true})
