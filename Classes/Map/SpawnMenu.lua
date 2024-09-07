@@ -162,7 +162,7 @@ function SpawnMenu:SpawnInstance(instance, instance_data, spawn)
             instance_name = instance_name .. (i < 10 and "00" or i < 100 and "0" or "") .. i
         end
 
-        local module_data = BeardLib.managers.MapFramework._loaded_instances[instance]
+        local module_data = BeardLib.Frameworks.Map._loaded_instances[instance]
         local index_size = module_data and module_data._config.index_size or self:Val("InstanceIndexSize")
 
         if not managers.mission:script(instance_data.script) then

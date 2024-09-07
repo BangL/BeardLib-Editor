@@ -29,7 +29,7 @@ function ProjectInstanceEditor:build_menu(menu, data)
 end
 
 function ProjectInstanceEditor:create(create_data)
-    local instances = table.map_keys(BeardLib.managers.MapFramework._loaded_instances)
+    local instances = table.map_keys(BeardLib.Frameworks.Map._loaded_instances)
     BLE.InputDialog:Show({
         title = "Enter a name for the instance",
         yes = "Create",
@@ -87,7 +87,7 @@ end
 --- The callback function for all items for this menu.
 function ProjectInstanceEditor:set_data_callback()
     local data = self._data
-    local instances = table.map_keys(BeardLib.managers.MapFramework._loaded_instances)
+    local instances = table.map_keys(BeardLib.Frameworks.Map._loaded_instances)
 
     local name_item = self:GetItem("InstanceID")
     local new_name = name_item:Value()

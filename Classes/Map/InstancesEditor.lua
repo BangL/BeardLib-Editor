@@ -80,7 +80,7 @@ end
 function Instance:set_menu_unit(unit)
     self:build_editor_menu()
     local instance = unit:object()
-    local custom = BeardLib.managers.MapFramework._loaded_instances[instance.folder] and true or false
+    local custom = BeardLib.Frameworks.Map._loaded_instances[instance.folder] and true or false
     self:GetItem("Name"):SetValue(instance.name, false, true)
     self:GetItem("Instance"):SetValue(instance.folder, false, true)
     self:GetItem("MissionPlaced"):SetValue(instance.mission_placed)

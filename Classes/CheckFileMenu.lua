@@ -86,12 +86,6 @@ function CheckFileMenu:DoCheckFile(file)
     local assets_dir
     if mod and mod.AddFiles then
         assets_dir = Path:CombineDir(mod.ModPath, mod.AddFiles._config.directory)
-    elseif BeardLib.Frameworks.add.add_configs then
-        for path, _ in pairs(BeardLib.Frameworks.add.add_configs) do
-            if file:find(path, 1, true) ~= nil then
-                assets_dir = path
-            end
-        end
     end
 
     if not assets_dir then
@@ -161,7 +155,7 @@ function CheckFileMenu:DoCheckFile(file)
 end
 
 function CheckFileMenu:Load(data)
-    self._last_dir = data.last_dir or "assets/mod_overrides/"
+    self._last_dir = data.last_dir or "mods/"
 end
 
 function CheckFileMenu:OpneFileBrowser(folder_browser)
