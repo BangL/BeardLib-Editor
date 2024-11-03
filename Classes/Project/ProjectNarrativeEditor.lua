@@ -21,7 +21,7 @@ end
 
 local EU = BLE.Utils
 local XML = BeardLib.Utils.XML
-local DIFFS = {"Normal", "Hard", "Very Hard", "Overkill", "Mayhem", "Death Wish", "Death Sentence"}
+local DIFFS = {"Easy", "Normal", "Hard", "Very Hard"}
 
 --- @param menu ProjectEditor
 --- @param data table

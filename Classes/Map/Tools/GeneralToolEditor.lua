@@ -1,14 +1,11 @@
 GeneralToolEditor = GeneralToolEditor or class(ToolEditor)
 
-local difficulty_ids = {"normal", "hard", "overkill", "overkill_145", "easy_wish", "overkill_290", "sm_wish"}
+local difficulty_ids = {"difficulty_1", "difficulty_2", "difficulty_3", "difficulty_4"}
 local difficulty_loc = {
-	"menu_difficulty_normal",
-	"menu_difficulty_hard",
-	"menu_difficulty_very_hard",
-	"menu_difficulty_overkill",
-	"menu_difficulty_easy_wish",
-	"menu_difficulty_apocalypse",
-	"menu_difficulty_sm_wish"
+	"menu_difficulty_1",
+	"menu_difficulty_2",
+	"menu_difficulty_3",
+	"menu_difficulty_4"
 }
 
 local GenTool = GeneralToolEditor
@@ -90,7 +87,7 @@ end
 
 function GenTool:set_difficulty(item) 
     local difficulty = item:Value()
-    Global.game_settings.difficulty = difficulty_ids[difficulty] or "normal"
+    Global.game_settings.difficulty = difficulty_ids[difficulty] or "difficulty_2"
     tweak_data.character:init(tweak_data)
     tweak_data:set_difficulty()
 end
