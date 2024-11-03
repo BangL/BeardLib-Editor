@@ -20,7 +20,7 @@ Hooks:PostHook(GameSetup, "load_packages", "BeardLibEditorLoadPackages", functio
 		end
 	end
 	for i, difficulty in ipairs(tweak_data.difficulties) do
-		local diff_package = "packages/" .. (difficulty or "normal")
+		local diff_package = "packages/" .. (difficulty or "difficulty_2")
 		load_difficulty_package(diff_package)
 	end	
 end)

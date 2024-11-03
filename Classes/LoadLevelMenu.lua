@@ -1,14 +1,11 @@
 LoadLevelMenu = LoadLevelMenu or class()
 
-local difficulty_ids = {"normal", "hard", "overkill", "overkill_145", "easy_wish", "overkill_290", "sm_wish"}
+local difficulty_ids = {"difficulty_1", "difficulty_2", "difficulty_3", "difficulty_4"}
 local difficulty_loc = {
-	"menu_difficulty_normal",
-	"menu_difficulty_hard",
-	"menu_difficulty_very_hard",
-	"menu_difficulty_overkill",
-	"menu_difficulty_easy_wish",
-	"menu_difficulty_apocalypse",
-	"menu_difficulty_sm_wish"
+	"menu_difficulty_1",
+	"menu_difficulty_2",
+	"menu_difficulty_3",
+	"menu_difficulty_4"
 }
 
 function LoadLevelMenu:init(data)
@@ -268,7 +265,7 @@ function LoadLevelMenu:load_level(item)
         Global.game_settings.level_id = level_id
         Global.current_level_id = item.real_id or level_id
         Global.game_settings.mission = "none"
-		Global.game_settings.difficulty = difficulty_ids[difficulty] or "normal"
+		Global.game_settings.difficulty = difficulty_ids[difficulty] or "difficulty_2"
 		--Global.game_settings.one_down = one_down
         Global.game_settings.world_setting = nil
         self:start_the_game()

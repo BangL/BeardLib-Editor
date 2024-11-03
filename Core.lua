@@ -195,7 +195,7 @@ function BLE:InitManagers(data)
             table.insert(self.ConstPackages, prefix .. tostring(dlc_package) .. sufix)
         end
         for i, difficulty in ipairs(tweak_data.difficulties) do
-            table.insert(self.ConstPackages, "packages/" .. (difficulty or "normal"))
+            table.insert(self.ConstPackages, "packages/" .. (difficulty or "difficulty_2"))
         end
         for path, _ in pairs(self.Utils.core_units) do
             if Global.DBPaths and  Global.DBPaths.unit then
