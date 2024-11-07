@@ -3,3 +3,4 @@
 *.log
 version.txt
 Tools/massunit.massunit
+Data/
