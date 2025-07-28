@@ -15,8 +15,8 @@ end
 function EditorStatisticsJobs:_build_panel()
 	self:_create_panel()
 	local job_list = {}
-	for job, data in pairs(tweak_data.narrative.jobs) do
-		if not data.wrapped_to_job and table.contains(tweak_data.narrative:get_jobs_index(), job) then
+	for job, data in pairs(tweak_data.operations.missions) do
+		if not data.wrapped_to_job and table.contains(tweak_data.operations:get_raids_index(), job) then
 			table.insert(job_list, job)
 		end
 	end

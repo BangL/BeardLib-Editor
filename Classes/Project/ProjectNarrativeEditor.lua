@@ -4,7 +4,7 @@ ProjectNarrativeEditor = ProjectNarrativeEditor or class(ProjectModuleEditor)
 ProjectEditor.EDITORS.narrative = ProjectNarrativeEditor
 ProjectEditor.ACTIONS["CloneHeist"] = function(parent, create_data)
     local levels = {}
-    for id, narr in pairs(tweak_data.narrative.jobs) do
+    for id, narr in pairs(tweak_data.operations.missions) do
         if not narr.custom and not narr.hidden then
             --dunno why the name_id is nil for some of them..
             table.insert(levels, {name = id.." / " .. managers.localization:text((narr.name_id or ("heist_"..id)):gsub("_prof", ""):gsub("_night", "")), id = id})
@@ -32,8 +32,8 @@ function ProjectNarrativeEditor:build_menu(menu, data)
     menu:textbox("NarrativeID", up, data.id)
 
     local divgroup_opt = {border_position_below_title = true, private = {size = 22}}
-    local contacts = table.map_keys(tweak_data.narrative.contacts)
-    menu:combobox("Contact", up, contacts, table.get_key(contacts, data.contact or "custom"))
+    -- local contacts = table.map_keys(tweak_data.narrative.contacts)
+    -- menu:combobox("Contact", up, contacts, table.get_key(contacts, data.contact or "custom"))
     menu:textbox("BriefingEvent", up, data.briefing_event)
     data.crimenet_callouts = type(data.crimenet_callouts) == "table" and data.crimenet_callouts or {data.crimenet_callouts}
     data.debrief_event = type(data.debrief_event) == "table" and data.debrief_event or {data.debrief_event}
@@ -131,7 +131,7 @@ function ProjectNarrativeEditor:create(create_data)
         text = create_data.name or "",
         check_value = function(name)
             local warn
-            for k in pairs(tweak_data.narrative.jobs) do
+            for k in pairs(tweak_data.operations.missions) do
                 if string.lower(k) == name:lower() then
                     warn = string.format("A narrative with the id %s already exists! Please use a unique id", k)
                 end
@@ -157,7 +157,7 @@ function ProjectNarrativeEditor:create(create_data)
             template.id = name
 
             if create_data.clone_id then
-                table.merge(template, deep_clone(tweak_data.narrative.jobs[create_data.clone_id]))
+                table.merge(template, deep_clone(tweak_data.operations.missions[create_data.clone_id]))
                 local cv = template.contract_visuals
                 local preview = cv and cv.preview_image
                 if preview then
@@ -402,7 +402,7 @@ function ProjectNarrativeEditor:set_data_callback()
                 exists = true
             end
         end
-        if exists or new_name == "" or (data.orig_id ~= new_name and tweak_data.narrative.jobs[new_name]) then
+        if exists or new_name == "" or (data.orig_id ~= new_name and tweak_data.operations.missions[new_name]) then
             title = title .. "[Invalid]"
         else
             data.id = new_name
@@ -438,8 +438,8 @@ function ProjectNarrativeEditor:save_data()
     local narr = self._data
     local orig_id = narr.orig_id or narr.id -- Narrative ID has been changed, let's delete the old ID.
     if orig_id ~= narr.id then
-        tweak_data.narrative.jobs[orig_id] = nil
-        table.delete(tweak_data.narrative._jobs_index, orig_id)
+        tweak_data.operations.missions[orig_id] = nil
+        table.delete(tweak_data.operations._raids_index, orig_id)
 
         local af = self._parent:get_module_by_meta("AddFiles")
         local icon = Path:Combine(self._parent:get_dir(), af and af.directory or "assets", "guis/textures/mods/icons", "narr_")

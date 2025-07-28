@@ -366,7 +366,7 @@ end
 --- Creates a new map project by cloning
 function ProjectManager:create_new_cloned_map()
     local levels = {}
-    for id, narr in pairs(tweak_data.narrative.jobs) do
+    for id, narr in pairs(tweak_data.operations.missions) do
         if not narr.custom and not narr.hidden then
             --dunno why the name_id is nil for some of them..
             table.insert(levels, {name = id.." / " .. managers.localization:text((narr.name_id or ("heist_"..id)):gsub("_prof", ""):gsub("_night", "")), id = id})
@@ -400,10 +400,10 @@ function ProjectManager:delete_project(mod)
     BLE.Utils:YesNoQuestion("This will delete the project and its files completely. This cannot be undone!", function()
         BLE.Utils:YesNoQuestion("Are you 100% sure?", function()
             FileIO:Delete(Path:Combine("Maps", self._current_data.name))
-            local narr = tweak_data.narrative.jobs[mod.Name]
+            local narr = tweak_data.operations.missions[mod.Name]
             if narr and narr.custom then
-                tweak_data.narrative.jobs[mod.Name] = nil
-                table.delete(tweak_data.narrative._jobs_index, mod.Name)
+                tweak_data.operations.missions[mod.Name] = nil
+                table.delete(tweak_data.operations._raids_index, mod.Name)
             end
             for _, level in pairs(XML:GetNodes(self._current_data, "level")) do
                 local tweak = tweak_data.levels[level.id]

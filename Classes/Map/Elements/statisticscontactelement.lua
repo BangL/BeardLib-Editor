@@ -12,14 +12,14 @@ function EditorStatisticsContact:create_element()
 end
 function EditorStatisticsContact:_build_panel()
 	self:_create_panel()
-	local contact_list = {}
-	for contact, _ in pairs(tweak_data.narrative.contacts) do
-		if contact ~= "wip" and contact ~= "tests" then
-			table.insert(contact_list, contact)
-		end
-	end
-	table.sort(contact_list)
-	self:ComboCtrl("contact", contact_list, {help = "Select the required contact"})
+	-- local contact_list = {}
+	-- for contact, _ in pairs(tweak_data.narrative.contacts) do
+	-- 	if contact ~= "wip" and contact ~= "tests" then
+	-- 		table.insert(contact_list, contact)
+	-- 	end
+	-- end
+	-- table.sort(contact_list)
+	-- self:ComboCtrl("contact", contact_list, {help = "Select the required contact"})
 	local states = {
 		"started",
 		"started_dropin",
