@@ -12,7 +12,7 @@ function DebugTool:build_menu()
     local ai = self._holder:group("AI")
     ai:tickbox("AIEnabled", ClassClbk(self, "set_ai_enabled"), true, {help = "Sets whenever AI can be present. Removes every spawned AI if disabled."})
     --ai:button("Select AI", function() self._selecting = true end, {text = "Select AI for debugging"})
-    ai:button("SpawnPhalanx", ClassClbk(self, "spawn_phalanx"), {text = "Force Spawn Phalanx"})
+    -- ai:button("SpawnPhalanx", ClassClbk(self, "spawn_phalanx"), {text = "Force Spawn Phalanx"})
 
     local draw = self._holder:group("Drawing", groups_opt)
     draw:tickbox("Tasks", ClassClbk(self, "draw_group_ai"), false, {text = "Group AI Tasks", size_by_text = true})
@@ -293,30 +293,30 @@ function DebugTool:set_script_debug(item)
     managers.mission:set_persistent_debug_enabled(value > 1)
 end
 
-function DebugTool:spawn_phalanx(item)
-    local groupai = managers.groupai:state()
+-- function DebugTool:spawn_phalanx(item)
+--     local groupai = managers.groupai:state()
 
-    if groupai._phalanx_spawn_group then
-        BLE.Dialog:Show({title = "Can't spawn phalanx", message = "The captain is already alive!", force = true})
-		return
-	end
+--     if groupai._phalanx_spawn_group then
+--         BLE.Dialog:Show({title = "Can't spawn phalanx", message = "The captain is already alive!", force = true})
+-- 		return
+-- 	end
 
-    if not groupai._phalanx_center_pos then
-        BLE.Dialog:Show({title = "Can't spawn phalanx", message = "The captain cannot spawn without an active Special Objective set to the \"AI_phalanx\" action!", force = true})
-        return
-	end
+--     if not groupai._phalanx_center_pos then
+--         BLE.Dialog:Show({title = "Can't spawn phalanx", message = "The captain cannot spawn without an active Special Objective set to the \"AI_phalanx\" action!", force = true})
+--         return
+-- 	end
     
-    groupai:_spawn_phalanx()
+--     groupai:_spawn_phalanx()
 
-    if not groupai._phalanx_spawn_group then
-        BLE.Dialog:Show({title = "Can't spawn phalanx", message = "The captain cannot spawn without an active Enemy Group set to the \"Phalanx\" group type!", force = true})
-		return
-	end
+--     if not groupai._phalanx_spawn_group then
+--         BLE.Dialog:Show({title = "Can't spawn phalanx", message = "The captain cannot spawn without an active Enemy Group set to the \"Phalanx\" group type!", force = true})
+-- 		return
+-- 	end
 
-    if table.size(groupai._flee_points) == 0 then
-        BLE.Dialog:Show({title = "No flee points!", message = "The level is missing active flee points, the captain will not be able to leave!", force = true})
-    end
-end
+--     if table.size(groupai._flee_points) == 0 then
+--         BLE.Dialog:Show({title = "No flee points!", message = "The level is missing active flee points, the captain will not be able to leave!", force = true})
+--     end
+-- end
 
 
 function DebugTool:draw_group_ai(item) managers.groupai:state():set_debug_draw_state(item:Value()) end

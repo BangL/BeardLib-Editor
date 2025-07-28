@@ -218,90 +218,90 @@ function HUDCombatDebug:build_menu()
 		layer = background:layer() + 1
 	})
 	self._current_phase_timer = 0
-	self._phase_number_val = self._combat_debug_panel:text({
-		name = "combat_debug_phase_number_val",
-		vertical = "top",
-		text = "0",
-		align = "right",
-		blend_mode = "normal",
-		visible = true,
-		x = -10,
-		color = Color(0.2, 0.7529411764705882, 0.9372549019607843),
-		font = self._default_font,
-		font_size = self._default_font_size,
-		y = phase_number:y(),
-		layer = background:layer() + 1
-	})
-	self._spawned_phase_val = self._combat_debug_panel:text({
-		name = "combat_debug_phase_enemies_spawned_val",
-		vertical = "top",
-		text = "0",
-		align = "right",
-		blend_mode = "normal",
-		visible = true,
-		x = -10,
-		color = Color(0.3058823529411765, 0.6745098039215687, 0.23137254901960785),
-		font = self._default_font,
-		font_size = self._default_font_size,
-		y = spawned_phase:y(),
-		layer = background:layer() + 1
-	})
-	self._killed_phase_val = self._combat_debug_panel:text({
-		name = "combat_debug_phase_enemies_killed_val",
-		vertical = "top",
-		text = "0",
-		align = "right",
-		blend_mode = "normal",
-		visible = true,
-		x = -10,
-		color = Color(0.2980392156862745, 0.796078431372549, 0.2823529411764706),
-		font = self._default_font,
-		font_size = self._default_font_size,
-		y = killed_phase:y(),
-		layer = background:layer() + 1
-	})
-	self._spawned_lifetime_val = self._combat_debug_panel:text({
-		name = "combat_debug_lifetime_enemies_spawned_val",
-		vertical = "top",
-		text = "0",
-		align = "right",
-		blend_mode = "normal",
-		visible = true,
-		x = -10,
-		color = Color(0.7137254901960784, 0.2627450980392157, 0.7411764705882353),
-		font = self._default_font,
-		font_size = self._default_font_size,
-		y = spawned_lifetime:y(),
-		layer = background:layer() + 1
-	})
-	self._killed_lifetime_val = self._combat_debug_panel:text({
-		name = "combat_debug_lifetime_enemies_killed_val",
-		vertical = "top",
-		text = "0",
-		align = "right",
-		blend_mode = "normal",
-		visible = true,
-		x = -10,
-		color = Color(0.8509803921568627, 0.3568627450980392, 0.8823529411764706),
-		font = self._default_font,
-		font_size = self._default_font_size,
-		y = killed_lifetime:y(),
-		layer = background:layer() + 1
-	})
-	self._enemies_alive_val = self._combat_debug_panel:text({
-		name = "combat_debug_enemies_alive_val",
-		vertical = "top",
-		text = "0",
-		align = "right",
-		blend_mode = "normal",
-		visible = true,
-		x = -10,
-		color = Color(0.8823529411764706, 0.3568627450980392, 0.3568627450980392),
-		font = self._default_font,
-		font_size = self._default_font_size,
-		y = enemies_alive:y(),
-		layer = background:layer() + 1
-	})
+	-- self._phase_number_val = self._combat_debug_panel:text({
+	-- 	name = "combat_debug_phase_number_val",
+	-- 	vertical = "top",
+	-- 	text = "0",
+	-- 	align = "right",
+	-- 	blend_mode = "normal",
+	-- 	visible = true,
+	-- 	x = -10,
+	-- 	color = Color(0.2, 0.7529411764705882, 0.9372549019607843),
+	-- 	font = self._default_font,
+	-- 	font_size = self._default_font_size,
+	-- 	y = phase_number:y(),
+	-- 	layer = background:layer() + 1
+	-- })
+	-- self._spawned_phase_val = self._combat_debug_panel:text({
+	-- 	name = "combat_debug_phase_enemies_spawned_val",
+	-- 	vertical = "top",
+	-- 	text = "0",
+	-- 	align = "right",
+	-- 	blend_mode = "normal",
+	-- 	visible = true,
+	-- 	x = -10,
+	-- 	color = Color(0.3058823529411765, 0.6745098039215687, 0.23137254901960785),
+	-- 	font = self._default_font,
+	-- 	font_size = self._default_font_size,
+	-- 	y = spawned_phase:y(),
+	-- 	layer = background:layer() + 1
+	-- })
+	-- self._killed_phase_val = self._combat_debug_panel:text({
+	-- 	name = "combat_debug_phase_enemies_killed_val",
+	-- 	vertical = "top",
+	-- 	text = "0",
+	-- 	align = "right",
+	-- 	blend_mode = "normal",
+	-- 	visible = true,
+	-- 	x = -10,
+	-- 	color = Color(0.2980392156862745, 0.796078431372549, 0.2823529411764706),
+	-- 	font = self._default_font,
+	-- 	font_size = self._default_font_size,
+	-- 	y = killed_phase:y(),
+	-- 	layer = background:layer() + 1
+	-- })
+	-- self._spawned_lifetime_val = self._combat_debug_panel:text({
+	-- 	name = "combat_debug_lifetime_enemies_spawned_val",
+	-- 	vertical = "top",
+	-- 	text = "0",
+	-- 	align = "right",
+	-- 	blend_mode = "normal",
+	-- 	visible = true,
+	-- 	x = -10,
+	-- 	color = Color(0.7137254901960784, 0.2627450980392157, 0.7411764705882353),
+	-- 	font = self._default_font,
+	-- 	font_size = self._default_font_size,
+	-- 	y = spawned_lifetime:y(),
+	-- 	layer = background:layer() + 1
+	-- })
+	-- self._killed_lifetime_val = self._combat_debug_panel:text({
+	-- 	name = "combat_debug_lifetime_enemies_killed_val",
+	-- 	vertical = "top",
+	-- 	text = "0",
+	-- 	align = "right",
+	-- 	blend_mode = "normal",
+	-- 	visible = true,
+	-- 	x = -10,
+	-- 	color = Color(0.8509803921568627, 0.3568627450980392, 0.8823529411764706),
+	-- 	font = self._default_font,
+	-- 	font_size = self._default_font_size,
+	-- 	y = killed_lifetime:y(),
+	-- 	layer = background:layer() + 1
+	-- })
+	-- self._enemies_alive_val = self._combat_debug_panel:text({
+	-- 	name = "combat_debug_enemies_alive_val",
+	-- 	vertical = "top",
+	-- 	text = "0",
+	-- 	align = "right",
+	-- 	blend_mode = "normal",
+	-- 	visible = true,
+	-- 	x = -10,
+	-- 	color = Color(0.8823529411764706, 0.3568627450980392, 0.3568627450980392),
+	-- 	font = self._default_font,
+	-- 	font_size = self._default_font_size,
+	-- 	y = enemies_alive:y(),
+	-- 	layer = background:layer() + 1
+	-- })
 	self._music_state_val = self._combat_debug_panel:text({
 		name = "combat_debug_music_state_val",
 		vertical = "top",
@@ -356,53 +356,53 @@ function HUDCombatDebug:update(t, dt)
 
 	self._current_phase_duration_val:set_text(string.format("%.2d:%.2d:%.2d", curr_t / 3600, curr_t / 60 % 60, curr_t % 60))
 
-    local phase_number = tostring(managers.groupai:state():get_assault_number())
+    -- local phase_number = tostring(managers.groupai:state():get_assault_number())
 
-	if self._phase_number_val:text() ~= phase_number then
-		self._phase_number_val:set_text(phase_number)
-		self._phase_number_val:stop()
-		self._phase_number_val:animate(callback(self, self, "_animate_change"), Color(0.2, 0.7529411764705882, 0.9372549019607843))
-	end
+	-- if self._phase_number_val:text() ~= phase_number then
+	-- 	self._phase_number_val:set_text(phase_number)
+	-- 	self._phase_number_val:stop()
+	-- 	self._phase_number_val:animate(callback(self, self, "_animate_change"), Color(0.2, 0.7529411764705882, 0.9372549019607843))
+	-- end
 
-    local spawned_phase = tostring(managers.groupai:state():enemies_spawned_in_current_assault())
+    -- local spawned_phase = tostring(managers.groupai:state():enemies_spawned_in_current_assault())
 
-	if self._spawned_phase_val:text() ~= spawned_phase then
-		self._spawned_phase_val:set_text(spawned_phase)
-		self._spawned_phase_val:stop()
-		self._spawned_phase_val:animate(callback(self, self, "_animate_change"), Color(0.3058823529411765, 0.6745098039215687, 0.23137254901960785))
-	end
+	-- if self._spawned_phase_val:text() ~= spawned_phase then
+	-- 	self._spawned_phase_val:set_text(spawned_phase)
+	-- 	self._spawned_phase_val:stop()
+	-- 	self._spawned_phase_val:animate(callback(self, self, "_animate_change"), Color(0.3058823529411765, 0.6745098039215687, 0.23137254901960785))
+	-- end
 
-	local killed_phase = tostring(managers.groupai:state():enemies_killed_in_current_assault())
+	-- local killed_phase = tostring(managers.groupai:state():enemies_killed_in_current_assault())
 
-	if self._killed_phase_val:text() ~= killed_phase then
-		self._killed_phase_val:set_text(killed_phase)
-		self._killed_phase_val:stop()
-		self._killed_phase_val:animate(callback(self, self, "_animate_change"), Color(0.2980392156862745, 0.796078431372549, 0.2823529411764706))
-	end
+	-- if self._killed_phase_val:text() ~= killed_phase then
+	-- 	self._killed_phase_val:set_text(killed_phase)
+	-- 	self._killed_phase_val:stop()
+	-- 	self._killed_phase_val:animate(callback(self, self, "_animate_change"), Color(0.2980392156862745, 0.796078431372549, 0.2823529411764706))
+	-- end
 
-	local spawned_lifetime = tostring(managers.groupai:state():enemies_spawned_lifetime())
+	-- local spawned_lifetime = tostring(managers.groupai:state():enemies_spawned_lifetime())
 
-	if self._spawned_lifetime_val:text() ~= spawned_lifetime then
-		self._spawned_lifetime_val:set_text(spawned_lifetime)
-		self._spawned_lifetime_val:stop()
-		self._spawned_lifetime_val:animate(callback(self, self, "_animate_change"), Color(0.7137254901960784, 0.2627450980392157, 0.7411764705882353))
-	end
+	-- if self._spawned_lifetime_val:text() ~= spawned_lifetime then
+	-- 	self._spawned_lifetime_val:set_text(spawned_lifetime)
+	-- 	self._spawned_lifetime_val:stop()
+	-- 	self._spawned_lifetime_val:animate(callback(self, self, "_animate_change"), Color(0.7137254901960784, 0.2627450980392157, 0.7411764705882353))
+	-- end
 
-	local kills_lifetime = tostring(managers.groupai:state():enemies_killed_lifetime())
+	-- local kills_lifetime = tostring(managers.groupai:state():enemies_killed_lifetime())
 
-	if self._killed_lifetime_val:text() ~= kills_lifetime then
-		self._killed_lifetime_val:set_text(kills_lifetime)
-		self._killed_lifetime_val:stop()
-		self._killed_lifetime_val:animate(callback(self, self, "_animate_change"), Color(0.8509803921568627, 0.3568627450980392, 0.8823529411764706))
-	end
+	-- if self._killed_lifetime_val:text() ~= kills_lifetime then
+	-- 	self._killed_lifetime_val:set_text(kills_lifetime)
+	-- 	self._killed_lifetime_val:stop()
+	-- 	self._killed_lifetime_val:animate(callback(self, self, "_animate_change"), Color(0.8509803921568627, 0.3568627450980392, 0.8823529411764706))
+	-- end
 
-	local enemies_alive = tostring(managers.groupai:state():enemies_in_level())
+	-- local enemies_alive = tostring(managers.groupai:state():enemies_in_level())
 
-	if self._enemies_alive_val:text() ~= enemies_alive then
-		self._enemies_alive_val:set_text(enemies_alive)
-		self._enemies_alive_val:stop()
-		self._enemies_alive_val:animate(callback(self, self, "_animate_change"), Color(0.8823529411764706, 0.3568627450980392, 0.3568627450980392))
-	end
+	-- if self._enemies_alive_val:text() ~= enemies_alive then
+	-- 	self._enemies_alive_val:set_text(enemies_alive)
+	-- 	self._enemies_alive_val:stop()
+	-- 	self._enemies_alive_val:animate(callback(self, self, "_animate_change"), Color(0.8823529411764706, 0.3568627450980392, 0.3568627450980392))
+	-- end
 
     local music_state = Global.music_manager.current_event or "none"
     music_state = music_state:gsub("music_heist_", "")
