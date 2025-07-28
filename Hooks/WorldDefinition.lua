@@ -90,7 +90,8 @@ function WorldDefinition:create(layer, offset)
 	if layer == "ai" or layer == "all" then
 		BLE:SetLoadingText("Creating AI layer")
 		if self._definition.ai_nav_graphs then
-			self:_load_ai_nav_graphs(self._definition.ai_nav_graphs, offset)
+			local path = self:world_dir() .. self._definition.ai_nav_graphs.file
+			self:_load_ai_nav_graphs(path, offset)
 			Application:cleanup_thread_garbage()
 		end
 
@@ -736,7 +737,7 @@ function WorldDef:assign_unit_data(unit, data)
 	end
 	-- self:_setup_lights(unit, data)
 	self:_setup_variations(unit, data)
-	self:_setup_editable_gui(unit, data)
+	-- self:_setup_editable_gui(unit, data)
 	self:add_trigger_sequence(unit, data.triggers)
 	self:_set_only_visible_in_editor(unit, data)
 	self:_setup_cutscene_actor(unit, data)
@@ -749,8 +750,8 @@ function WorldDef:assign_unit_data(unit, data)
 	self:_setup_disable_on_ai_graph(unit, data)
 	self:_add_to_portal(unit, data)
 	self:_setup_projection_light(unit, data)
-	self:_setup_ladder(unit, data)
-	self:_setup_zipline(unit, data)
+	-- self:_setup_ladder(unit, data)
+	-- self:_setup_zipline(unit, data)
 	self:_project_assign_unit_data(unit, data)
 	-- self:_setup_cubemaps(unit, data)
 end
