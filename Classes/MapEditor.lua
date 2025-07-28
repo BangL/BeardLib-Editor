@@ -71,7 +71,7 @@ function Editor:init(data)
 		2000,
 		10000
 	}
-    
+
     self._snap_rotations = {
 		1,
 		2,
@@ -94,8 +94,6 @@ function Editor:init(data)
 
     self:set_use_surface_move(BLE.Options:GetValue("Map/SurfaceMove"))
     self:check_has_fix()
-
-	self:_init_layer_classes()
 
     self._idstrings = {
         ["@ID4f01cba97e94239b@"] = "x",
@@ -1642,49 +1640,3 @@ end
 
 --Empty/Unused functions
 function Editor:register_message()end
-
-
-function Editor:_init_layer_classes()
-	self._layers = {}
-	self._current_layer = nil
-	self._mission_layer_name = "Mission"
-
-	self:add_layer("Brush", CoreBrushLayer.BrushLayer)
-	self:add_layer("Sound", CoreSoundLayer.SoundLayer)
-	self:add_layer("Mission", CoreMissionLayer.MissionLayer)
-	self:add_layer("Environment", CoreEnvironmentLayer.EnvironmentLayer)
-	self:add_layer("WorldCamera", CoreWorldCameraLayer.WorldCameraLayer)
-	self:add_layer("Portals", CorePortalLayer.PortalLayer)
-	self:add_layer("Wires", CoreWireLayer.WireLayer)
-	self:add_layer("Statics", CoreStaticsLayer.StaticsLayer)
-	self:add_layer("Dynamics", CoreDynamicsLayer.DynamicsLayer)
-	self:add_layer("Level Settings", CoreLevelSettingsLayer.LevelSettingsLayer)
-	self:add_layer("Instances", CoreInstancesLayer.InstancesLayer)
-
-	self._layer_load_order = {
-		"Ai",
-		"WorldCamera",
-		"Dynamics",
-		"Wires",
-		"Level Settings",
-		"Portals",
-		"Brush",
-		"Environment",
-		"Instances",
-		"Statics",
-		"Sound",
-		"Mission",
-	}
-end
-
-function Editor:add_layer(name, layer_class)
-	self._layers[name] = layer_class:new(self)
-end
-
-function Editor:layers()
-	return self._layers
-end
-
-function Editor:layer(name)
-	return self._layers[name]
-end

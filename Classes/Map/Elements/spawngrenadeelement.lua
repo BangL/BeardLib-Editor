@@ -34,7 +34,7 @@ end
 
 function EditorSpawnGrenade:_build_panel()
 	self:_create_panel()
-	self:ComboCtrl("grenade_type", table.map_keys(tweak_data.blackmarket.projectiles), {help = "Select what type of grenade will be spawned."})
+	self:ComboCtrl("grenade_type", table.map_keys(tweak_data.projectiles), {help = "Select what type of grenade will be spawned."})
 	self:NumberCtrl("strength", {floats = 1, help = "Use this to add a strength to a physic push on the spawned grenade"})
 	self:Text("Spawns a grenade.")
 end
