@@ -27,7 +27,7 @@ end
 
 function PortalUnitGroup:_change_units_visibility_in_editor(diff)
 	for _, unit in pairs(managers.worlddefinition._all_units) do
-		if self._ids and unit:unit_data() and self._ids[unit:unit_data().unit_id] then
+		if self._ids and unit and unit:unit_data() and self._ids[unit:unit_data().unit_id] then
 			self:_change_visibility(unit, diff)
 		end
 	end
