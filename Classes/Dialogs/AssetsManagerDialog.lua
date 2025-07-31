@@ -387,8 +387,7 @@ function AssetsManagerDialog:clean_add_xml()
 end
 
 function AssetsManagerDialog:db_has_asset(ext, asset)
-    --TODO: Fix when asset_db works
-    return false-- blt.asset_db.has_file(asset, ext)
+    return blt.asset_db.has_file(asset, ext)
 end
 
 function AssetsManagerDialog:quick_load_from_db(ext, asset, clbk, exclude, extra_info)
