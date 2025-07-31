@@ -368,25 +368,26 @@ end
 function BLE:GenerateBrushData()
     --Contains units that do not follow the pattern. To reduce the time it takes to search these units.
     local brush_units = {
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_3",
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_2",
-        "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_01",
-        "units/pd2_dlc_holly/mansion/vegetation/lxa_vegetation_bush_small/lxa_vegetation_bush_small_a",
-        "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_11",
-        "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_02",
-        "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_mix_medium",
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_7",
-        "units/world/props/nick/nick_speedrun",
-        "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_green_medium",
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_6",
-        "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_brown_medium",
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_4",
-        "units/pd2_dlc_jerry/terrain/jry_rock_03",
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_5",
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_1",
-        "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_08",
-        "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_06",
-        "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_05"
+        -- TODO: re-evaluate for raid
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_3",
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_2",
+        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_01",
+        -- "units/pd2_dlc_holly/mansion/vegetation/lxa_vegetation_bush_small/lxa_vegetation_bush_small_a",
+        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_11",
+        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_02",
+        -- "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_mix_medium",
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_7",
+        -- "units/world/props/nick/nick_speedrun",
+        -- "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_green_medium",
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_6",
+        -- "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_brown_medium",
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_4",
+        -- "units/pd2_dlc_jerry/terrain/jry_rock_03",
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_5",
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_1",
+        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_08",
+        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_06",
+        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_05"
     }
     for unit in pairs(BLE.DBPaths.unit) do
         if unit:match("brush") and blt.asset_db.has_file(unit, "unit") then
@@ -404,33 +405,50 @@ function BLE:GenerateBrushData()
     Global.Brushes = brush_units
 end
 
+local blacklisted = {
+    -- these two files crash the shit out of blt, no clue why
+    ['levels/instances/zone/tapping_telegraph_poles/world_sounds'] = true,
+    ['levels/instances/zone/vehicle_landmine_zone/world_sounds'] = true,
+}
+
 --Gets all emitters and occasionals from extracted .world_sounds
 function BLE:GenerateSoundData()
     local sounds = {}
-    for _, file in pairs(self.DBPaths.world_sounds) do
-        local data = self.Utils:ParseXml("world_sounds", file, true)
-        if not table.contains(sounds, data.default_ambience) then
-            table.insert(sounds, data.default_ambience)
-        end
-        if not table.contains(sounds, data.default_occasional) then
-            table.insert(sounds, data.default_occasional)
-        end
-        for _, v in pairs(data.sound_area_emitters) do
-            if not table.contains(sounds, v.emitter_event) then
-                table.insert(sounds, v.emitter_event)
+    for file in pairs(self.DBPaths.world_sounds) do
+        local data
+        if blt.asset_db.has_file(file, "world_sounds") and not blacklisted[file] then
+            -- log("ATTEMPTING TO READ: " .. tostring(file))
+            -- blt.flush_log()
+            if blt.asset_db.read_file(file, "world_sounds") then
+                data = self.Utils:ParseXml("world_sounds", file, true)
             end
         end
-        for _, v in pairs(data.sound_emitters) do
-            if not table.contains(sounds, v.emitter_event) then
-                table.insert(sounds, v.emitter_event)
+        if data and (type(data) == 'table') then
+            if not table.contains(sounds, data.default_ambience) then
+                table.insert(sounds, data.default_ambience)
             end
-        end
-        for _, v in pairs(data.sound_environments) do
-            if not table.contains(sounds, v.ambience_event) then
-                table.insert(sounds, v.ambience_event)
+            if data.default_occasional then
+                if not table.contains(sounds, data.default_occasional) then
+                    table.insert(sounds, data.default_occasional)
+                end
             end
-            if not table.contains(sounds, v.occasional_event) then
-                table.insert(sounds, v.occasional_event)
+            for _, v in pairs(data.sound_area_emitters) do
+                if not table.contains(sounds, v.emitter_event) then
+                    table.insert(sounds, v.emitter_event)
+                end
+            end
+            for _, v in pairs(data.sound_emitters) do
+                if not table.contains(sounds, v.emitter_event) then
+                    table.insert(sounds, v.emitter_event)
+                end
+            end
+            for _, v in pairs(data.sound_environments) do
+                if not table.contains(sounds, v.ambience_event) then
+                    table.insert(sounds, v.ambience_event)
+                end
+                if not table.contains(sounds, v.occasional_event) then
+                    table.insert(sounds, v.occasional_event)
+                end
             end
         end
     end
