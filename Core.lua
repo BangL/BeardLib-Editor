@@ -405,23 +405,13 @@ function BLE:GenerateBrushData()
     Global.Brushes = brush_units
 end
 
-local blacklisted = {
-    -- these two files crash the shit out of blt, no clue why
-    ['levels/instances/zone/tapping_telegraph_poles/world_sounds'] = true,
-    ['levels/instances/zone/vehicle_landmine_zone/world_sounds'] = true,
-}
-
 --Gets all emitters and occasionals from extracted .world_sounds
 function BLE:GenerateSoundData()
     local sounds = {}
     for file in pairs(self.DBPaths.world_sounds) do
         local data
-        if blt.asset_db.has_file(file, "world_sounds") and not blacklisted[file] then
-            -- log("ATTEMPTING TO READ: " .. tostring(file))
-            -- blt.flush_log()
-            if blt.asset_db.read_file(file, "world_sounds") then
-                data = self.Utils:ParseXml("world_sounds", file, true)
-            end
+        if blt.asset_db.has_file(file, "world_sounds") and blt.asset_db.read_file(file, "world_sounds") then
+            data = self.Utils:ParseXml("world_sounds", file, true)
         end
         if data and (type(data) == 'table') then
             if not table.contains(sounds, data.default_ambience) then
