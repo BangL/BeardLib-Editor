@@ -2,6 +2,7 @@ HUDCombatDebug = HUDCombatDebug or class()
 
 function HUDCombatDebug:init()
     self._is_shown = false
+	self._current_phase_timer = 0
 end
 
 function HUDCombatDebug:build_menu()
