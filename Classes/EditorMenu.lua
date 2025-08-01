@@ -52,7 +52,7 @@ function EditorMenu:Load(data)
 end
 
 function EditorMenu:Destroy()
-    BeardLib.managers.dialog:CloseDialog(self)
+    BeardLib.Managers.Dialog:CloseDialog(self)
     self._main_menu:Destroy()
     return {last_page = self._current_page, opened = self._enabled}
 end
@@ -108,10 +108,10 @@ function EditorMenu:set_enabled(enabled)
         return
     end
     local in_editor = managers.editor and game_state_machine:current_state_name() == "editor"
-    local opened = BeardLib.managers.dialog:DialogOpened(self)
+    local opened = BeardLib.Managers.Dialog:DialogOpened(self)
     if enabled then
         if not opened then
-            BeardLib.managers.dialog:ShowDialog(self)
+            BeardLib.Managers.Dialog:ShowDialog(self)
             self._main_menu:Enable()
             if in_editor then
                 managers.editor._enabled = false
@@ -119,7 +119,7 @@ function EditorMenu:set_enabled(enabled)
         end
         self._enabled = true
     elseif opened then
-        BeardLib.managers.dialog:CloseDialog(self)
+        BeardLib.Managers.Dialog:CloseDialog(self)
         self._main_menu:Disable()
         if in_editor then
             managers.editor._enabled = true

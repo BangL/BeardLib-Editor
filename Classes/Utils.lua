@@ -470,7 +470,7 @@ function Utils:GetPackages(asset, type, size_needed, first, packages)
     local found_packages = {}
     for name, package in pairs(packages or BLE.DBPackages) do
         if not name:begins("all_") and package[type] and package[type][asset] then
-            local custom = CustomPackageManager.custom_packages[name:key()] ~= nil
+            local custom = BeardLib.Managers.Package.custom_packages[name:key()] ~= nil
             local package_size = not custom and size_needed and self:GetPackageSize(name)
             if not size_needed or package_size or custom then
                 if not name:begins("all_") then

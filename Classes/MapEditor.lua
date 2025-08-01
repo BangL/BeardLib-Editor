@@ -1080,8 +1080,8 @@ function Editor:update(t, dt)
             end
             
             -- Check binds
-            local allowed = not BeardLib.managers.dialog:DialogOpened()
-            local not_focused = not (self._menu:Focused() or BeardLib.managers.dialog:Menu():Typing())
+            local allowed = not BeardLib.Managers.Dialog:DialogOpened()
+            local not_focused = not (self._menu:Focused() or BeardLib.Managers.Dialog:Menu():Typing())
             for _, trigger in pairs(self._triggers) do
                 if not_focused and (allowed or trigger.in_dialogs) and BeardLib.Utils.Input:IsTriggered(trigger, nil) then
                     trigger.clbk()
@@ -1200,7 +1200,7 @@ local v0 = Vector3()
 function Editor:update_camera(t, dt)
     local shft = shift()
     local move_flying = BLE.Options:GetValue("Map/OnlyMoveWhileFlying")
-    local move = not (self._menu:Focused() or BeardLib.managers.dialog:Menu():Focused() or self._camera_locked) and (not move_flying or shft and move_flying) 
+    local move = not (self._menu:Focused() or BeardLib.Managers.Dialog:Menu():Focused() or self._camera_locked) and (not move_flying or shft and move_flying) 
     if not move or not shft then
         managers.mouse_pointer:_activate()
     end

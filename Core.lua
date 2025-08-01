@@ -298,7 +298,7 @@ function BLE:LoadHashlist()
         Global.Brushes = self.Brushes
     end
     local script_data_types = clone(self._config.script_data_types)
-    for _, pkg in pairs(CustomPackageManager.custom_packages) do
+    for _, pkg in pairs(BeardLib.Managers.Package.custom_packages) do
         local id = pkg.id
         self.DBPackages[id] = self.DBPackages[id] or {}
         for _, type in pairs(table.list_add(script_data_types, {"unit", "texture", "movie", "effect", "scene"})) do
@@ -535,8 +535,8 @@ function BLE:LoadCustomAssetsToHashList(add, directory, package_id)
                     else
                         self:Err("Unit loaded with shortcuts (%s), but one of the dependencies don't exist! Directory: %s Path: %s", tostring(path), tostring(directory), tostring(dir))
                     end
-                elseif CustomPackageManager.TEXTURE_SHORTCUTS[typ] then
-                    for _, suffix in pairs(CustomPackageManager.TEXTURE_SHORTCUTS[typ]) do
+                elseif BeardLib.Managers.Package.TEXTURE_SHORTCUTS[typ] then
+                    for _, suffix in pairs(BeardLib.Managers.Package.TEXTURE_SHORTCUTS[typ]) do
                         self.DBPaths.texture[path..suffix] = true
                         if package_id then
                             local package = self.DBPackages[package_id]
