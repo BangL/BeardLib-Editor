@@ -374,9 +374,7 @@ function Utils:ParseXmlFromAssets(typ, path, scriptdata, assets_dir)
 end
 
 function Utils:ParseXml(typ, path, scriptdata)
-    --Need to figure out why asset_db causes crashes
-    --The answer is the bundles are different and doesn't work with the compression.
-    --[[if not blt.asset_db.has_file(path, typ) then
+    if not blt.asset_db.has_file(path, typ) then
         local asset = BeardLibFileManager:Get(typ, path)
         if asset and FileIO:Exists(asset.file) then
             return SystemFS:parse_xml(asset.file, "r")
@@ -387,7 +385,7 @@ function Utils:ParseXml(typ, path, scriptdata)
         else
             return Node.from_xml(blt.asset_db.read_file(path, typ))
         end
-   end]]
+   end
 end
 
 function Utils:FilterList(a,b)
@@ -472,7 +470,7 @@ function Utils:GetPackages(asset, type, size_needed, first, packages)
     local found_packages = {}
     for name, package in pairs(packages or BLE.DBPackages) do
         if not name:begins("all_") and package[type] and package[type][asset] then
-            local custom = CustomPackageManager.custom_packages[name:key()] ~= nil
+            local custom = BeardLib.Managers.Package.custom_packages[name:key()] ~= nil
             local package_size = not custom and size_needed and self:GetPackageSize(name)
             if not size_needed or package_size or custom then
                 if not name:begins("all_") then

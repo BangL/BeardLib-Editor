@@ -8,7 +8,8 @@ function RaidMainMenuGui:_list_menu_data_source(...)
         availability_flags = {
             RaidGUIItemAvailabilityFlag.IS_IN_MAIN_MENU
         },
-        text = managers.localization:text("BeardLibEditorMenu")
+        text = managers.localization:text("BeardLibEditorMenu"),
+        icon = "menu_item_skills"
     })
 
     return _list_items

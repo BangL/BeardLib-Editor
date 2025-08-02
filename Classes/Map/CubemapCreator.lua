@@ -209,9 +209,9 @@ function CubemapCreator:create_dome_occlusion(shape, res)
 	managers.editor:disable_all_post_effects(true)
 	self:viewport():vp():set_post_processor_effect("World", Idstring("depth_projection"), Idstring("render_dome_occ"))
 
-	self._aa_setting = managers.environment_controller:get_aa_setting()
-
-	managers.environment_controller:set_aa_setting("AA_off")
+	self._aa_setting = managers.user:get_setting("AA_setting")
+	-- FIXME: shouldnt we revert this at some point? i dont see the saved value being used anywhere
+	managers.environment_controller:set_AA_setting("off", self:viewport():vp())
 
 	local saved_environment = managers.viewport:default_environment()
 	local params = {

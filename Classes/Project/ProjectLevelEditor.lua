@@ -185,7 +185,7 @@ function ProjectLevelEditor:clone_level(create_data)
 
     --Search for the narrative package if exists, some levels may depend on it.
     local found_narr = false
---[[   for _, narr in pairs(tweak_data.narrative.jobs) do
+--[[   for _, narr in pairs(tweak_data.operations.missions) do
         if found_narr then
             break
         end

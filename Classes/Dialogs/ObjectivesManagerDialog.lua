@@ -6,7 +6,7 @@ function ObjectivesManagerDialog:init(params, menu)
         params = params and clone(params) or {}
     end
     params.scrollbar = false
-    menu = menu or BeardLib.managers.dialog:Menu()
+    menu = menu or BeardLib.Managers.Dialog:Menu()
     self._obj_info = menu:Menu(table.merge({
         name = "objinfo",
         visible = false,

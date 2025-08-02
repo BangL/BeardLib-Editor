@@ -13,6 +13,7 @@ EditorSpecialObjective._AI_SO_types = {
 	"AI_idle",
 	"AI_escort",
 	"AI_sniper",
+	"AI_spotter",
     "AI_turret",
 	"AI_phalanx"
 }

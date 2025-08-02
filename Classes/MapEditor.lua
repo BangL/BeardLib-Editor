@@ -1,5 +1,16 @@
 MapEditor = MapEditor or class()
 core:import("CoreEditorWidgets")
+core:import("CoreBrushLayer")
+core:import("CoreSoundLayer")
+core:import("CoreMissionLayer")
+core:import("CoreEnvironmentLayer")
+core:import("CoreWorldCameraLayer")
+core:import("CorePortalLayer")
+core:import("CoreWireLayer")
+core:import("CoreStaticsLayer")
+core:import("CoreDynamicsLayer")
+core:import("CoreLevelSettingsLayer")
+core:import("CoreInstancesLayer")
 
 local Editor = MapEditor
 local Utils = BLE.Utils
@@ -60,7 +71,7 @@ function Editor:init(data)
 		2000,
 		10000
 	}
-    
+
     self._snap_rotations = {
 		1,
 		2,
@@ -237,12 +248,12 @@ function Editor:_init_post_effects()
 		POSTFX_bloom = {
 			enable = true,
             on = function()
-                self._vp:vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), Idstring(managers.user:get_setting("light_adaption") and "default" or "no_light_adaption"))
-				self._vp:vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), Idstring("bloom_combine"))
+                -- self._vp:vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), Idstring(managers.user:get_setting("light_adaption") and "default" or "no_light_adaption"))
+				self._vp:vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), Idstring("bloom_DOF_combine"))
 				--self._vp:force_apply_feeders() Causes weird shaders
 			end,
 			off = function()
-				self._vp:vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), Idstring("empty"))
+				-- self._vp:vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), Idstring("empty"))
 				self._vp:vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), Idstring("bloom_combine_empty"))
 			end
 		},
@@ -1069,8 +1080,8 @@ function Editor:update(t, dt)
             end
             
             -- Check binds
-            local allowed = not BeardLib.managers.dialog:DialogOpened()
-            local not_focused = not (self._menu:Focused() or BeardLib.managers.dialog:Menu():Typing())
+            local allowed = not BeardLib.Managers.Dialog:DialogOpened()
+            local not_focused = not (self._menu:Focused() or BeardLib.Managers.Dialog:Menu():Typing())
             for _, trigger in pairs(self._triggers) do
                 if not_focused and (allowed or trigger.in_dialogs) and BeardLib.Utils.Input:IsTriggered(trigger, nil) then
                     trigger.clbk()
@@ -1189,7 +1200,7 @@ local v0 = Vector3()
 function Editor:update_camera(t, dt)
     local shft = shift()
     local move_flying = BLE.Options:GetValue("Map/OnlyMoveWhileFlying")
-    local move = not (self._menu:Focused() or BeardLib.managers.dialog:Menu():Focused() or self._camera_locked) and (not move_flying or shft and move_flying) 
+    local move = not (self._menu:Focused() or BeardLib.Managers.Dialog:Menu():Focused() or self._camera_locked) and (not move_flying or shft and move_flying) 
     if not move or not shft then
         managers.mouse_pointer:_activate()
     end
@@ -1629,4 +1640,3 @@ end
 
 --Empty/Unused functions
 function Editor:register_message()end
-

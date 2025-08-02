@@ -298,7 +298,7 @@ function BLE:LoadHashlist()
         Global.Brushes = self.Brushes
     end
     local script_data_types = clone(self._config.script_data_types)
-    for _, pkg in pairs(CustomPackageManager.custom_packages) do
+    for _, pkg in pairs(BeardLib.Managers.Package.custom_packages) do
         local id = pkg.id
         self.DBPackages[id] = self.DBPackages[id] or {}
         for _, type in pairs(table.list_add(script_data_types, {"unit", "texture", "movie", "effect", "scene"})) do
@@ -368,25 +368,26 @@ end
 function BLE:GenerateBrushData()
     --Contains units that do not follow the pattern. To reduce the time it takes to search these units.
     local brush_units = {
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_3",
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_2",
-        "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_01",
-        "units/pd2_dlc_holly/mansion/vegetation/lxa_vegetation_bush_small/lxa_vegetation_bush_small_a",
-        "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_11",
-        "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_02",
-        "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_mix_medium",
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_7",
-        "units/world/props/nick/nick_speedrun",
-        "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_green_medium",
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_6",
-        "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_brown_medium",
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_4",
-        "units/pd2_dlc_jerry/terrain/jry_rock_03",
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_5",
-        "units/world/architecture/secret_stash/props/secret_stash_props_trash_1",
-        "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_08",
-        "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_06",
-        "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_05"
+        -- TODO: re-evaluate for raid
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_3",
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_2",
+        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_01",
+        -- "units/pd2_dlc_holly/mansion/vegetation/lxa_vegetation_bush_small/lxa_vegetation_bush_small_a",
+        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_11",
+        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_02",
+        -- "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_mix_medium",
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_7",
+        -- "units/world/props/nick/nick_speedrun",
+        -- "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_green_medium",
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_6",
+        -- "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_brown_medium",
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_4",
+        -- "units/pd2_dlc_jerry/terrain/jry_rock_03",
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_5",
+        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_1",
+        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_08",
+        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_06",
+        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_05"
     }
     for unit in pairs(BLE.DBPaths.unit) do
         if unit:match("brush") and blt.asset_db.has_file(unit, "unit") then
@@ -407,30 +408,37 @@ end
 --Gets all emitters and occasionals from extracted .world_sounds
 function BLE:GenerateSoundData()
     local sounds = {}
-    for _, file in pairs(self.DBPaths.world_sounds) do
-        local data = self.Utils:ParseXml("world_sounds", file, true)
-        if not table.contains(sounds, data.default_ambience) then
-            table.insert(sounds, data.default_ambience)
+    for file in pairs(self.DBPaths.world_sounds) do
+        local data
+        if blt.asset_db.has_file(file, "world_sounds") and blt.asset_db.read_file(file, "world_sounds") then
+            data = self.Utils:ParseXml("world_sounds", file, true)
         end
-        if not table.contains(sounds, data.default_occasional) then
-            table.insert(sounds, data.default_occasional)
-        end
-        for _, v in pairs(data.sound_area_emitters) do
-            if not table.contains(sounds, v.emitter_event) then
-                table.insert(sounds, v.emitter_event)
+        if data and (type(data) == 'table') then
+            if not table.contains(sounds, data.default_ambience) then
+                table.insert(sounds, data.default_ambience)
             end
-        end
-        for _, v in pairs(data.sound_emitters) do
-            if not table.contains(sounds, v.emitter_event) then
-                table.insert(sounds, v.emitter_event)
+            if data.default_occasional then
+                if not table.contains(sounds, data.default_occasional) then
+                    table.insert(sounds, data.default_occasional)
+                end
             end
-        end
-        for _, v in pairs(data.sound_environments) do
-            if not table.contains(sounds, v.ambience_event) then
-                table.insert(sounds, v.ambience_event)
+            for _, v in pairs(data.sound_area_emitters) do
+                if not table.contains(sounds, v.emitter_event) then
+                    table.insert(sounds, v.emitter_event)
+                end
             end
-            if not table.contains(sounds, v.occasional_event) then
-                table.insert(sounds, v.occasional_event)
+            for _, v in pairs(data.sound_emitters) do
+                if not table.contains(sounds, v.emitter_event) then
+                    table.insert(sounds, v.emitter_event)
+                end
+            end
+            for _, v in pairs(data.sound_environments) do
+                if not table.contains(sounds, v.ambience_event) then
+                    table.insert(sounds, v.ambience_event)
+                end
+                if not table.contains(sounds, v.occasional_event) then
+                    table.insert(sounds, v.occasional_event)
+                end
             end
         end
     end
@@ -527,8 +535,8 @@ function BLE:LoadCustomAssetsToHashList(add, directory, package_id)
                     else
                         self:Err("Unit loaded with shortcuts (%s), but one of the dependencies don't exist! Directory: %s Path: %s", tostring(path), tostring(directory), tostring(dir))
                     end
-                elseif CustomPackageManager.TEXTURE_SHORTCUTS[typ] then
-                    for _, suffix in pairs(CustomPackageManager.TEXTURE_SHORTCUTS[typ]) do
+                elseif BeardLib.Managers.Package.TEXTURE_SHORTCUTS[typ] then
+                    for _, suffix in pairs(BeardLib.Managers.Package.TEXTURE_SHORTCUTS[typ]) do
                         self.DBPaths.texture[path..suffix] = true
                         if package_id then
                             local package = self.DBPackages[package_id]

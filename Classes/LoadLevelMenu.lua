@@ -189,7 +189,7 @@ function LoadLevelMenu:do_load_narratives()
 			})
 		end
 	end
-	for narr_id, narr in pairs(tweak_data.narrative.jobs) do
+	for narr_id, narr in pairs(tweak_data.operations.missions) do
         if not narr.hidden and ((narr.custom and custom) or (not narr.custom and vanilla)) then
             local txt = loc:text((narr.name_id or ("heist_"..narr_id:gsub("_prof", ""):gsub("_night", "")))) .." / " .. narr_id
             local texture, rect = nil, nil

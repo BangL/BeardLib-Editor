@@ -90,7 +90,8 @@ function WorldDefinition:create(layer, offset)
 	if layer == "ai" or layer == "all" then
 		BLE:SetLoadingText("Creating AI layer")
 		if self._definition.ai_nav_graphs then
-			self:_load_ai_nav_graphs(self._definition.ai_nav_graphs, offset)
+			local path = self:world_dir() .. self._definition.ai_nav_graphs.file
+			self:_load_ai_nav_graphs(path, offset)
 			Application:cleanup_thread_garbage()
 		end
 
@@ -691,13 +692,13 @@ function WorldDef:make_unit(data, offset)
 		else
 			local failed = false
 			if not PackageManager:has(unit_ids, Idstring(name)) then
-				--if blt.asset_db.has_file(name, "unit") then
-				--	table.insert(self._werent_loaded, name)
-				--	managers.editor.parts.assets:quick_load_from_db("unit", name)
-				--else
+				if blt.asset_db.has_file(name, "unit") then
+					table.insert(self._werent_loaded, name)
+					managers.editor.parts.assets:quick_load_from_db("unit", name)
+				else
 					failed = true
 					table.insert(self._failed_to_load, name)
-				--end
+				end
 			end
 			if not failed then
 				unit = CoreUnit.safe_spawn_unit(name, data.position, data.rotation)
@@ -734,9 +735,9 @@ function WorldDef:assign_unit_data(unit, data)
 	if unit:unit_data().helper_type and unit:unit_data().helper_type ~= "none" then
 		--managers.helper_unit:add_unit(unit, unit:unit_data().helper_type)
 	end
-	-- self:_setup_lights(unit, data)
+	self:_setup_lights(unit, data)
 	self:_setup_variations(unit, data)
-	self:_setup_editable_gui(unit, data)
+	-- self:_setup_editable_gui(unit, data)
 	self:add_trigger_sequence(unit, data.triggers)
 	self:_set_only_visible_in_editor(unit, data)
 	self:_setup_cutscene_actor(unit, data)
@@ -749,8 +750,8 @@ function WorldDef:assign_unit_data(unit, data)
 	self:_setup_disable_on_ai_graph(unit, data)
 	self:_add_to_portal(unit, data)
 	self:_setup_projection_light(unit, data)
-	self:_setup_ladder(unit, data)
-	self:_setup_zipline(unit, data)
+	-- self:_setup_ladder(unit, data)
+	-- self:_setup_zipline(unit, data)
 	self:_project_assign_unit_data(unit, data)
 	-- self:_setup_cubemaps(unit, data)
 end

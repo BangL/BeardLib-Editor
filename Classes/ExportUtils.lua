@@ -77,7 +77,7 @@ function Utils:AssetExists(ext, path, lang)
         end
     end
 
-    return false --blt.asset_db.has_file(path, ext, {language = lang}), FROM_DB
+    return blt.asset_db.has_file(path, ext, {language = lang}), FROM_DB
 end
 
 function Utils:ParseXml(ext, path, scriptdata)

@@ -18,7 +18,7 @@ function AssetsManagerDialog:init(params, menu)
     end
     self._exporter = BLE.Utils.Export:new()
 	params.scrollbar = false
-    menu = menu or BeardLib.managers.dialog:Menu()
+    menu = menu or BeardLib.Managers.Dialog:Menu()
     self._unit_info = menu:Menu(table.merge({
         name = "unitinfo",
         visible = false,
@@ -215,7 +215,7 @@ function AssetsManagerDialog:show_packages()
     if self._tbl._data then
         if level.packages then
             for i, package in pairs(level.packages) do
-                local custom = CustomPackageManager.custom_packages[package:key()] ~= nil
+                local custom = BeardLib.Managers.Package.custom_packages[package:key()] ~= nil
                 local size = not custom and BLE.Utils:GetPackageSize(package)
                 if size or custom then
                     local text = custom and string.format("%s(custom)", package, size) or string.format("%s(%.3fmb)", package, size)
@@ -387,8 +387,7 @@ function AssetsManagerDialog:clean_add_xml()
 end
 
 function AssetsManagerDialog:db_has_asset(ext, asset)
-    --TODO: Fix when asset_db works
-    return false-- blt.asset_db.has_file(asset, ext)
+    return blt.asset_db.has_file(asset, ext)
 end
 
 function AssetsManagerDialog:quick_load_from_db(ext, asset, clbk, exclude, extra_info)
@@ -468,7 +467,7 @@ function AssetsManagerDialog:_load_from_db(config, inc_in_proj, dontask, failed_
         end)
         local function save()
             project:save_xml(level._add_path, add)
-            CustomPackageManager:LoadPackageConfig(assets_dir, add, true)
+            BeardLib.Managers.Package:LoadPackageConfig(assets_dir, add, true)
             self:reload()
             if clbk then
                 clbk()
@@ -483,7 +482,7 @@ function AssetsManagerDialog:_load_from_db(config, inc_in_proj, dontask, failed_
                 warn = "This will copy the required files from your extract directory and add the files to your map assets (add.xml) proceed?"
             end
             BLE.Utils:YesNoQuestion(warn, save, function()
-                CustomPackageManager:UnloadPackageConfig(config)
+                BeardLib.Managers.Package:UnloadPackageConfig(config)
             end)
         else
             save()
