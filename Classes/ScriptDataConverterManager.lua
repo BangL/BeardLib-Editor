@@ -17,7 +17,7 @@ function SConverter:init()
         {path = "%userprofile%", name = "User Folder"},
         {path = "%userprofile%/Documents/", name = "Documents"},
         {path = "%userprofile%/Desktop/", name = "Desktop"},
-        {path = string.gsub(Application:base_path(), "\\", "/"), name = "PAYDAY 2 Directory"},
+        {path = string.gsub(Application:base_path(), "\\", "/"), name = "RAID WW2 Directory"},
         {path = BLE.Options:GetValue("LastConvertedFile") or "C:/", name = "Last Converted File"},
         {path = "C:/", name = "C Drive"},
         {path = "D:/", name = "D Drive"},
