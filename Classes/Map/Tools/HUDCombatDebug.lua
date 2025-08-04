@@ -324,7 +324,7 @@ function HUDCombatDebug:update(t, dt)
         self:build_menu()
     end
 
-    self._current_phase_timer = self._current_phase_timer + dt
+    self._current_phase_timer = 0 + dt
 
 	if self._is_shown == false or not self._combat_debug_panel then
 		return

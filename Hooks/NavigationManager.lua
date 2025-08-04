@@ -184,7 +184,7 @@ function NavigationManager:set_debug_draw_state(options)
                 	temp[k] = option.value
 				end
             end
-        end 
+        end
 
 		if table.size(temp) > 0 then
         	options = temp
@@ -208,8 +208,6 @@ function NavigationManager:build_complete_clbk(draw_options)
 		self._quad_field:clear_all()
 
 		local setup_data = {
-			quad_grid_size = nil,
-			sector_grid_size = nil,
 			quad_grid_size = self._grid_size,
 			sector_grid_size = self._sector_grid_size
 		}
@@ -280,7 +278,7 @@ function NavigationManager:_draw_nav_obstacles()
 			end
 		end
 	end
-end 
+end
 
 function NavigationManager:_refresh_data_from_builder()
 	self._rooms = self._builder._rooms
@@ -374,7 +372,6 @@ function NavigationManager:get_save_data()
 	log("load Data:")
 	log(tostring(self._load_data))
 	return ScriptSerializer:to_generic_xml(self._load_data or {
-		version = nil,
 		version = NavFieldBuilder._VERSION
 	})
 end
