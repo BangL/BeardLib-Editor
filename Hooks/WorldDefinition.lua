@@ -754,6 +754,18 @@ function WorldDef:assign_unit_data(unit, data)
 	-- self:_setup_zipline(unit, data)
 	self:_project_assign_unit_data(unit, data)
 	-- self:_setup_cubemaps(unit, data)
+
+	for _, extension in pairs(unit:extensions_infos()) do
+		if extension.setup_load then
+			extension:setup_load(data)
+		end
+	end
+
+	for _, extension in pairs(unit:extensions_infos()) do
+		if extension.on_load_complete then
+			extension:on_load_complete()
+		end
+	end
 end
 
 function WorldDef:_setup_unit_id(unit, data)
