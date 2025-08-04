@@ -1643,21 +1643,5 @@ function Editor:set_listener_active(active)
 	end
 end
 
-
--- function Editor:layer(name)
---     local fake_layers = {
---         ["Level Settings"] = {
---             get_setting = function(setting)
---                 if setting == "simulation_level_id" then
---                     return level_id
---                 else
---                     self:Log("game code requested unknown setting in layer \"Level Settings\": " .. tostring(setting))
---                 end
---             end
---         }
---     }
---     return fake_layers[name]
--- end
-
 --Empty/Unused functions
 function Editor:register_message()end
