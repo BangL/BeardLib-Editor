@@ -10,7 +10,6 @@ function ObjectivesManager:objectives_by_name()
     -- 		end
     -- 	end
     -- else
-    log("OOOOOF OOOOOF OOOOOF OOOOOF OOOOOF!!!!!")
     for name, _ in pairs(self._objectives) do
         table.insert(t, name)
     end
