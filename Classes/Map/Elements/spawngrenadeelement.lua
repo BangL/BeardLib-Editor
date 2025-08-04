@@ -2,7 +2,7 @@ EditorSpawnGrenade = EditorSpawnGrenade or class(MissionScriptEditor)
 function EditorSpawnGrenade:create_element()
 	self.super.create_element(self)
 	self._element.class = "ElementSpawnGrenade"
-	self._element.values.grenade_type = "frag"
+	self._element.values.grenade_type = "m24"
 	self._element.values.spawn_dir = Vector3(0, 0, 1)
 	self._element.values.strength = 1
 end

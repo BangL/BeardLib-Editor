@@ -138,6 +138,7 @@
         <hook source_file="lib/managers/menu/menucomponentmanager" file="LoadLastLevelButton.lua"/>
         <hook source_file="lib/managers/menu/raid_menu/raidmainmenugui" file="RaidMainMenuGui.lua"/>
         <hook source_file="lib/managers/objectivesmanager" file="ObjectivesManager.lua"/>
+        <hook source_file="lib/managers/gameplaycentralmanager" file="GamePlayCentralManager.lua"/>
     </Hooks>
     <Options build_menu="false" early_post_init="true">
         <options>                
