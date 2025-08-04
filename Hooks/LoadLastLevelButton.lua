@@ -1,4 +1,4 @@
-Hooks:PostHook(BLTNotificationsGui, "_setup", "BLESetup", function(self)
+Hooks:PostHook(BLTNotificationsGui, "_layout", "BLESetup", function(self)
     self._beardlib_editor_menu = self._beardlib_panel:bitmap({
         name = "BeardlibEditorMenu",
         texture = "textures/editor_icons_df",
@@ -6,6 +6,7 @@ Hooks:PostHook(BLTNotificationsGui, "_setup", "BLESetup", function(self)
         w = 28,
         h = 28,
         y = 8,
+        layer = 60,
         x = self._beardlib_achievements:right() + 4,
         color = self._beardlib_accent
     })
@@ -18,6 +19,7 @@ Hooks:PostHook(BLTNotificationsGui, "_setup", "BLESetup", function(self)
             w = 28,
             h = 28,
             y = 8,
+            layer = 60,
             x = self._beardlib_editor_menu:right() + 4,
             color = self._beardlib_accent
         })
