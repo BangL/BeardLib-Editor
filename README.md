@@ -2,12 +2,6 @@
 
 BeardLib-Editor is a tool that allows you to edit and create things like maps & environments.
 
-# !!!!!!!!!!!!!!!!!NOTICE ABOUT MATCHMAKING!!!!!!!!!!!!!!
-Matchmaking is **disabled** by default due to having to edit the physics settings of the game.
-Playing with people with said edit can cause issues if not everyone has the said fix.
-
-In order to enable matchmaking, you must disable the physics fix through the editor's options menu. Do note that without that fix, the editor will not work properly.
-
 ## Installation
 1. (Required for the massunits tool) https://dotnet.microsoft.com/download/dotnet/5.0/runtime Download the x64 version runtime.
 2. Install [RAID-SuperBLT](https://modworkshop.net/mod/49744)
