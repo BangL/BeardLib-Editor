@@ -467,7 +467,6 @@ function Options:save_nav_data(include, skip_restart)
     local typ = save_in_binary and "binary" or "generic_xml"
     if save_data then
         table.insert(include, {_meta = "nav_data", path = "nav_manager_data", script_data_type = typ})
-        --This sucks
         self:SaveData(path, "nav_manager_data.nav_data", save_in_binary and FileIO:ConvertToScriptData(FileIO:ConvertScriptData(save_data, "generic_xml"), typ) or save_data)
     else
         BLE.Utils:Notify("Save data is not ready yet")
