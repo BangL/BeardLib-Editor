@@ -223,8 +223,6 @@ function NavigationManager:build_complete_clbk(draw_options)
 	end
 	self:set_debug_draw_state(draw_options)
 	if self:is_data_ready() then
-		self._load_data = self:get_save_data()
-        local c = BLE.Utils:GetPart("opt")
         BLE:log("Navigation data Progress: Done!")
     end
 	if self._build_complete_clbk then
@@ -366,12 +364,4 @@ function NavigationManager:_draw_coarse_graph()
 			Application:draw_cone(pos, pos + cone_height, 40, unpack(color))
 		end
 	end
-end
-
-function NavigationManager:get_save_data()
-	log("load Data:")
-	log(tostring(self._load_data))
-	return ScriptSerializer:to_generic_xml(self._load_data or {
-		version = NavFieldBuilder._VERSION
-	})
 end

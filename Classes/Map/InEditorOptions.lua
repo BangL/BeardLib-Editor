@@ -455,9 +455,6 @@ function Options:SaveData(path, file_name, data)
         FileIO:MakeDir(path)
     end
     self._parent:Log("Saving script data '%s' in %s", file_name, path)
-    if file_name == "nav_manager_data.nav_data" then
-        --log(tostring(data))
-    end
     FileIO:WriteTo(Path:Combine(path, file_name), data)
 end
 
@@ -470,8 +467,6 @@ function Options:save_nav_data(include, skip_restart)
     local typ = save_in_binary and "binary" or "generic_xml"
     if save_data then
         table.insert(include, {_meta = "nav_data", path = "nav_manager_data", script_data_type = typ})
-        --This sucks
-        --log(tostring(save_data))
         self:SaveData(path, "nav_manager_data.nav_data", save_in_binary and FileIO:ConvertToScriptData(FileIO:ConvertScriptData(save_data, "generic_xml"), typ) or save_data)
     else
         BLE.Utils:Notify("Save data is not ready yet")
