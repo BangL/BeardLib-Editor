@@ -20,6 +20,11 @@ function Editor:init(data)
         PackageManager:load("core/packages/editor")
     end
 
+    if self:needs_fix() then
+        Application:set_force_editor_physics_bodies(true)
+        self._phys_fix_applied = true
+    end
+
     self._editor_active = false
     self._mapeditor = {}
     self.parts = {}
@@ -93,7 +98,6 @@ function Editor:init(data)
     self:_init_head_lamp()
 
     self:set_use_surface_move(BLE.Options:GetValue("Map/SurfaceMove"))
-    self:check_has_fix()
 
     self._idstrings = {
         ["@ID4f01cba97e94239b@"] = "x",
@@ -206,9 +210,7 @@ function Editor:post_init(menu)
     m.world:Switch()
 
     menu.mouse_move = ClassClbk(m.static, "mouse_moved")
-    if self._has_fix then
-        m.quick:toggle_widget("move")
-    end
+    m.quick:toggle_widget("move")
 
     TimerManager:pausable():set_multiplier(1)
 	TimerManager:game_animation():set_multiplier(1)
@@ -236,11 +238,12 @@ function Editor:animate_bg_fade()
     })
 end
 
-function Editor:check_has_fix()
+function Editor:needs_fix()
     local unit = World:spawn_unit(Idstring("core/units/move_widget/move_widget"), Vector3())
-    self._has_fix = World:raycast("ray", unit:position(), unit:position():with_z(100), "ray_type", "widget", "target_unit", unit) ~= nil
+    local result = World:raycast("ray", unit:position(), unit:position():with_z(100), "ray_type", "widget", "target_unit", unit) ~= nil
     unit:set_enabled(false)
     unit:set_slot(0)
+    return not result
 end
 
 function Editor:_init_post_effects()
@@ -820,6 +823,9 @@ function Editor:set_unit_visible(unit, visible)
 end
 
 function Editor:destroy()
+    if self._phys_fix_applied then
+        Application:set_force_editor_physics_bodies(false)
+    end
     local scroll_y_tbl = {}
     for name, manager in pairs(self.parts) do
         if alive(manager._holder) then
@@ -1637,6 +1643,21 @@ function Editor:set_listener_active(active)
 	end
 end
 
+
+-- function Editor:layer(name)
+--     local fake_layers = {
+--         ["Level Settings"] = {
+--             get_setting = function(setting)
+--                 if setting == "simulation_level_id" then
+--                     return level_id
+--                 else
+--                     self:Log("game code requested unknown setting in layer \"Level Settings\": " .. tostring(setting))
+--                 end
+--             end
+--         }
+--     }
+--     return fake_layers[name]
+-- end
 
 --Empty/Unused functions
 function Editor:register_message()end

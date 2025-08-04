@@ -37,16 +37,16 @@ function QuickAccess:init(parent, menu)
         {name = "IgnoreFirstRaycast", rect = icons.ignore_raycast, offset = reversed and 0, help = "Ignore First Raycast"},
         {name = "ShowElements", rect = icons.show_elements, help = "Show Elements"},
         {name = "EditorUnits", rect = icons.editor_units, help = "Draw editor units"},
-        {name = "rotation_widget_toggle", rect = icons.rotation_widget, callback = ClassClbk(self, "toggle_widget", "rotation"), help = "Toggle Rotation Widget", enabled = normal and self._parent._has_fix},
-        {name = "move_widget_toggle", rect = icons.move_widget, offset = reversed and {2,0} or 0, callback = ClassClbk(self, "toggle_widget", "move"), help = "Toggle Move Widget", enabled = normal and self._parent._has_fix}
+        {name = "rotation_widget_toggle", rect = icons.rotation_widget, callback = ClassClbk(self, "toggle_widget", "rotation"), help = "Toggle Rotation Widget", enabled = normal},
+        {name = "move_widget_toggle", rect = icons.move_widget, offset = reversed and {2,0} or 0, callback = ClassClbk(self, "toggle_widget", "move"), help = "Toggle Move Widget", enabled = normal}
     }
 
     self._buttons = {
         {name = "GeneralOptions", rect = icons.settings_gear, offset = reversed and 0, callback = "open_options", help = "General Options"},
-        {name = "Deselect", rect = icons.deselect, callback = "deselect_unit", help = "Deselect", enabled = normal and self._parent._has_fix},
-        {name = "TeleportPlayer", rect = icons.teleport, callback = "drop_player", help = "Teleport Player To Camera Position", enabled = normal and self._parent._has_fix},
-        {name = "TeleportToSelection", rect = icons.teleport_selection, items = {}, callback = "open_teleport_menu", help = "Teleport Camera To...", enabled = normal and self._parent._has_fix},
-        {name = "LocalTransform", rect = icons.local_transform, offset = reversed and {2,0} or 0, callback = "toggle_local_move", help = "Local Transform Orientation", enabled = normal and self._parent._has_fix}
+        {name = "Deselect", rect = icons.deselect, callback = "deselect_unit", help = "Deselect", enabled = normal},
+        {name = "TeleportPlayer", rect = icons.teleport, callback = "drop_player", help = "Teleport Player To Camera Position", enabled = normal},
+        {name = "TeleportToSelection", rect = icons.teleport_selection, items = {}, callback = "open_teleport_menu", help = "Teleport Camera To...", enabled = normal},
+        {name = "LocalTransform", rect = icons.local_transform, offset = reversed and {2,0} or 0, callback = "toggle_local_move", help = "Local Transform Orientation", enabled = normal}
     }
 
     local opt = {h = size, offset = {0, 2}, background_color = BLE.Options:GetValue("ToolbarBackgroundColor"), align_method = reversed and "grid" or "reversed_grid"}
