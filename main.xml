@@ -118,7 +118,6 @@
         <hook source_file="core/lib/utils/dev/editor/coreworlddefinition" file="WorldDefinition.lua"/>
         <hook source_file="lib/utils/game_state_machine/gamestatemachine" file="GameStateMachine.lua"/>
         <hook source_file="lib/managers/mission/elementaiglobalevent" file="ElementAiGlobalEvent.lua"/>
-        <hook source_file="lib/managers/mission/elementlasertrigger" file="ElementLaserTrigger.lua"/>
         <hook source_file="lib/managers/mission/elementspawncivilian" file="Fixes.lua"/>
         <hook source_file="lib/managers/mission/elementspawnenemydummy" file="Fixes.lua"/>
     	<hook source_file="core/lib/managers/mission/coreelementarea" file="Fixes.lua"/>
@@ -128,7 +127,6 @@
         <hook source_file="lib/managers/navigationmanager" file="NavigationManager.lua"/>
         <hook source_file="lib/managers/navfieldbuilder" file="NavFieldBuilder.lua"/>
         <hook source_file="core/lib/managers/viewport/environment/coreenvironmentmanager" file="EnvironmentManager.lua"/>
-    	<hook source_file="lib/network/matchmaking/networkmatchmakingsteam" file="NetworkMatchMakingSteam.lua"/>
     	<hook source_file="lib/tweak_data/levelstweakdata" file="Fixes.lua"/>
     	<hook source_file="lib/managers/jobmanager" file="Fixes.lua"/>
         <hook source_file="lib/managers/menu/raid_menu/raidmenuscenemanager" file="Fixes.lua"/>
@@ -425,7 +423,6 @@
         <value_node value="ElementJobValue"/>
         <value_node value="ElementUnitSequence"/>
         <value_node value="ElementKillZone"/>
-        <value_node value="ElementLaserTrigger"/>
         <value_node value="ElementLookAtTrigger"/>
         <value_node value="ElementLootBag"/>
         <value_node value="ElementLootSecuredTrigger"/>
@@ -516,12 +513,9 @@
         <value_node value="ElementNavigationStitcher"/>
         <value_node value="ElementNavLink"/>
         <value_node value="ElementWorldOperator"/>
-	    <!--value_node value="ElementHeistTimerOperator"/> Removed as they are not actually used, use the non Heist variants.
-	    <value_node value="ElementHeistTimerTrigger"/-->
 	<value_node value="ElementAIGroupType"/>
     </MissionElements>
     <AutoClassElements>
-        <!--<value_node value="ElementPickupCriminalDeployables"/> Moved to a normal class to give information about its functionality-->
     </AutoClassElements>
 	<script_data_types>
 		<value_node value="sequence_manager"/>

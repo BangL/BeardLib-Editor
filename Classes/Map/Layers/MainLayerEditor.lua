@@ -45,10 +45,6 @@ function MainLayerEditor:build_menu()
             text_offset = {4, 4, 32, 4}})
         return_button:tb_imgbtn("Alert", nil, nil, BLE.Utils.EditorIcons.alert, {divider_type = true, img_scale = 0.8, w = 24, h = 24})
     end
-    
-    if not managers.editor._has_fix then
-        self._holder:alert("Physics settings fix is not enabled!\nPlease enable it through the BLE settings menu\nSome features will not work.")
-    end
 
     local load_db = self._holder:divgroup("LoadFromDatabase", {align_method = "grid"})
     local load = self._holder:divgroup("LoadWithPackages", {enabled = BeardLib.current_level ~= nil, align_method = "grid"})

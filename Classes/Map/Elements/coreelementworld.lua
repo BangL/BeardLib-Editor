@@ -40,7 +40,7 @@ function EditorWorldPoint:create_element()
 	EditorWorldPoint.super.create_element(self)
 	self._element.class = "ElementWorldPoint"
 	self._element.module = "CoreElementWorld"
-    self._spawn_counter = 0
+    self._counted_continents = 0
 end
 
 function EditorWorldPoint:_build_panel()

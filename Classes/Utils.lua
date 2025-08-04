@@ -198,7 +198,6 @@ Utils.ElementIcons = {
 	Hint = {192, 832},
 	Invulnerable = {257, 832},
 	KillZone = {320, 832},
-	LaserTrigger = {384, 832},
 	LoadDelayed = {448, 832},
 	LookAtTrigger = {0, 896},
 	LootBagTrigger = {64, 896},
