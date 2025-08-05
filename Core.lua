@@ -87,6 +87,12 @@ function BLE:InitManagers(data)
         self:LoadHashlist()
     end
 
+    if Global.editor_mode then
+        Application:set_force_editor_physics_bodies(true)
+    else
+        Application:set_force_editor_physics_bodies(false)
+    end
+
     Hooks:PostHook(MenuCallbackHandler, "change_resolution", "reload_to_fix_res", function()
         BeardLib:AddDelayedCall("FixEditorResolution", 0.5, ClassClbk(BLE, "MapEditorCodeReload"), true)
     end)

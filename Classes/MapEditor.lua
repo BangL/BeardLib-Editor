@@ -20,11 +20,6 @@ function Editor:init(data)
         PackageManager:load("core/packages/editor")
     end
 
-    if self:needs_fix() then
-        Application:set_force_editor_physics_bodies(true)
-        self._phys_fix_applied = true
-    end
-
     self._editor_active = false
     self._mapeditor = {}
     self.parts = {}
@@ -236,14 +231,6 @@ function Editor:animate_bg_fade()
         end,
         wait = 0.5,
     })
-end
-
-function Editor:needs_fix()
-    local unit = World:spawn_unit(Idstring("core/units/move_widget/move_widget"), Vector3())
-    local result = World:raycast("ray", unit:position(), unit:position():with_z(100), "ray_type", "widget", "target_unit", unit) ~= nil
-    unit:set_enabled(false)
-    unit:set_slot(0)
-    return not result
 end
 
 function Editor:_init_post_effects()
@@ -823,9 +810,7 @@ function Editor:set_unit_visible(unit, visible)
 end
 
 function Editor:destroy()
-    if self._phys_fix_applied then
-        Application:set_force_editor_physics_bodies(false)
-    end
+    Application:set_force_editor_physics_bodies(false)
     local scroll_y_tbl = {}
     for name, manager in pairs(self.parts) do
         if alive(manager._holder) then
