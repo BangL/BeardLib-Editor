@@ -810,7 +810,9 @@ function Editor:set_unit_visible(unit, visible)
 end
 
 function Editor:destroy()
+    -- force disable phys fix when exiting editor
     Application:set_force_editor_physics_bodies(false)
+
     local scroll_y_tbl = {}
     for name, manager in pairs(self.parts) do
         if alive(manager._holder) then
