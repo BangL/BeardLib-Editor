@@ -54,7 +54,7 @@
 		<entry key="environment_areas" type="table">
 		</entry>
 		<entry key="environment_values" type="table">
-			<entry key="color_grading" type="string" value="color_xxxgen"/>
+			<!-- <entry key="color_grading" type="string" value="color_xxxgen"/> -->
 			<entry key="dome_occ_resolution" type="number" value="512"/>
 			<entry key="environment" type="string" value="core/environments/default"/>
 			<entry key="sky_rot" type="number" value="0"/>

@@ -26,7 +26,7 @@ function GenTool:build_menu()
     local game = self._holder:group("Game", groups_opt)
     game:slider("GameSpeed", ClassClbk(self, "set_game_speed"), 1, {max = 10, min = 0.1, step = 0.3, floats = 1, wheel_control = true, help = "High settings can have a negative effect on game logic, use with caution"})
     game:combobox("Difficulty", ClassClbk(self, "set_difficulty"), difficulty_loc, table.get_key(difficulty_ids, Global.game_settings.difficulty), {items_localized = true, items_pretty = true})
-    game:numberbox("MissionFilter", ClassClbk(self, "set_mission_filter"), Global.current_mission_filter or 0, {floats = 0, min = 0, max = 5, help = "Set a mission filter to be forced on the level, 0 uses the default filter."})
+    -- game:numberbox("MissionFilter", ClassClbk(self, "set_mission_filter"), Global.current_mission_filter or 0, {floats = 0, min = 0, max = 5, help = "Set a mission filter to be forced on the level, 0 uses the default filter."})
     game:tickbox("PauseGame", ClassClbk(self, "pause_game"), false, {size_by_text = true})
     game:tickbox("MuteMusic", ClassClbk(self, "mute_music"), false, {size_by_text = true})
     game:button("FlushMemory", ClassClbk(Application, "apply_render_settings"), {size_by_text = true, help = "Clears unused textures from memory (has a small chance to break things)"})
@@ -63,11 +63,11 @@ function GenTool:pause_game(item)
     SoundDevice:set_rtpc("ingame_sound", paused and 0 or 1)
 end
 
-function GenTool:set_mission_filter(item) 
-    local filter = item:Value()
-    Global.current_mission_filter = filter > 0 and filter or nil
-    managers.mission:set_mission_filter({Global.current_mission_filter})
-end
+-- function GenTool:set_mission_filter(item) 
+--     local filter = item:Value()
+--     Global.current_mission_filter = filter > 0 and filter or nil
+--     managers.mission:set_mission_filter({Global.current_mission_filter})
+-- end
 
 function GenTool:mute_music(item) 
     local mute = item:Value()

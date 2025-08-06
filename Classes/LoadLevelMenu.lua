@@ -247,11 +247,11 @@ function LoadLevelMenu:load_level(item)
     local log_on_spawn = self:GetItem("LogSpawnedUnits"):Value()
     --local one_down = self:GetItem("OneDown"):Value()
     local difficulty = self:GetItem("Difficulty"):Value()
-	local filter = self:GetItem("MissionFilter"):Value()
+	-- local filter = self:GetItem("MissionFilter"):Value()
 
 	local function load()
 		Global.editor_mode = true
-		Global.current_mission_filter = filter == 0 and nil or filter
+		-- Global.current_mission_filter = filter == 0 and nil or filter
 		Global.editor_loaded_instance = item.instance and item.instance or false
 		Global.editor_return_bookmark = item.return_bookmark
         Global.editor_safe_mode = safe_mode == true
@@ -260,7 +260,7 @@ function LoadLevelMenu:load_level(item)
         BeardLib.current_level = nil
 		MenuCallbackHandler:play_single_player()
 		if narr_id then
-			managers.job:activate_job(narr_id)
+			managers.raid_job:set_selected_job(narr_id)
 		end
         Global.game_settings.level_id = level_id
         Global.current_level_id = item.real_id or level_id
@@ -271,8 +271,8 @@ function LoadLevelMenu:load_level(item)
         self:start_the_game()
         BLE.Menu:set_enabled(false)
 
-	--Saving the last loaded heist to file for the restart button
-	BLE.Options:SetValue("LastLoaded", {name = item.name, narr_id = item.narr_id, instance = item.instance and true or nil, real_id = item.real_id or nil, vanilla = item.vanilla})
+		--Saving the last loaded heist to file for the restart button
+		BLE.Options:SetValue("LastLoaded", {name = item.name, narr_id = item.narr_id, instance = item.instance and true or nil, real_id = item.real_id or nil, vanilla = item.vanilla})
     end
 
     local load_tbl = {{"Yes", load}}

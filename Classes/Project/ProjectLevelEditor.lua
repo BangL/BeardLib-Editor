@@ -354,7 +354,7 @@ function ProjectLevelEditor:set_data_callback()
     end
     name_item:SetText(title)
 
-    data.ai_group_type = self:GetItem("AiGroupType"):SelectedItem()
+    -- data.ai_group_type = self:GetItem("AiGroupType"):SelectedItem()
     data.player_style = self:GetItem("PlayerStyle"):SelectedItem()
     data.briefing_dialog = self:GetItem("BriefingDialog"):Value()
     data.ghost_bonus = self:GetItem("GhostBonus"):Value()
