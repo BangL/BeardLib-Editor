@@ -128,7 +128,7 @@
         <hook source_file="lib/managers/navfieldbuilder" file="NavFieldBuilder.lua"/>
         <hook source_file="core/lib/managers/viewport/environment/coreenvironmentmanager" file="EnvironmentManager.lua"/>
     	<hook source_file="lib/tweak_data/levelstweakdata" file="Fixes.lua"/>
-    	<hook source_file="lib/managers/jobmanager" file="Fixes.lua"/>
+    	<hook source_file="lib/managers/raidjobmanager" file="Fixes.lua"/>
         <hook source_file="lib/managers/menu/raid_menu/raidmenuscenemanager" file="Fixes.lua"/>
         <hook source_file="core/lib/managers/coreworldcameramanager" file="Fixes.lua"/>
         <hook source_file="core/lib/managers/mission/coreelementworldcamera" file="Fixes.lua"/>
@@ -515,7 +515,7 @@
         <value_node value="ElementNavigationStitcher"/>
         <value_node value="ElementNavLink"/>
         <value_node value="ElementWorldOperator"/>
-	<value_node value="ElementAIGroupType"/>
+	    <!-- <value_node value="ElementAIGroupType"/> FIXME? -->
     </MissionElements>
     <AutoClassElements>
     </AutoClassElements>

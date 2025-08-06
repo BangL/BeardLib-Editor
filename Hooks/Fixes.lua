@@ -129,15 +129,15 @@ elseif F == "levelstweakdata" then
 			})
 		end
 	end)
-elseif F == "jobmanager" then
-	function JobManager:current_mission_filter()
-		if not self._global.current_job then
-			return
-		end
-		return {Global.current_mission_filter} or self:current_stage_data().mission_filter
-	end
-	
-	Hooks:PostHook(JobManager, "stop_sounds", "EditorUnmuteWanted", function(self)
+elseif F == "raidjobmanager" then
+	-- function RaidJobManager:current_mission_filter()
+	-- 	if not self._current_job then
+	-- 		return
+	-- 	end
+	-- 	return {Global.current_mission_filter} or self:current_stage_data().mission_filter
+	-- end
+
+	Hooks:PostHook(RaidJobManager, "stop_sounds", "EditorUnmuteWanted", function(self)
 		if managers.editor then
 			managers.editor:set_wanted_mute(false)
 		end

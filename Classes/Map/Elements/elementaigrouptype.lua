@@ -8,10 +8,11 @@ end
 function EditorAIGroupType:_build_panel()
 	self:_create_panel()
 
-	local options = {"default"}
-	for key, value in pairs(tweak_data.levels.LevelType) do
-		table.insert(options, value)
-	end
+	-- FIXME?
+	-- local options = {"default"}
+	-- for key, value in pairs(tweak_data.levels.LevelType) do
+	-- 	table.insert(options, value)
+	-- end
 
-	self:ComboCtrl("ai_group_type", options, {help = "Select the ai group type to switch to."})
+	-- self:ComboCtrl("ai_group_type", options, {help = "Select the ai group type to switch to."})
 end

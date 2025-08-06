@@ -96,3 +96,19 @@ function Instance:prepare_mission_data_by_name(name, worlddefinition_id)
 	mdata.instance_name = name
 	return mdata
 end
+
+function Instance:register_output_event_element(mission_id, instance_name, instance_output, mission_element)
+	-- FIXME?
+end
+
+function Instance:unregister_output_event_elements(mission_id)
+	-- FIXME?
+end
+
+function Instance:register_input_element(mission_id, instance_name, instance_input, mission_element)
+	-- FIXME?
+end
+
+function Instance:unregister_input_elements(mission_id)
+	-- FIXME?
+end

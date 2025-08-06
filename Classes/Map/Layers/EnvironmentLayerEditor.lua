@@ -274,17 +274,17 @@ function EnvLayer:build_menu()
 	environment_group:pathbox("Environment", ClassClbk(self, "change_environment"), environment_values.environment, "environment", {not_close = true})
     local sky = self._holder:group("Sky")
     sky:slider("SkyRotation", ClassClbk(self, "change_sky_rotation"), environment_values.sky_rot, {min = 0, max = 360})
-    local colors = {
-        "color_off",
-        "color_payday",
-        "color_heat",
-        "color_nice",
-        "color_sin",
-        "color_bhd",
-        "color_xgen",
-        "color_xxxgen",
-        "color_matrix"
-	}
+    -- local colors = {
+    --     "color_off",
+    --     "color_payday",
+    --     "color_heat",
+    --     "color_nice",
+    --     "color_sin",
+    --     "color_bhd",
+    --     "color_xgen",
+    --     "color_xxxgen",
+    --     "color_matrix"
+	-- }
 
 	environment_group:button("BuildCubemaps", function()
 		local cubes = self:selected_unit() and "selected" or "all"
@@ -314,7 +314,7 @@ function EnvLayer:build_menu()
 			end)
 		end
 	end)
-    environment_group:combobox("ColorGrading", ClassClbk(self, "change_color_grading"), colors, table.get_key(colors, environment_values.color_grading))
+    -- environment_group:combobox("ColorGrading", ClassClbk(self, "change_color_grading"), colors, table.get_key(colors, environment_values.color_grading))
 
 	local spawn = self:GetPart("spawn")
     environment_group:button("SpawnEffect", ClassClbk(spawn, "begin_spawning", self._effect_unit))
@@ -476,13 +476,13 @@ function EnvLayer:change_environment(item)
 	self:save()
 end
 
-function EnvLayer:change_color_grading(item)
-	local environment_values = self:data().environment_values
-	environment_values.color_grading = item:SelectedItem()
-	managers.environment_controller:set_default_color_grading(environment_values.color_grading)
-	managers.environment_controller:refresh_render_settings()
-	self:save()
-end
+-- function EnvLayer:change_color_grading(item)
+-- 	local environment_values = self:data().environment_values
+-- 	environment_values.color_grading = item:SelectedItem()
+-- 	managers.environment_controller:set_default_color_grading(environment_values.color_grading)
+--  managers.environment_controller:refresh_render_settings()
+-- 	self:save()
+-- end
 
 function EnvLayer:set_environment_area(env)
 	local area = self:selected_unit():unit_data().environment_area
@@ -728,7 +728,7 @@ function EnvLayer:reset_environment_values()
 	environment_values.environment = managers.viewport:game_default_environment()
 	environment_values.sky_rot = 0
 	managers.viewport:update_global_environment_value(CoreEnvironmentFeeder.SkyRotationFeeder.DATA_PATH_KEY)
-	environment_values.color_grading = managers.environment_controller:game_default_color_grading()
+	-- environment_values.color_grading = managers.environment_controller:game_default_color_grading()
 	environment_values.dome_occ_resolution = 256
 end
 
