@@ -1141,6 +1141,9 @@ end
 
 function Static:set_multi_selected()
     BeardLib:AddDelayedCall("BuildItemsStaticEditor", 0.05, function()
+        if not Global.editor_mode then
+            return
+        end
         self._built_multi = true
         self._editors = {}
         self:clear_menu()

@@ -168,9 +168,7 @@ elseif F == "coreworldcameramanager" then
 	end
 elseif F == "raidmenuscenemanager" then
 	Hooks:PostHook(RaidMenuSceneManager, "close_menu", "EditorHideHUD", function(self)
-		if not managers.editor and not managers.editor:enabled() then
-			return
-		else
+		if managers.editor and managers.editor:enabled() then
 			managers.hud:set_disabled()
 		end
 	end)

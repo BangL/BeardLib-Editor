@@ -18,6 +18,11 @@ function EnvTool:init(parent)
 	EnvTool.super.init(self, parent, "EnvironmentToolEditor")
 end
 
+function EnvTool:destroy()
+	managers.viewport:first_active_viewport():set_environment_editor_callback(nil)
+	managers.viewport:first_active_viewport():set_environment(managers.viewport:first_active_viewport():get_environment_path())
+end
+
 function EnvTool:load_included_environments()
     local included = self._holder:GetItem("IncludedEnvironments")
     local level = BeardLib.current_level

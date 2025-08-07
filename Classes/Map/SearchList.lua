@@ -46,7 +46,7 @@ end
 function SearchList:do_search(no_reset_page, no_clear, t)
     local item = self._options:GetItem("Search")
     BeardLib:AddDelayedCall("BLEDoSearchList" .. tostring(self), self._filtered == nil and 0 or 0.2, function()
-        if not managers.mission._missions then
+        if (not self._list) or (not Global.editor_mode) then
             return
         end
         local search = item:Value():lower():split(",")

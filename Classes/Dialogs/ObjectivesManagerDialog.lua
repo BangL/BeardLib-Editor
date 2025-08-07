@@ -173,6 +173,9 @@ function ObjectivesManagerDialog:set_objective_data(item)
         self._selected_objective[item.name] = value
 
         BeardLib:AddDelayedCall("BLESetObjectiveData", 0.2, function()
+            if not Global.editor_mode then
+                return
+            end
             self:load_objectives()
             self:update_localization()
         end)

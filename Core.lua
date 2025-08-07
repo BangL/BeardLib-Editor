@@ -40,6 +40,10 @@ function BLE:Dofiles(path)
 end
 
 function BLE:MapEditorCodeReload()
+    if not Global.editor_mode then
+        return
+    end
+
     self:Dofiles(self.ClassDirectory)
     self:Dofiles(self.MapClassesDir)
     self:Dofiles(Path:Combine(self.MapClassesDir, "Layers"))
