@@ -1055,7 +1055,7 @@ end
 --Update functions
 function Editor:paused_update(t, dt) self:update(t, dt) end
 function Editor:update(t, dt)
-    if self._safemode then
+    if self._safemode or not Global.editor_mode then
         return
     end
     if BeardLib.Utils.Input:IsTriggered(self._toggle_trigger) and not self._partially_disabled then

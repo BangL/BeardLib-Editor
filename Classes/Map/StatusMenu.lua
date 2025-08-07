@@ -44,6 +44,9 @@ function StatusMenu:StatusMessage(message)
         self._text:SetVisible(true)
         self._text:SetText(message)
         BeardLib:AddDelayedCall("BLEStatusMessage", 2, function()
+            if not Global.editor_mode then
+                return
+            end
             self._text:SetVisible(false)
         end)
     end

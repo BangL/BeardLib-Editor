@@ -70,6 +70,9 @@ end
 
 function MainLayerEditor:random_hint()
     BeardLib:AddDelayedCall("BLEHint", self._hint_set and 60 or 0, function()
+        if not Global.editor_mode then
+            return
+        end
         local h = table.random(self.hints)
         self._hint:SetText(h)
         self._hint_set = true

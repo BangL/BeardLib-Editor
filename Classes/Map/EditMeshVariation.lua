@@ -24,6 +24,9 @@ function EditMeshVariation:set_unit_data()
         
         --The delayed collision update breaks animations in the sequence, so this needs a delay too
         BeardLib:AddDelayedCall("BLEMeshVariation"..tostring(mesh_variation), 0.015, function()
+            if not Global.editor_mode then
+                return
+            end
             managers.sequence:run_sequence_simple2(mesh_variation, "change_state", unit)
         end, true)
     end

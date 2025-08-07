@@ -163,11 +163,15 @@ function ElementSelectList:init(parent)
 end
 
 function ElementSelectList:do_search_list()
+    if not managers.mission._missions then
+        return
+    end
+
     local scripts = table.map_keys(managers.mission._scripts)
     local used_scripts = #scripts - #self._filtered_scripts
     self._filter:GetItem("Count"):SetText(used_scripts.."/"..#scripts)
 
-    
+
     for _, script in pairs(managers.mission._missions) do
         for _, tbl in pairs(script) do
             if tbl.elements then
@@ -324,6 +328,10 @@ function GroupSelectList:set_selected_objects()
 end
 
 function GroupSelectList:do_search_list()
+    if not managers.worlddefinition then
+        return
+    end
+
     local continents = managers.worlddefinition._continent_definitions
     if managers.editor and managers.editor._continents then
         for _, continent in pairs(managers.editor._continents) do

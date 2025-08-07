@@ -405,6 +405,9 @@ function MaterialEditorPanel:update_output(clear, undoredo)
 
 		if not undoredo then
 			BeardLib:AddDelayedCall("MaterialUndo"..name, 0.2, function()
+				if not Global.editor_mode then
+					return
+				end
 				self._undo_stack:push(new_xml)
             end, true)
         end
