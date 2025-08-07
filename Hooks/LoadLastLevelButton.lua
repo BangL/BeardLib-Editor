@@ -13,7 +13,7 @@ Hooks:PostHook(BLTNotificationsGui, "_layout", "BLESetup", function(self)
     local data = BLE.Options:GetValue("LastLoaded")
     if data then
         self._beardlib_editor_startlast = self._beardlib_panel:bitmap({
-            name = "RestartLastEditorHeist",
+            name = "RestartLastEditorJob",
             texture = "textures/editor_icons_df",
             texture_rect = {128, 64, 48, 48},
             w = 28,

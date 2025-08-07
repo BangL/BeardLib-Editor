@@ -246,7 +246,7 @@ function Options:save(force_backup, old_include, skip_warning)
             return
         elseif self._playtest_saving_allowed == nil then
             self._playtest_saving_allowed = false
-            BLE.Utils:YesNoQuestion("Saving while the heist is running can lead to unintended side effects. Do you want to allow saving for this session?", function() 
+            BLE.Utils:YesNoQuestion("Saving while the job is running can lead to unintended side effects. Do you want to allow saving for this session?", function() 
                 self._playtest_saving_allowed = true 
                 self:save(force_backup, old_include)
             end)

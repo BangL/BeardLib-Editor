@@ -26,14 +26,14 @@ end
 function EditorMusic:_build_panel()
 	self:_create_panel()
 	self:BooleanCtrl("use_instigator")
-	local category = self._class_group:combobox("Category", ClassClbk(self, "_set_category"), {"music_heist", "track_ghost", "track_menu"}, 1)
+	local category = self._class_group:combobox("Category", ClassClbk(self, "_set_category"), {"music_job", "track_ghost", "track_menu"}, 1)
 	self:_set_category(category)
 end
 
 function EditorMusic:_set_category(item)
 	self._class_group:ClearItems("events")
 	local category = item:SelectedItem()
-	if category == "music_heist" then
+	if category == "music_job" then
 		self:ComboCtrl("music_event", table.list_add({"", "stop_all_music"}, table.map_values(tweak_data.music.default)), {label = "events", free_typing = true})
 	elseif category == "track_ghost" then
 		local t = {"", "stop_all_music", "suspense_1", "suspense_2", "suspense_3", "suspense_4", "suspense_5"}

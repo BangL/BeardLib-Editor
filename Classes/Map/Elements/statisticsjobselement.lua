@@ -34,7 +34,6 @@ function EditorStatisticsJobs:_build_panel()
 	local difficulties = deep_clone(tweak_data.difficulties)
 	table.insert(difficulties, "all")
 	self:ComboCtrl("difficulty", difficulties, {help = "Select the required difficulty."})
-	-- self:BooleanCtrl("include_prof", {help = "Select if professional heists should be included."})
 	self:BooleanCtrl("include_dropin", {help = "Select if drop-in is counted as well."})
 	self:NumberCtrl("required", {min = 1, help = "Type the required amount that is needed."})
 end

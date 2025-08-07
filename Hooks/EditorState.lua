@@ -11,7 +11,7 @@ function EditorState:at_enter()
 	 
 	managers.editor:set_enabled(true)
     managers.achievment.award = function() end
-	local job_id = managers.raid_job:current_job_id()
+    local job_id = managers.job:current_job_id()
     if job_id then
 		--[[
 	    tweak_data.operations.missions[job_id].contract_cost = {0,0,0,0,0,0,0}
@@ -20,6 +20,12 @@ function EditorState:at_enter()
 	    tweak_data.operations.missions[job_id].contract_visuals.min_mission_xp = {0,0,0,0,0,0,0}
 	    tweak_data.operations.missions[job_id].contract_visuals.max_mission_xp = {0,0,0,0,0,0,0}
 		]]
+		tweak_data.operations.missions[job_id].job_type = OperationsTweakData.JOB_TYPE_RAID
+	    tweak_data.operations.missions[job_id].xp = 0
+		tweak_data.operations.missions[job_id].loading = {}
+		tweak_data.operations.missions[job_id].photos = {}
+		tweak_data.operations.missions[job_id].events = nil
+		tweak_data.operations.missions[job_id].events_index_template = nil
 	end
 end
 

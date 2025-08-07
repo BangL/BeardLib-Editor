@@ -24,7 +24,7 @@ function Options:init()
 	})
     main:tickbox("BackupMaps", ClassClbk(self, "set_map_clbk"), O:GetValue("Map/BackupMaps"))
     main:tickbox("SaveWarningAfterGameStarted", ClassClbk(self, "set_map_clbk"), O:GetValue("Map/SaveWarningAfterGameStarted"), {
-		help = "Show a warning message when trying to save after play testing started the heist, where you can allow or disable saving for that session"
+		help = "Show a warning message when trying to save after play testing started the job, where you can allow or disable saving for that session"
 	})
 	main:tickbox("OptimizedFileSaving", ClassClbk(self, "set_map_clbk"), O:GetValue("Map/OptimizedFileSaving"), {
 		help = "Clean up unnecessary data from files when saving. Reduces file size but can increase save times. (Experimental Feature)"

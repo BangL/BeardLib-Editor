@@ -22,7 +22,7 @@ function BrushLayerEditor:init(parent)
 	self._amount_dirty = true
 	self._short_names = true
 
-	self:load_unit_map_from_vector(CoreEditorUtils.layer_type("brush"))
+	-- self:load_unit_map_from_vector(CoreEditorUtils.layer_type("brush"))
 
 	self._place_slot_mask = managers.slot:get_mask("brush_placeable")
 	self._brush_slot_mask = managers.slot:get_mask("brushes")

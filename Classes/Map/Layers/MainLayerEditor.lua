@@ -23,7 +23,7 @@ function MainLayerEditor:build_menu()
     if not BeardLib.current_level then
         local s = "Preview mode"
         s = s .. "\nSaving the map will not clone the map, it'll just save it."
-        s = s .. "\nIf you wish to clone it please use the 'Clone Existing Heist' feature in projects menu."
+        s = s .. "\nIf you wish to clone it please use the 'Clone Existing Job' feature in projects menu."
         self._holder:alert(s)
     end
 

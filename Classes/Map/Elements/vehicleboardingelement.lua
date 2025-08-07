@@ -26,7 +26,7 @@ function EditorVehicleBoarding:_build_panel(disable_params)
 	self:ComboCtrl("operation", {
         "embark", 
         "disembark"
-    }, {help = "Specify wether heisters will enter or exit the vehicle"})
+    }, {help = "Specify wether raiders will enter or exit the vehicle"})
 
 	self._seat_group = self._class_group:group("Seat Order")
 	self:_populate_seats_list()

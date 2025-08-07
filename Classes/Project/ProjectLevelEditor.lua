@@ -140,9 +140,9 @@ function ProjectLevelEditor:create(create_data)
                 FileIO:MakeDir(Path:Combine(proj_path, level_path))
                 FileIO:CopyToAsync(Path:Combine(BLE.MapProject._templates_directory, "Level"), Path:Combine(proj_path, level_path))
             end
-            --If we need to insert this into a chain of a narrative
+            --If we need to insert this into a chain of a job
             if create_data.chain then
-                table.insert(create_data.chain, {level_id = template.id, type = "d", type_id = "heist_type_assault"})
+                table.insert(create_data.chain, {level_id = template.id, type = "d", type_id = "job_type_assault"})
             end
             self:finalize_creation(template, create_data)
         end
@@ -183,35 +183,35 @@ function ProjectLevelEditor:clone_level(create_data)
         end
     end
 
-    --Search for the narrative package if exists, some levels may depend on it.
-    local found_narr = false
---[[   for _, narr in pairs(tweak_data.operations.missions) do
-        if found_narr then
+    --Search for the job package if exists, some levels may depend on it.
+    local found_job = false
+    for _, job in pairs(tweak_data.operations.missions) do
+        if found_job then
             break
         end
-        if narr.chain then
-            for _, chain_level in ipairs(narr.chain) do
-                if found_narr then
+        if job.chain then
+            for _, chain_level in ipairs(job.chain) do
+                if found_job then
                     break
                 end
                 if level.level_id then
                     if type(chain_level) == "table" and chain_level.level_id == clone_id then
-                        extra_package(narr.package)
-                        found_narr = true
+                        extra_package(job.package)
+                        found_job = true
                         break
                     end
                 else
                     for _, inner_chain_level in pairs(chain_level) do
                         if type(inner_chain_level) == "table" and inner_chain_level.level_id == clone_id then
-                            extra_package(narr.package)
-                            found_narr = true
+                            extra_package(job.package)
+                            found_job = true
                             break
                         end
                     end
                 end
             end
         end
-    end]]
+    end
 
     local dir = self._parent:get_dir()
     local custom_level_dir = Path:Combine(dir, self.LEVELS_DIR, name)
@@ -333,7 +333,7 @@ function ProjectLevelEditor:set_data_callback()
         if exists or new_name == "" or (data.orig_id ~= new_name and tweak_data.levels[new_name]) then
             title = title .. "[Invalid]"
         else
-            for _, mod in pairs(self._parent:get_modules("narrative")) do
+            for _, mod in pairs(self._parent:get_modules("job")) do
                 if mod.chain then
                     for _, level in ipairs(mod.chain) do
                         if level.level_id == data.id then
@@ -395,7 +395,7 @@ end
 
 function ProjectLevelEditor:delete()
     local id = self._data.id
-    for _, mod in pairs(self._parent:get_modules("narrative")) do
+    for _, mod in pairs(self._parent:get_modules("job")) do
         if mod.chain then
             for _, level in ipairs(mod.chain) do
                 if level.level_id == id then

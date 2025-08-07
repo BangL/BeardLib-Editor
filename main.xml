@@ -28,7 +28,7 @@
             <class file="ProjectModuleEditor.lua"/>
             <class file="ProjectLevelEditor.lua"/>
             <class file="ProjectInstanceEditor.lua"/>
-            <class file="ProjectNarrativeEditor.lua"/>
+            <class file="ProjectJobEditor.lua"/>
             <class file="ProjectLocalizationEditor.lua"/>
             <class file="ProjectUpdatesEditor.lua"/>
             <class file="ProjectAddFilesEditor.lua"/>
@@ -494,7 +494,7 @@
 	    <value_node value="ElementPickupCriminalDeployables"/>
 	    <value_node value="ElementInstigatorOperator"/>
 	    <value_node value="ElementInstigatorTrigger"/>
-	    <value_node value="ElementHeistTimer"/>
+	    <value_node value="ElementJobTimer"/>
 	    <value_node value="ElementAreaDespawn"/>
         <value_node value="ElementSpawnTeamAI"/>
         <value_node value="ElementForceEndAssaultState"/>

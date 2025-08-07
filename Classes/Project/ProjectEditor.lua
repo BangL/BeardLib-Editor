@@ -94,7 +94,7 @@ function ProjectEditor:build_modules()
     end
 end
 
---- Searches a module by ID and meta, used to find levels from a narrative chain at the moment.
+--- Searches a module by ID and meta, used to find levels from a job chain at the moment.
 --- @param id string
 --- @param meta string
 --- @return table
@@ -107,7 +107,7 @@ function ProjectEditor:get_module(id, meta)
     end
 end
 
---- Searches a module meta, used to find levels from a narrative chain at the moment.
+--- Searches a module meta, used to find levels from a job chain at the moment.
 --- @param meta string
 --- @return table
 function ProjectEditor:get_module_by_meta(meta)

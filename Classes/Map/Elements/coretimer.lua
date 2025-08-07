@@ -53,15 +53,12 @@ function EditorTimer:update_selected(t, dt)
     end
 end
 
-EditorHeistTimer = EditorHeistTimer or class(EditorTimer)
-EditorHeistTimer.CLASS = "ElementHeistTimer"
-
 EditorTimerOperator = EditorTimerOperator or class(MissionScriptEditor)
 EditorTimerOperator.RANDOMS = {"time"}
 EditorTimerOperator.LINK_ELEMENTS = {"elements"}
 EditorTimerOperator.CLASS = "ElementTimerOperator"
 EditorTimerOperator.MODULE = "CoreElementTimer"
-EditorTimerOperator.ELEMENT_FILTER = {"ElementTimer", "ElementHeistTimer"}
+EditorTimerOperator.ELEMENT_FILTER = {"ElementTimer", "ElementJobTimer"}
 EditorTimerOperator.INSTANCE_VAR_NAMES = {{type = "number", value = "time"}}
 function EditorTimerOperator:create_element()
 	EditorTimerOperator.super.create_element(self)
@@ -82,7 +79,7 @@ EditorTimerTrigger = EditorTimerTrigger or class(MissionScriptEditor)
 EditorTimerTrigger.LINK_ELEMENTS = {"elements"}
 EditorTimerTrigger.CLASS = "ElementTimerTrigger"
 EditorTimerTrigger.MODULE = "CoreElementTimer"
-EditorTimerTrigger.ELEMENT_FILTER = {"ElementTimer", "ElementHeistTimer"}
+EditorTimerTrigger.ELEMENT_FILTER = {"ElementTimer", "ElementJobTimer"}
 
 function EditorTimerTrigger:create_element()
 	EditorTimerTrigger.super.create_element(self)
@@ -96,13 +93,13 @@ function EditorTimerTrigger:_build_panel()
 	self:Text("This element is a trigger to timer element.")
 end
 
-EditorHeistTimer = EditorHeistTimer or class(EditorTimerOperator)
-EditorHeistTimer.CLASS = "ElementHeistTimer"
+EditorJobTimer = EditorJobTimer or class(EditorTimer)
+EditorJobTimer.CLASS = "ElementJobTimer"
 
-EditorHeistTimerOperator = EditorHeistTimerOperator or class(EditorTimerOperator)
-EditorHeistTimerOperator.CLASS = "ElementHeistTimerOperator"
-EditorHeistTimerOperator.ELEMENT_FILTER = {"ElementHeistTimer"}
+EditorJobTimerOperator = EditorJobTimerOperator or class(EditorTimerOperator)
+EditorJobTimerOperator.CLASS = "ElementJobTimerOperator"
+EditorJobTimerOperator.ELEMENT_FILTER = {"ElementJobTimer"}
 
-EditorHeistTimerTrigger = EditorHeistTimerTrigger or class(EditorTimerTrigger)
-EditorHeistTimerTrigger.CLASS = "ElementHeistTimerTrigger"
-EditorHeistTimerTrigger.ELEMENT_FILTER = {"ElementHeistTimer"}
+EditorJobTimerTrigger = EditorJobTimerTrigger or class(EditorTimerTrigger)
+EditorJobTimerTrigger.CLASS = "ElementJobTimerTrigger"
+EditorJobTimerTrigger.ELEMENT_FILTER = {"ElementJobTimer"}

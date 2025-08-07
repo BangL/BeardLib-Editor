@@ -9,7 +9,7 @@ function ProjectManager:init()
     self._add_xml_template = BLE.Utils:ReadConfig(Path:Combine(self._templates_directory, "Level/add.xml"))
     self._main_xml_template = BLE.Utils:ReadConfig(Path:Combine(self._templates_directory, "EmptyProject.xml"))
     self._level_module_template = BLE.Utils:ReadConfig(Path:Combine(self._templates_directory, "LevelModule.xml"))
-    self._narr_module_template = BLE.Utils:ReadConfig(Path:Combine(self._templates_directory, "NarrativeModule.xml"))
+    self._job_module_template = BLE.Utils:ReadConfig(Path:Combine(self._templates_directory, "JobModule.xml"))
     self._instance_module_template = BLE.Utils:ReadConfig(Path:Combine(self._templates_directory, "InstanceModule.xml"))
 
     self._packages_to_unload = {}
@@ -329,7 +329,7 @@ function ProjectManager:create_new_map_dialog(clbk)
     })
 end
 
---- Creates a new clean map project (without asking the user to make a level and narrative)
+--- Creates a new clean map project (without asking the user to make a level and job)
 --- @param name string
 function ProjectManager:create_new_map_clean(name)
     local data = deep_clone(self._main_xml_template)
@@ -350,8 +350,8 @@ end
 --- @param name string
 function ProjectManager:create_new_map(name)
     self:create_new_map_clean(name)
-    --ProjectNarrativeEditor:new(self._project, nil, {name = name, no_reload = true, final_callback = function(success, data)
-        --if success then
+    ProjectJobEditor:new(self._project, nil, {name = name, no_reload = true, final_callback = function(success, data)
+        if success then
             ProjectLevelEditor:new(self._project, nil, {name = name, final_callback = function(success)
                 if success then
                     self:load_mods()
@@ -359,17 +359,17 @@ function ProjectManager:create_new_map(name)
                     self._project:reload_mod()
                 end
             end})
-        --end
-    --end})
+        end
+    end})
 end
 
 --- Creates a new map project by cloning
 function ProjectManager:create_new_cloned_map()
     local levels = {}
-    for id, narr in pairs(tweak_data.operations.missions) do
-        if not narr.custom and not narr.hidden then
+    for id, job in pairs(tweak_data.operations.missions) do
+        if not job.custom and not job.hidden then
             --dunno why the name_id is nil for some of them..
-            table.insert(levels, {name = id.." / " .. managers.localization:text((narr.name_id or ("heist_"..id)):gsub("_prof", ""):gsub("_night", "")), id = id})
+            table.insert(levels, {name = id.." / " .. managers.localization:text(job.name_id or ("job_"..id)), id = id})
         end
     end
     BLE.ListDialog:Show({
@@ -378,7 +378,7 @@ function ProjectManager:create_new_cloned_map()
             BLE.ListDialog:hide()
             self:create_new_map_dialog(function(name)
                 self:create_new_map_clean(name)
-                ProjectNarrativeEditor:new(self._project, nil, table.merge({clone_id = selection.id, name = name}))
+                ProjectJobEditor:new(self._project, nil, table.merge({clone_id = selection.id, name = name}))
             end)
         end
     })
@@ -400,8 +400,8 @@ function ProjectManager:delete_project(mod)
     BLE.Utils:YesNoQuestion("This will delete the project and its files completely. This cannot be undone!", function()
         BLE.Utils:YesNoQuestion("Are you 100% sure?", function()
             FileIO:Delete(Path:Combine("Maps", self._current_data.name))
-            local narr = tweak_data.operations.missions[mod.Name]
-            if narr and narr.custom then
+            local job = tweak_data.operations.missions[mod.Name]
+            if job and job.custom then
                 tweak_data.operations.missions[mod.Name] = nil
                 table.delete(tweak_data.operations._raids_index, mod.Name)
             end
