@@ -287,6 +287,9 @@ function ProjectManager:load_mods(mod_name)
     BeardLib.Frameworks.Map:RegisterHooks()
     if mod_name then
         BeardLib.Frameworks.Map:GetModByName(mod_name):PreInitModules(true) --this is a mess
+        -- the modules of the mod only exist now, the registration above did not see them: register them (changed jobs,
+        -- operations and icons would not reach the game data otherwise, a module is only registered once)
+        BeardLib.Frameworks.Map:RegisterHooks()
     end
     BLE.LoadLevel:load_levels()
 end
