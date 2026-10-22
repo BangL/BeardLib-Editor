@@ -1,4 +1,4 @@
--- Keeps the editor from touching the player's profile (progress, stats, xp, gold).
+-- Keeps the editor from touching the player's profile (progress, stats, xp, gold, weapon challenges).
 -- The wrappers check Global.editor_mode on every call, so nothing stays disabled outside the editor.
 local function guard(class, names)
     for _, name in ipairs(names) do
@@ -28,4 +28,9 @@ elseif F == "raidexperiencemanager" then
     guard(RaidExperienceManager, {"add_points", "mission_xp_award", "add_loot_redeemed_xp", "on_loot_drop_xp"})
 elseif F == "greedmanager" then
     guard(GreedManager, {"award_gold_picked_up_in_mission", "on_level_exited", "secure_bounty", "sync_secured_bounty"})
+elseif F == "challengetasks" then
+    -- the progress of the weapon challenges (kills, ammo, candy) is kept in memory and saved with the next save after the editor
+    guard(ChallengeTaskKillEnemies, {"on_enemy_killed"})
+    guard(ChallengeTaskCollectAmmo, {"on_ammo_collected"})
+    guard(ChallengeTaskCollectCandy, {"_on_candy_consumed"})
 end

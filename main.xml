@@ -146,6 +146,7 @@
         <hook source_file="lib/managers/statisticsmanager" file="ProfileGuard.lua"/>
         <hook source_file="lib/managers/raidexperiencemanager" file="ProfileGuard.lua"/>
         <hook source_file="lib/managers/greedmanager" file="ProfileGuard.lua"/>
+        <hook source_file="lib/managers/challenges/challengetasks" file="ProfileGuard.lua"/>
         <hook source_file="lib/managers/menu/raid_menu/raidmenucallbackhandler" file="RaidMenuCallbackHandler.lua"/>
     </Hooks>
     <Options build_menu="false" early_post_init="true">
