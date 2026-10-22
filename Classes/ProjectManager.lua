@@ -10,6 +10,7 @@ function ProjectManager:init()
     self._main_xml_template = BLE.Utils:ReadConfig(Path:Combine(self._templates_directory, "EmptyProject.xml"))
     self._level_module_template = BLE.Utils:ReadConfig(Path:Combine(self._templates_directory, "LevelModule.xml"))
     self._job_module_template = BLE.Utils:ReadConfig(Path:Combine(self._templates_directory, "JobModule.xml"))
+    self._operation_module_template = BLE.Utils:ReadConfig(Path:Combine(self._templates_directory, "OperationModule.xml"))
     self._instance_module_template = BLE.Utils:ReadConfig(Path:Combine(self._templates_directory, "InstanceModule.xml"))
 
     self._packages_to_unload = {}
@@ -352,7 +353,7 @@ function ProjectManager:create_new_map(name)
     self:create_new_map_clean(name)
     ProjectJobEditor:new(self._project, nil, {name = name, no_reload = true, final_callback = function(success, data)
         if success then
-            ProjectLevelEditor:new(self._project, nil, {name = name, final_callback = function(success)
+            ProjectLevelEditor:new(self._project, nil, {name = name, job = data, final_callback = function(success)
                 if success then
                     self:load_mods()
                 else
@@ -367,7 +368,7 @@ end
 function ProjectManager:create_new_cloned_map()
     local levels = {}
     for id, job in pairs(tweak_data.operations.missions) do
-        if not job.custom and not job.hidden then
+        if not job.custom and not job.hidden and job.job_type == OperationsTweakData.JOB_TYPE_RAID and job.level_id then
             --dunno why the name_id is nil for some of them..
             table.insert(levels, {name = id.." / " .. managers.localization:text(job.name_id or ("job_"..id)), id = id})
         end
@@ -404,6 +405,13 @@ function ProjectManager:delete_project(mod)
             if job and job.custom then
                 tweak_data.operations.missions[mod.Name] = nil
                 table.delete(tweak_data.operations._raids_index, mod.Name)
+            end
+            for _, op in pairs(XML:GetNodes(self._current_data, "operation")) do
+                local tweak = tweak_data.operations.missions[op.id]
+                if tweak and tweak.custom then
+                    tweak_data.operations.missions[op.id] = nil
+                    table.delete(tweak_data.operations._operations_index, op.id)
+                end
             end
             for _, level in pairs(XML:GetNodes(self._current_data, "level")) do
                 local tweak = tweak_data.levels[level.id]

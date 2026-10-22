@@ -9,6 +9,18 @@ ProjectEditor.ACTIONS = ProjectEditor.ACTIONS or {}
 local XML = BeardLib.Utils.XML
 local CXML = "custom_xml"
 
+--- Asks for the id of a new module. With create_data.fixed_name the id is taken without asking (cloning a whole operation
+--- creates a lot of modules).
+--- @param create_data table
+--- @param opts table Options of the input dialog.
+function ProjectEditor.AskName(create_data, opts)
+    if create_data.fixed_name then
+        opts.callback(create_data.fixed_name)
+    else
+        BLE.InputDialog:Show(opts)
+    end
+end
+
 --- @param parent Menu
 --- @param mod ModCore
 function ProjectEditor:init(parent, mod, previous_project_data)
@@ -94,7 +106,7 @@ function ProjectEditor:build_modules()
     end
 end
 
---- Searches a module by ID and meta, used to find levels from a job chain at the moment.
+--- Searches a module by ID and meta, used to find levels of a job.
 --- @param id string
 --- @param meta string
 --- @return table
@@ -107,7 +119,7 @@ function ProjectEditor:get_module(id, meta)
     end
 end
 
---- Searches a module meta, used to find levels from a job chain at the moment.
+--- Searches a module meta, used to find levels of a job.
 --- @param meta string
 --- @return table
 function ProjectEditor:get_module_by_meta(meta)

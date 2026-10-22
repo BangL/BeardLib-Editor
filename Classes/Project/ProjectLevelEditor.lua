@@ -30,25 +30,7 @@ function ProjectLevelEditor:build_menu(menu, data)
     local is_current = (BeardLib.current_level and BeardLib.current_level._config.id or nil) == data.id
     self._deletable = not is_current
     menu:textbox("LevelID", up, data.id, {forbidden_chars = {':','*','?','"','<','>','|'}, enabled = self._deletable})
-    menu:textbox("BriefingDialog", up, data.briefing_dialog)
-    data.intro_event = type(data.intro_event) == "table" and data.intro_event[1] or data.intro_event
-    data.outro_event = type(data.outro_event) == "table" and data.outro_event or {data.outro_event}
-
-    menu:textbox("IntroEvent", up, data.intro_event)
-    menu:textbox("OutroEvent", up, table.concat(data.outro_event, ","))
-    menu:numberbox("GhostBonus", up, data.data or 0, {max = 1, min = 0, step = 0.1})
-    menu:numberbox("MaxBags", up, data.max_bags, {max = 999, min = 0, floats = 0})
-
-    --local aitype = table.map_keys(tweak_data.levels.ai_groups)
-    --menu:combobox("AiGroupType", up, aitype, table.get_key(aitype, data.ai_group_type) or 1)
-
-    --local styles = table.map_keys(tweak_data.scene_poses.player_style)
-    --menu:combobox("PlayerStyle", up, styles, table.get_key(styles, data.player_style or "generic") or data.player_style, {
-    --    help = "Set the player style for the map, make sure the packages for the suits are loaded!", free_typing = true
-    --})
     menu:tickbox("TeamAiOff", up, data.team_ai_off)
-    menu:tickbox("RetainBags", up, data.repossess_bags)
-    menu:tickbox("PlayerInvulnerable", up, data.player_invulnerable)
     menu:button("ManageMissionAssets", ClassClbk(self, "set_mission_assets_dialog"))
 
     local icon_group = menu:divgroup("LoadingTexture", {border_position_below_title = true, private = {size = 22}})
@@ -58,10 +40,6 @@ function ProjectLevelEditor:build_menu(menu, data)
         text = "If no texture is defined, the texture is automatically loaded from the level folder (loading.png or loading.texture)"
         ..". Use the button on top to easily select the texture from disk."
     })
-
-    if data.ghost_bonus == 0 then
-        data.ghost_bonus = nil
-    end
 end
 
 function ProjectLevelEditor:SelectLoadingTextureFromDisk()
@@ -83,7 +61,7 @@ function ProjectLevelEditor:SelectLoadingTextureFromDisk()
 end
 
 function ProjectLevelEditor:create(create_data)
-    BLE.InputDialog:Show({
+    ProjectEditor.AskName(create_data, {
         title = "Enter a name for the level",
         yes = "Create",
         text = create_data.name or "",
@@ -114,8 +92,8 @@ function ProjectLevelEditor:create(create_data)
                 table.insert(create_data.taken_names, name)
             end
             local template
-            if create_data.chain_level then
-                create_data.chain_level.level_id = name
+            if create_data.job then
+                create_data.job.level_id = name
             end
 
             local proj_path = self._parent:get_dir()
@@ -140,9 +118,9 @@ function ProjectLevelEditor:create(create_data)
                 FileIO:MakeDir(Path:Combine(proj_path, level_path))
                 FileIO:CopyToAsync(Path:Combine(BLE.MapProject._templates_directory, "Level"), Path:Combine(proj_path, level_path))
             end
-            --If we need to insert this into a chain of a job
-            if create_data.chain then
-                table.insert(create_data.chain, {level_id = template.id, type = "d", type_id = "job_type_assault"})
+            --If this level belongs to a freshly created job, point the job at it
+            if create_data.job then
+                create_data.job.level_id = template.id
             end
             self:finalize_creation(template, create_data)
         end
@@ -170,46 +148,10 @@ function ProjectLevelEditor:clone_level(create_data)
     local clone_id = create_data.clone_id
     local name = create_data.name
 
-    --Clone preplanning
-    --local preplanning = tweak_data.preplanning.locations[clone_id]
-    --if preplanning then
-    --    level.preplanning = deep_clone(preplanning)
-    --end
-
     local function extra_package(p)
         level.packages = level.packages or {}
         if not table.contains(level.packages, p) then
             table.insert(level.packages, p)
-        end
-    end
-
-    --Search for the job package if exists, some levels may depend on it.
-    local found_job = false
-    for _, job in pairs(tweak_data.operations.missions) do
-        if found_job then
-            break
-        end
-        if job.chain then
-            for _, chain_level in ipairs(job.chain) do
-                if found_job then
-                    break
-                end
-                if level.level_id then
-                    if type(chain_level) == "table" and chain_level.level_id == clone_id then
-                        extra_package(job.package)
-                        found_job = true
-                        break
-                    end
-                else
-                    for _, inner_chain_level in pairs(chain_level) do
-                        if type(inner_chain_level) == "table" and inner_chain_level.level_id == clone_id then
-                            extra_package(job.package)
-                            found_job = true
-                            break
-                        end
-                    end
-                end
-            end
         end
     end
 
@@ -334,19 +276,8 @@ function ProjectLevelEditor:set_data_callback()
             title = title .. "[Invalid]"
         else
             for _, mod in pairs(self._parent:get_modules("job")) do
-                if mod.chain then
-                    for _, level in ipairs(mod.chain) do
-                        if level.level_id == data.id then
-                            level.level_id = new_name
-                            break
-                        else
-                            for i, inner_level in pairs(level) do
-                                if inner_level.level_id == data.id then
-                                    inner_level.level_id = new_name
-                                end
-                            end
-                        end
-                    end
+                if mod.level_id == data.id then
+                    mod.level_id = new_name
                 end
             end
             data.id = new_name
@@ -354,24 +285,11 @@ function ProjectLevelEditor:set_data_callback()
     end
     name_item:SetText(title)
 
-    -- data.ai_group_type = self:GetItem("AiGroupType"):SelectedItem()
-    data.player_style = self:GetItem("PlayerStyle"):SelectedItem()
-    data.briefing_dialog = self:GetItem("BriefingDialog"):Value()
-    data.ghost_bonus = self:GetItem("GhostBonus"):Value()
-    if data.ghost_bonus == 0 then
-        data.ghost_bonus = nil
-    end
-    data.max_bags = self:GetItem("MaxBags"):Value()
     data.team_ai_off = self:GetItem("TeamAiOff"):Value()
-    data.intro_event = self:GetItem("IntroEvent"):Value()
-    data.repossess_bags = self:GetItem("RetainBags"):Value()
-    data.player_invulnerable = self:GetItem("PlayerInvulnerable"):Value()
     data.load_screen = self:GetItem("LoadingTexture"):Value()
     if data.load_screen == "" then
         data.load_screen = nil
     end
-    local outro = self:GetItem("OutroEvent"):Value()
-    data.outro_event = outro:match(",") and string.split(outro, ",") or {outro}
 end
 
 function ProjectLevelEditor:save_data()
@@ -396,23 +314,18 @@ end
 function ProjectLevelEditor:delete()
     local id = self._data.id
     for _, mod in pairs(self._parent:get_modules("job")) do
-        if mod.chain then
-            for _, level in ipairs(mod.chain) do
-                if level.level_id == id then
-                    table.delete_value(mod.chain, level)
-                    break
-                else
-                    for i, inner_level in pairs(level) do
-                        if inner_level.level_id == id then
-                            table.delete_value(level, inner_level)
-                        end
-                    end
-                end
-            end
+        if mod.level_id == id then
+            mod.level_id = nil
         end
     end
     local path = self:get_dir()
     if FileIO:Exists(path) then
         FileIO:Delete(path)
+    end
+    -- the lists of the editor read the game data
+    local level = tweak_data.levels[id]
+    if level and level.custom then
+        tweak_data.levels[id] = nil
+        table.delete(tweak_data.levels._level_index, id)
     end
 end
