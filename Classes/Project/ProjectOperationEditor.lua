@@ -65,12 +65,19 @@ function ProjectOperationEditor:build_menu(menu, data)
     local events = menu:divgroup("Events", {border_position_below_title = true, private = {size = 22}})
     events:button("AddEvent", ClassClbk(self, "AddEvent"))
     local jobs = self:job_ids()
+    local used = {}
     for i, event in ipairs(self:events()) do
         local job = event.job or event.id
         if job and not table.contains(jobs, job) then
             table.insert(jobs, job)
         end
-        events:combobox("EventJob" .. i, up, jobs, table.get_key(jobs, job) or 1, {text = "Event " .. i .. " (job)"})
+        -- the game knows every job of an operation only once
+        local twice = job and used[job]
+        used[job or ""] = true
+        events:combobox("EventJob" .. i, up, jobs, table.get_key(jobs, job) or 1, {
+            text = "Event " .. i .. " (job)" .. (twice and " [!]" or ""),
+            help = twice and "This job is already an event of this operation, a job can only be one event (only the first one is used)" or nil
+        })
         events:numberbox("EventRow" .. i, up, tonumber(event.row) or i, {min = 1, floats = 0, text = "Event " .. i .. " row", help = "Events with the same row are alternatives, one of them is picked every time the operation is started"})
         events:button("RemoveEvent" .. i, ClassClbk(self, "RemoveEvent", i), {text = "Remove event " .. i})
     end
@@ -123,10 +130,24 @@ function ProjectOperationEditor:AddEvent()
     self:read_events()
     local jobs = self:job_ids()
     local events = self:events()
-    -- the job of the last event, or the first of the project
-    local job = events[#events] and (events[#events].job or events[#events].id) or jobs[1]
-    if not job then
+    if #jobs == 0 then
         BLE.Utils:Notify("Error", "Create a job first, the events of an operation are jobs")
+        return
+    end
+    -- the first job that is no event yet, a job can only be one event of an operation
+    local used = {}
+    for _, event in ipairs(events) do
+        used[event.job or event.id or ""] = true
+    end
+    local job
+    for _, id in ipairs(jobs) do
+        if not used[id] then
+            job = id
+            break
+        end
+    end
+    if not job then
+        BLE.Utils:Notify("Error", "Every job of the project is already an event of this operation, a job can only be one event. Create another job first")
         return
     end
     XML:InsertNode(self._data, {_meta = "event", job = job, row = #events + 1})
