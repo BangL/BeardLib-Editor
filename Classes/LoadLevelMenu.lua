@@ -203,7 +203,21 @@ function LoadLevelMenu:do_load_jobs()
 			})
 		end
 	end
+	-- pairs() order is not stable, keep the list sorted by the shown name
+	local job_ids = {}
+	local names = {}
 	for job_id, job in pairs(tweak_data.operations.missions) do
+		table.insert(job_ids, job_id)
+		names[job_id] = (loc:text(job.name_id or ("job_"..job_id))):lower()
+	end
+	table.sort(job_ids, function(a, b)
+		if names[a] ~= names[b] then
+			return names[a] < names[b]
+		end
+		return a < b
+	end)
+	for _, job_id in ipairs(job_ids) do
+		local job = tweak_data.operations.missions[job_id]
         if (job.custom and custom) or (not job.custom and vanilla) then
 			if job.job_type == OperationsTweakData.JOB_TYPE_RAID then
 				local txt = loc:text((job.name_id or ("job_"..job_id))) .." / " .. job_id
