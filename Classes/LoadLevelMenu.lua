@@ -138,8 +138,8 @@ function LoadLevelMenu:do_load_jobs()
     local levels = self:GetItem("LevelList")
     levels:ClearItems()
     local loc = managers.localization
+    -- the job and operation icons are square (the 16:9 box was made for the contract images of PAYDAY 2)
     local img_size = 100
-	local img_w, img_h = img_size * 1.7777, img_size
 	local load_level = ClassClbk(self, "load_level")
 	local w
 	local function create_job(id, txt, texture, rect, color)
@@ -152,6 +152,8 @@ function LoadLevelMenu:do_load_jobs()
 			min_h = 250,
 		})
 
+		-- the image keeps the aspect ratio of its icon, the width stays the same for every entry (the text column lines up)
+		local img_h = rect and (rect[3] or 0) > 0 and (rect[4] or 0) > 0 and img_size * rect[4] / rect[3] or img_size
 		local img = holder:Create(texture and "Image" or "Divider", {
 			text = "No preview image",
 			texture = texture,
@@ -161,7 +163,7 @@ function LoadLevelMenu:do_load_jobs()
 			text_align = "center",
 			text_vertical = "center",
 			offset_y = 6,
-			w = img_w,
+			w = img_size,
 			h = img_h
 		})
 
