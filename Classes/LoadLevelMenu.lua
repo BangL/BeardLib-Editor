@@ -103,20 +103,20 @@ function LoadLevelMenu:do_load_levels()
     local loc = managers.localization
 	levels:ClearItems()
 
+	local entries = {}
 	for _, id in pairs(tweak_data.levels._level_index) do
 		local level = tweak_data.levels[id]
 		if level then
 			if (level.custom and custom) or (not level.custom and vanilla) then
-				levels:button(id, ClassClbk(self, "load_level"), {text = (level.name_id and loc:text(level.name_id) or "").."/"..id, vanilla = not level.custom})
+				table.insert(entries, {id = id, text = (level.name_id and loc:text(level.name_id) or "").."/"..id, vanilla = not level.custom})
 			end
 		end
 	end
 
 	if custom then
 		for path, instance in pairs(BeardLib.Frameworks.Map._loaded_instances) do
-			local id = instance._config.id
 			path = path:gsub("levels/", ""):gsub("/world", "")
-			levels:button(path, ClassClbk(self, "load_level"), {text = path, instance = true})
+			table.insert(entries, {id = path, text = path, instance = true})
 		end
 	end
 
@@ -124,9 +124,22 @@ function LoadLevelMenu:do_load_levels()
 		for _, path in pairs(BLE.Utils:GetEntries({type = "world"})) do
 			if path:match("levels/instances") then
 				path = path:gsub("levels/", ""):gsub("/world", "")
-				levels:button(path, ClassClbk(self, "load_level"), {text = path, vanilla = true, instance = true})
+				table.insert(entries, {id = path, text = path, vanilla = true, instance = true})
 			end
 		end
+	end
+
+	-- pairs() order is not stable, keep the list sorted
+	table.sort(entries, function(a, b)
+		local ta, tb = a.text:lower(), b.text:lower()
+		if ta ~= tb then
+			return ta < tb
+		end
+		return a.id < b.id
+	end)
+
+	for _, entry in ipairs(entries) do
+		levels:button(entry.id, ClassClbk(self, "load_level"), {text = entry.text, vanilla = entry.vanilla, instance = entry.instance})
 	end
 
 	self:search_levels()
