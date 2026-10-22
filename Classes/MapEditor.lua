@@ -454,7 +454,9 @@ function Editor:GetSpawnRotation(data)
     if data then
         rotation = data.rotation
     end
-    return rotation or (self.parts.spawn:is_spawning() and self.parts.spawn._dummy_spawn_unit:rotation()) or Rotation()
+    local dummy = self.parts.spawn._dummy_spawn_unit
+    -- a dead unit crashes the engine when it is asked for its rotation (e.g. a dynamic unit that fell out of the world)
+    return rotation or (self.parts.spawn:is_spawning() and alive(dummy) and dummy:rotation()) or Rotation()
 end
 
 function Editor:SpawnUnit(unit_path, old_unit, add, unit_id, no_select)
