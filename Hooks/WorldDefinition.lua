@@ -270,8 +270,15 @@ function WorldDef:_create_massunit(data, offset)
 
 	MassUnitManager:delete_all_units()
 
+	-- the editor passes a position, the game ({pos =, rot =}, e.g. when the simulation ends) a table: the engine
+	-- crashes on anything but a Vector3 here
+	local position, rotation = offset, Rotation()
+	if type(offset) == "table" then
+		position, rotation = offset.pos, offset.rot or rotation
+	end
+
 	if PackageManager:has(Idstring("massunit"), path:id()) then
-		MassUnitManager:load(path:id(), offset, Rotation(), self._massunit_replace_names)
+		MassUnitManager:load(path:id(), position or Vector3(), rotation, self._massunit_replace_names)
 	end
 end
 
