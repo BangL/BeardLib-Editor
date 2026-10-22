@@ -52,7 +52,7 @@ function ProjectOperationEditor:build_menu(menu, data)
     local up = ClassClbk(self, "set_data_callback")
 
     data.orig_id = data.orig_id or data.id
-    menu:textbox("OperationID", up, data.id, {forbidden_chars = {':','*','?','"','<','>','|'}})
+    menu:textbox("OperationID", up, data.id, {forbidden_chars = ProjectEditor.ID_FORBIDDEN_CHARS})
 
     local regions = tweak_data.operations.regions
     menu:combobox("Region", up, regions, table.get_key(regions, data.region or "germany") or 1)
@@ -260,11 +260,7 @@ function ProjectOperationEditor:create(create_data)
                     warn = string.format("A job or operation with the id %s already exists! Please use a unique id", k)
                 end
             end
-            if name == "" then
-                warn = "Id cannot be empty!"
-            elseif string.begins(name, " ") then
-                warn = "Invalid ID!"
-            end
+            warn = ProjectEditor.InvalidIdReason(name) or warn
             if warn then
                 BLE.Utils:Notify("Error", warn)
             end
@@ -304,7 +300,7 @@ function ProjectOperationEditor:set_data_callback()
     local title = "Operation ID"
     if data.id ~= new_name then
         local exists = tweak_data.operations.missions[new_name] and new_name ~= data.orig_id
-        if new_name == "" or exists then
+        if ProjectEditor.InvalidIdReason(new_name) or exists then
             title = title .. "[!]"
         else
             data.id = new_name

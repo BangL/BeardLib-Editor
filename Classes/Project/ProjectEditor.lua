@@ -9,6 +9,26 @@ ProjectEditor.ACTIONS = ProjectEditor.ACTIONS or {}
 local XML = BeardLib.Utils.XML
 local CXML = "custom_xml"
 
+--- Characters the id of a level, job or operation must not have: the ones of file names (folders and files of the project
+--- are named after it) and whitespace (the multiplayer handshake sends the ids separated by spaces).
+ProjectEditor.ID_FORBIDDEN_CHARS = {':','*','?','"','<','>','|',' ','\t'}
+
+--- Why an id of a level, job or operation is not valid (nil if it is fine), the check of the textboxes and the name dialogs.
+--- @param name string
+--- @return string?
+function ProjectEditor.InvalidIdReason(name)
+    if name == "" then
+        return "Id cannot be empty!"
+    elseif name:find("%s") then
+        return "The id cannot contain spaces!"
+    end
+    for _, c in ipairs(ProjectEditor.ID_FORBIDDEN_CHARS) do
+        if name:find(c, 1, true) then
+            return "The id cannot contain " .. c
+        end
+    end
+end
+
 --- Asks for the id of a new module. With create_data.fixed_name the id is taken without asking (cloning a whole operation
 --- creates a lot of modules).
 --- @param create_data table

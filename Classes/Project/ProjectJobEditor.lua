@@ -49,7 +49,7 @@ function ProjectJobEditor:build_menu(menu, data)
     local up = ClassClbk(self, "set_data_callback")
 
     data.orig_id = data.orig_id or data.id
-    menu:textbox("JobID", up, data.id, {forbidden_chars = {':','*','?','"','<','>','|'}})
+    menu:textbox("JobID", up, data.id, {forbidden_chars = ProjectEditor.ID_FORBIDDEN_CHARS})
 
     local levels = {}
     for _, mod in pairs(self._parent:get_modules("level")) do
@@ -215,11 +215,7 @@ function ProjectJobEditor:create(create_data)
                     warn = string.format("A job with the id %s already exists! Please use a unique id", k)
                 end
             end
-            if name == "" then
-                warn = "Id cannot be empty!"
-            elseif string.begins(name, " ") then
-                warn = "Invalid ID!"
-            end
+            warn = ProjectEditor.InvalidIdReason(name) or warn
             if warn then
                 BLE.Utils:Notify("Error", warn)
             end
@@ -300,7 +296,7 @@ function ProjectJobEditor:set_data_callback()
                 exists = true
             end
         end
-        if exists or new_name == "" or (data.orig_id ~= new_name and tweak_data.operations.missions[new_name]) then
+        if exists or ProjectEditor.InvalidIdReason(new_name) or (data.orig_id ~= new_name and tweak_data.operations.missions[new_name]) then
             title = title .. "[Invalid]"
         else
             data.id = new_name
