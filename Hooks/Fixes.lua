@@ -83,6 +83,14 @@ elseif civ or F == "elementspawnenemydummy" then
 		if (not params or not params.name) and (not enemy or not PackageManager:has(UnitIds, enemy:id())) then
 			return
 		end
+		-- the units crash on spawning without navigation data (nav tracker of the movement)
+		if Global.editor_mode and not managers.navigation:is_data_ready() then
+			if not C._nav_warned then
+				C._nav_warned = true
+				BLE.Utils:Notify("Navigation data missing", "An enemy/civilian spawn element was skipped: the map has no navigation data (AI-graph). Build it in the AI tab (Calculate All, then Save).")
+			end
+			return
+		end
 		return orig(self, params, ...)
 	end
 elseif F == "coreelementworldcamera" then
