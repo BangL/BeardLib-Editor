@@ -58,7 +58,7 @@ EditorTimerOperator.RANDOMS = {"time"}
 EditorTimerOperator.LINK_ELEMENTS = {"elements"}
 EditorTimerOperator.CLASS = "ElementTimerOperator"
 EditorTimerOperator.MODULE = "CoreElementTimer"
-EditorTimerOperator.ELEMENT_FILTER = {"ElementTimer", "ElementJobTimer"}
+EditorTimerOperator.ELEMENT_FILTER = {"ElementTimer", "ElementTimerHud"}
 EditorTimerOperator.INSTANCE_VAR_NAMES = {{type = "number", value = "time"}}
 function EditorTimerOperator:create_element()
 	EditorTimerOperator.super.create_element(self)
@@ -79,7 +79,7 @@ EditorTimerTrigger = EditorTimerTrigger or class(MissionScriptEditor)
 EditorTimerTrigger.LINK_ELEMENTS = {"elements"}
 EditorTimerTrigger.CLASS = "ElementTimerTrigger"
 EditorTimerTrigger.MODULE = "CoreElementTimer"
-EditorTimerTrigger.ELEMENT_FILTER = {"ElementTimer", "ElementJobTimer"}
+EditorTimerTrigger.ELEMENT_FILTER = {"ElementTimer", "ElementTimerHud"}
 
 function EditorTimerTrigger:create_element()
 	EditorTimerTrigger.super.create_element(self)
@@ -92,14 +92,3 @@ function EditorTimerTrigger:_build_panel()
 	self:NumberCtrl("time", {floats = 1, min = 0, help = "Specify how much time should be left on the timer to trigger"})
 	self:Text("This element is a trigger to timer element.")
 end
-
-EditorJobTimer = EditorJobTimer or class(EditorTimer)
-EditorJobTimer.CLASS = "ElementJobTimer"
-
-EditorJobTimerOperator = EditorJobTimerOperator or class(EditorTimerOperator)
-EditorJobTimerOperator.CLASS = "ElementJobTimerOperator"
-EditorJobTimerOperator.ELEMENT_FILTER = {"ElementJobTimer"}
-
-EditorJobTimerTrigger = EditorJobTimerTrigger or class(EditorTimerTrigger)
-EditorJobTimerTrigger.CLASS = "ElementJobTimerTrigger"
-EditorJobTimerTrigger.ELEMENT_FILTER = {"ElementJobTimer"}
