@@ -168,7 +168,6 @@ function AssetsManagerDialog:show_assets()
         })
 	end
 
-    local brush = self:GetPart("world"):get_layer("brush")
     local element_units = managers.mission:get_used_units()
     for unit, times in pairs(managers.worlddefinition._all_names) do
         new_asset(unit, UNIT, times)
@@ -179,7 +178,7 @@ function AssetsManagerDialog:show_assets()
 			if type ~= UNIT or not managers.worlddefinition._all_names[name] then
                 local times = 0
                 if table.contains(BLE.Brushes, name) then
-                    times = #brush:unit_positions(name)
+                    times = self:brush_count(name)
                 elseif element_units and element_units[name] then
                     times = element_units[name]
                 elseif asset.used then
@@ -553,13 +552,23 @@ function AssetsManagerDialog:find_packages(missing_assets, clbk)
     })
 end
 
+--- Number of brush (massunit) placements of a unit. The brush layer is disabled in the editor at the moment, so this is 0 then.
+--- @param name string
+--- @return number
+function AssetsManagerDialog:brush_count(name)
+    local brush = self:GetPart("world"):get_layer("brush")
+    if brush and table.contains(BLE.Brushes, name) then
+        return #brush:unit_positions(name)
+    end
+    return 0
+end
+
 function AssetsManagerDialog:remove_unused_units_from_map()
     BLE.Utils:YesNoQuestion("This will remove any unused units from your map and remove them from your map assets completely", function()
         local element_units = managers.mission:get_used_units()
-        local brush = self:GetPart("world"):get_layer("brush")
         for unit, asset in pairs(self._assets.unit) do
-            local brush = table.contains(BLE.Brushes, unit) and #brush:unit_positions(unit) > 0
-            if not managers.worlddefinition._all_names[unit] and not element_units[unit] and not brush and not asset.used then
+            local brushed = self:brush_count(unit) > 0
+            if not managers.worlddefinition._all_names[unit] and not element_units[unit] and not brushed and not asset.used then
                 self:remove_unit_from_map(true, unit, "unit")
             end
         end
@@ -675,7 +684,7 @@ function AssetsManagerDialog:remove_unit_from_map(remove_asset, name, type)
     local remove = function()
         if type == "unit" then
             local brush = self:GetPart("world"):get_layer("brush")
-            if brush:is_my_unit(name) then
+            if brush and brush:is_my_unit(name) then
                 brush:delete_units(name)
             end
             for k, unit in pairs(managers.worlddefinition._all_units) do
@@ -689,7 +698,8 @@ function AssetsManagerDialog:remove_unit_from_map(remove_asset, name, type)
             local continents = managers.worlddefinition._continent_definitions
             for cname, continent in pairs(continents) do
                 if continent.statics then
-                    for i, static in pairs(continent.statics) do
+                    for i = #continent.statics, 1, -1 do
+                        local static = continent.statics[i]
                         if static.unit_data and static.unit_data.name == name then
                             table.remove(continent.statics, i)
                         end
@@ -866,7 +876,7 @@ function AssetsManagerDialog:set_unit_selected(item)
         if file then
             load_from = (load_from or "") .. "\n"..(file.from_db and "Database" or "Map Assets")
             if type == UNIT and not managers.worlddefinition._all_names[asset] and not element_units[asset] then
-                if not table.contains(BLE.Brushes, asset) or not used_tagged or #self:GetPart("world"):get_layer("brush"):unit_positions(asset) == 0 then
+                if not table.contains(BLE.Brushes, asset) or not used_tagged or self:brush_count(asset) == 0 then
                     unused = true
                 end
             end

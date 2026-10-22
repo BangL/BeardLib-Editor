@@ -14,6 +14,7 @@
     <Classes directory="Classes">
 		<class file="Utils.lua"/>
 		<class file="ExportUtils.lua"/>
+		<class file="MassunitWriter.lua"/>
 		<class file="MenuUIExt.lua"/>
 		<class file="EditorMenu.lua"/>
 		<class file="EditorPart.lua"/>
