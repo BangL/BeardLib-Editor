@@ -198,6 +198,10 @@ function BrushLayerEditor:massunit_units()
 end
 
 function BrushLayerEditor:write_massunit_file()
+	if not BLE.MapProject:current_level_path() then
+		-- no project level (e.g. a vanilla level): nowhere to write the file to
+		return
+	end
 	local path = self:massunit_file_path()
 	local units = self:massunit_units()
 	if #units == 0 then
