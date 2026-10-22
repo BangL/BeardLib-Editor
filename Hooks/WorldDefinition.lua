@@ -924,7 +924,10 @@ end
 function WorldDef:prepare_for_spawn_instance(instance)
 	self:try_loading_custom_instance(instance.folder)
 	local package_data = managers.world_instance:packages_by_instance(instance)
-	if self._init_done then
+	-- _init_done is only set for worlds of the world collection, never for the root world of the editor: then the loaded
+	-- callback of the units stayed on and the engine crashed reading the sequence data of a unit that is still loading
+	local editing = self._init_done or (managers.editor and managers.editor:enabled())
+	if editing then
 		PackageManager:set_resource_loaded_clbk(Idstring("unit"), nil)
 	else
 		local s = "Loading Instance Package: %s"
@@ -941,7 +944,7 @@ function WorldDef:prepare_for_spawn_instance(instance)
 		end
 	end
 
-	if self._init_done then
+	if editing then
 		self:spawn_quick()
 		PackageManager:set_resource_loaded_clbk(Idstring("unit"), _G.ClassClbk(managers.sequence, "clbk_pkg_manager_unit_loaded"))
 		self:report_stuff()
