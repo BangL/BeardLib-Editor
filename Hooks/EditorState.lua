@@ -15,11 +15,11 @@ function EditorState:at_enter()
     if Global.editor_job_id and tweak_data.operations.missions[Global.editor_job_id] then
         managers.raid_job._current_job = tweak_data.operations:mission_data(Global.editor_job_id)
     end
-    local job = tweak_data.operations.missions[managers.raid_job:current_job_id()]
+    --no rewards while editing (on the copy of the running job, the tweak data stays as it is)
+    local job = managers.raid_job._current_job
     if job then
-        --no rewards while editing
         job.xp = 0
-	end
+    end
 end
 
 function EditorState:at_exit(new_state)
