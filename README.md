@@ -30,7 +30,6 @@ A job is a raid: one mission in `tweak_data.operations.missions` that points at 
 | `dogtags_min`, `dogtags_max`, `dogtags_diff_bonus`, `dogtags_min_dist` | Override the values of the preset (`dogtags_min_dist`: smallest distance between two dogtags, default 200). |
 | `greed_items_min`, `greed_items_max` | The same for the greed items (the small gold loot), default 300 to 500. |
 | `excluded_continents` | Comma separated continents of the level that are not created when it is played as a raid (vanilla raids exclude `operation`). |
-| `bounty_forbid_buffs` | Comma separated buffs a bounty challenge card must not have for this raid, e.g. `bags_dont_slow_players_down,effect_player_carry_invert_speed`. |
 | `audio_briefing_id`, `short_audio_briefing_id` | Sound events of the audio briefing and of the selection. They have to exist in the game, custom sounds are not possible. |
 | `loading` | Loading screen: `image` is a file name from `ui/loading_screens/`, `text` a localization id. |
 | `camp_objective_id` | The objective in the camp after selecting the raid. |

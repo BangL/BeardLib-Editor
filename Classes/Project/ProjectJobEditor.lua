@@ -87,7 +87,6 @@ function ProjectJobEditor:build_menu(menu, data)
     menu:textbox("AudioBriefingId", up, data.audio_briefing_id, {help = "Sound event of the audio briefing (Audio tab). Needs an event that exists in the game."})
     menu:textbox("ShortAudioBriefingId", up, data.short_audio_briefing_id, {help = "Sound event that plays when the raid is selected. Needs an event that exists in the game."})
     menu:textbox("ExcludedContinents", up, join(data.excluded_continents), {help = "Continents of the level that are not loaded when it is played as a raid, separated by commas (vanilla raids exclude \"operation\")"})
-    menu:textbox("BountyForbidBuffs", up, data.bounty_forbid_buffs or join(data.bounty_filters and data.bounty_filters.forbid_buffs), {help = "Buffs a bounty card must not have for this raid, separated by commas, e.g. bags_dont_slow_players_down,effect_player_carry_invert_speed"})
     menu:tickbox("Hidden", up, data.hidden, {help = "Hide from the raid selection"})
 
     local divgroup_opt = {border_position_below_title = true, private = {size = 22}}
@@ -243,7 +242,7 @@ function ProjectJobEditor:create(create_data)
 
             local clone_id = create_data.clone_id
             if clone_id then
-                for _, key in ipairs({"region", "xp", "music_id", "mission_flag", "stealth_description", "start_in_stealth", "dogtags", "dogtags_min", "dogtags_max", "dogtags_diff_bonus", "dogtags_min_dist", "greed_items_min", "greed_items_max", "audio_briefing_id", "short_audio_briefing_id", "bounty_forbid_buffs", "mission_state"}) do
+                for _, key in ipairs({"region", "xp", "music_id", "mission_flag", "stealth_description", "start_in_stealth", "dogtags", "dogtags_min", "dogtags_max", "dogtags_diff_bonus", "dogtags_min_dist", "greed_items_min", "greed_items_max", "audio_briefing_id", "short_audio_briefing_id", "mission_state"}) do
                     template[key] = src[key] or template[key]
                 end
                 -- vanilla keeps the loot values in tables, the project in attributes
@@ -258,7 +257,6 @@ function ProjectJobEditor:create(create_data)
                     template.greed_items_max = src.greed_items.max
                 end
                 template.excluded_continents = join(src.excluded_continents)
-                template.bounty_forbid_buffs = join(src.bounty_filters and src.bounty_filters.forbid_buffs)
                 -- the three icons of the vanilla raid, each slot has its own size (the list one is 56x56, the folder 392x392)
                 template.icon_menu = src.icon_menu
                 template.icon_menu_big = src.icon_menu_big
@@ -329,7 +327,6 @@ function ProjectJobEditor:set_data_callback()
     data.audio_briefing_id = self:GetItemValue("AudioBriefingId")
     data.short_audio_briefing_id = self:GetItemValue("ShortAudioBriefingId")
     data.excluded_continents = self:GetItemValue("ExcludedContinents")
-    data.bounty_forbid_buffs = self:GetItemValue("BountyForbidBuffs")
     -- the texts of the photos live in the localization
     local photo_count = self:photo_count()
     if photo_count > 0 and self:GetItem("PhotoTitle1") then
@@ -342,7 +339,7 @@ function ProjectJobEditor:set_data_callback()
             return true
         end)
     end
-    for _, key in ipairs({"music_id", "mission_flag", "icon", "audio_briefing_id", "short_audio_briefing_id", "excluded_continents", "bounty_forbid_buffs"}) do
+    for _, key in ipairs({"music_id", "mission_flag", "icon", "audio_briefing_id", "short_audio_briefing_id", "excluded_continents"}) do
         if data[key] == "" then
             data[key] = nil
         end
