@@ -237,6 +237,7 @@ function Editor:_init_post_effects()
 	self._post_effects = {
 		POSTFX_bloom = {
 			enable = true,
+			option = "PostFXBloom",
             on = function()
                 -- self._vp:vp():set_post_processor_effect("World", Idstring("hdr_post_processor"), Idstring(managers.user:get_setting("light_adaption") and "default" or "no_light_adaption"))
 				self._vp:vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), Idstring("bloom_DOF_combine"))
@@ -249,6 +250,7 @@ function Editor:_init_post_effects()
 		},
 		POSTFX_ssao = {
 			enable = true,
+			option = "PostFXSSAO",
 			on = function ()
 				managers.environment_controller:set_ssao_setting(managers.user:get_setting("ssao_setting"))
 			end,
@@ -258,6 +260,7 @@ function Editor:_init_post_effects()
 		},
 		POSTFX_aa = {
 			enable = true,
+			option = "PostFXAA",
 			on = function ()
 				managers.environment_controller:set_AA_setting(managers.user:get_setting("AA_setting"), self._vp:vp())
 			end,

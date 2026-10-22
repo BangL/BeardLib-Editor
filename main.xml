@@ -127,6 +127,7 @@
         <hook source_file="lib/managers/navigationmanager" file="NavigationManager.lua"/>
         <hook source_file="lib/managers/navfieldbuilder" file="NavFieldBuilder.lua"/>
         <hook source_file="core/lib/managers/viewport/environment/coreenvironmentmanager" file="EnvironmentManager.lua"/>
+        <hook source_file="core/lib/managers/coreenvironmentcontrollermanager" file="EnvironmentControllerManager.lua"/>
     	<hook source_file="lib/tweak_data/levelstweakdata" file="Fixes.lua"/>
     	<hook source_file="lib/managers/raidjobmanager" file="Fixes.lua"/>
         <hook source_file="lib/managers/menu/raid_menu/raidmenuscenemanager" file="Fixes.lua"/>
@@ -265,6 +266,9 @@
                 <option type="boolean" default_value="true" name="DrawPatrolPaths"/>
                 <option type="boolean" default_value="true" name="FastAIDrawing"/>
                 <option type="boolean" default_value="true" name="PostProcessingEffects"/>
+                <option type="boolean" default_value="true" name="PostFXBloom"/>
+                <option type="boolean" default_value="false" name="PostFXSSAO"/>
+                <option type="boolean" default_value="true" name="PostFXAA"/>
                 <option type="boolean" default_value="true" name="ShowHints"/>
                 <option type="boolean" default_value="true" name="RotationInfo"/>
                 <option type="boolean" default_value="true" name="AllowMultiWidgets"/>
