@@ -555,3 +555,14 @@ function NavigationManager:_draw_coarse_graph()
 		end
 	end
 end
+
+-- Application:editor() is false in BeardLib-Editor, so the vanilla set_load_data does not keep the loaded data and
+-- get_save_data would write an empty nav_manager_data (every save of a map destroyed its nav data).
+local set_load_data = NavigationManager.set_load_data
+function NavigationManager:set_load_data(data, world_id, translation, yaw, appendage, ...)
+	local result = set_load_data(self, data, world_id, translation, yaw, appendage, ...)
+	if not appendage then
+		self._load_data = deep_clone(self._data and self._data[world_id] or data)
+	end
+	return result
+end
