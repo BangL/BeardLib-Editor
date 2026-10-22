@@ -11,21 +11,14 @@ function EditorState:at_enter()
 	 
 	managers.editor:set_enabled(true)
     managers.achievment.award = function() end
-    local job_id = managers.job:current_job_id()
-    if job_id then
-		--[[
-	    tweak_data.operations.missions[job_id].contract_cost = {0,0,0,0,0,0,0}
-	    tweak_data.operations.missions[job_id].payout = {0,0,0,0,0,0,0}
-		tweak_data.operations.missions[job_id].contract_visuals = {}
-	    tweak_data.operations.missions[job_id].contract_visuals.min_mission_xp = {0,0,0,0,0,0,0}
-	    tweak_data.operations.missions[job_id].contract_visuals.max_mission_xp = {0,0,0,0,0,0,0}
-		]]
-		tweak_data.operations.missions[job_id].job_type = OperationsTweakData.JOB_TYPE_RAID
-	    tweak_data.operations.missions[job_id].xp = 0
-		tweak_data.operations.missions[job_id].loading = {}
-		tweak_data.operations.missions[job_id].photos = {}
-		tweak_data.operations.missions[job_id].events = nil
-		tweak_data.operations.missions[job_id].events_index_template = nil
+    --Fake the job start: the full flow (stats, sync, objectives) is not wanted in the editor
+    if Global.editor_job_id and tweak_data.operations.missions[Global.editor_job_id] then
+        managers.raid_job._current_job = tweak_data.operations:mission_data(Global.editor_job_id)
+    end
+    local job = tweak_data.operations.missions[managers.raid_job:current_job_id()]
+    if job then
+        --no rewards while editing
+        job.xp = 0
 	end
 end
 

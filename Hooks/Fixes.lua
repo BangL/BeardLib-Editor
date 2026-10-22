@@ -137,6 +137,55 @@ elseif F == "raidjobmanager" then
 	-- 	return {Global.current_mission_filter} or self:current_stage_data().mission_filter
 	-- end
 
+	-- There is no camp/mission world point to return to in the editor (the level is the root world),
+	-- so a mission end would hang in the camp loading screen. Go back to the editor instead.
+	local external_end_mission = RaidJobManager.external_end_mission
+	function RaidJobManager:external_end_mission(...)
+		if not Global.editor_mode then
+			return external_end_mission(self, ...)
+		end
+		managers.game_play_central:set_restarting(false)
+		managers.worldcollection.level_transition_in_progress = false
+
+		-- The gameover check re-arms itself every few seconds as long as its condition holds,
+		-- so clear the "disabled"/"dead" records, or it would end the next play test as well.
+		local groupai = managers.groupai:state()
+		for _, record in pairs(groupai._criminals) do
+			record.status = nil
+		end
+		managers.enemy:remove_delayed_clbk("_gameover_clbk")
+		groupai._gameover_clbk = nil
+
+		local editor = managers.editor
+		-- _enabled is false while play testing. In the editor itself there is nothing more to do,
+		-- toggling there would send us back into the preview.
+		if not editor or editor._enabled then
+			return
+		end
+
+		-- Revive, so the downed state (and its effects) is not carried back into the editor/preview.
+		-- A player that died for good is deleted by the bleed out state right after this, nothing to revive.
+		local player = managers.player:player_unit()
+		local player_died = Global.editor_player_died or not alive(player)
+		Global.editor_player_died = nil
+		if not player_died then
+			local damage = player:character_damage()
+			if damage:need_revive() then
+				-- every down costs a revive, so refill them: repeated downs while testing must not end in a real death
+				damage:force_set_revives(damage:get_max_revives())
+				damage:revive(true)
+			end
+		end
+		-- stop the queued/ongoing "downed" voicelines
+		managers.dialog:quit_dialog(true)
+		managers.subtitle:set_enabled(true)
+		editor:toggle_playtesting()
+		if player_died then
+			-- the next play test has to spawn a new player
+			editor._before_state = "ingame_waiting_for_players"
+		end
+	end
+
 	Hooks:PostHook(RaidJobManager, "stop_sounds", "EditorUnmuteWanted", function(self)
 		if managers.editor then
 			managers.editor:set_wanted_mute(false)
