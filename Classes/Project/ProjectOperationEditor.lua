@@ -4,6 +4,11 @@
 ProjectOperationEditor = ProjectOperationEditor or class(ProjectJobEditor)
 ProjectEditor.EDITORS.operation = ProjectOperationEditor
 
+ProjectOperationEditor.ICON_SLOTS = {
+    {key = "icon_menu", text = "List icon (game)", suffix = "_menu", size = 56},
+    {key = "icon_hud", text = "Paper icon (game)", suffix = "_hud", size = 224},
+}
+
 local XML = BeardLib.Utils.XML
 
 ProjectEditor.ACTIONS["CloneOperation"] = function(parent)
@@ -90,6 +95,9 @@ function ProjectOperationEditor:build_menu(menu, data)
     local icon_group = menu:divgroup("Icon", divgroup_opt)
     icon_group:button("SelectMenuIconFromDisk", ClassClbk(self, "SelectIconFromDisk", "_menu"))
     icon_group:button("SelectHudIconFromDisk", ClassClbk(self, "SelectIconFromDisk", "_hud"))
+    for _, slot in ipairs(self.ICON_SLOTS) do
+        self:game_icon_box(icon_group, slot, up)
+    end
     icon_group:divider("IconHelp", {
         text = "The icons are loaded from assets/guis/textures/mods/icons: job_[ID]_menu.png is the one in the list (56x56) and job_[ID]_hud.png the "
         .."big one on the paper and the loading screen (224x224), or .texture. A missing one is the default icon."
@@ -108,6 +116,11 @@ function ProjectOperationEditor:SelectIconFromDisk(suffix)
             FileIO:Delete(icon .. ".png")
             FileIO:Delete(icon .. ".texture")
             FileIO:CopyFile(path, icon .. "." .. Path:GetFileExtension(path))
+            self._data["icon" .. suffix] = nil -- the image replaces an icon of the game
+            local item = self:GetItem("GameIcon_icon" .. suffix)
+            if item then
+                item:SetValue("")
+            end
             self._parent:save_data_callback()
             BLE.FBD:Hide()
         end
@@ -320,6 +333,7 @@ function ProjectOperationEditor:set_data_callback()
         end
     end
     self:read_events()
+    self:read_game_icons(self.ICON_SLOTS)
 
     -- the texts of the photos live in the localization
     local photo_count = self:photo_count()

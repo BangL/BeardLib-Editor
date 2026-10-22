@@ -94,12 +94,75 @@ function ProjectJobEditor:build_menu(menu, data)
     local icon_group = menu:divgroup("Icon", divgroup_opt)
     icon_group:button("SelectIconFromDisk", ClassClbk(self, "SelectIconFromDisk"))
     icon_group:pathbox("Icon", up, data.icon, "texture", {text = "Icon Path"})
+    for _, slot in ipairs(self.ICON_SLOTS) do
+        self:game_icon_box(icon_group, slot, up)
+    end
     icon_group:divider("IconHelp", {
         text = "The icons are loaded from assets/guis/textures/mods/icons: job_[ID].png is the folder icon (about 392x392), job_[ID]_menu.png the one in the list and job_[ID]_hud.png the HUD one (both 56x56), or .texture. "
-        .."A missing one is the default icon. The button on top selects the folder icon from disk."
+        .."A missing one is the default icon. The button on top selects the folder icon from disk. The fields below use an icon of the game instead (they win over the images)."
     })
     self:build_photos(menu, divgroup_opt, up)
 end
+
+--- Icons of the game that can be used for a slot (key of the job data, e.g. icon_menu): the ones of about the size of the slot.
+--- @param size number Width/height of the slot
+--- @return table list Entries for the ListDialog
+local function game_icons(size)
+    local list = {}
+    for id, icon in pairs(tweak_data.gui.icons) do
+        local rect = type(icon) == "table" and icon.texture_rect
+        if rect and not icon.custom and rect[3] and rect[4] and rect[3] >= size * 0.5 and rect[3] <= size * 1.5 and rect[4] >= size * 0.5 and rect[4] <= size * 1.5 then
+            table.insert(list, {name = string.format("%s (%dx%d)", id, rect[3], rect[4]), id = id})
+        end
+    end
+    return list
+end
+
+--- A textbox for the icon of a slot that points at an icon of the game (instead of an image of the project), with a browse
+--- button. The icons set here win over the images of the project, empty is the image of the project / the default icon.
+--- @param group Item
+--- @param slot table {key, text, size}
+--- @param up function
+function ProjectJobEditor:game_icon_box(group, slot, up)
+    local tb = group:textbox("GameIcon_" .. slot.key, up, self._data[slot.key], {
+        text = slot.text,
+        help = "Id of an icon of the game (tweak_data.gui.icons), it is used instead of the image of the project. Empty: the image job_[ID]" .. slot.suffix .. " of the project, or the default icon.",
+        control_slice = 0.65,
+        textbox_offset = 36
+    })
+    tb:tb_imgbtn("Browse", function()
+        BLE.ListDialog:Show({
+            list = game_icons(slot.size),
+            callback = function(selection)
+                tb:SetValue(selection.id, true)
+                BLE.ListDialog:Hide()
+            end
+        })
+    end, nil, BLE.Utils.EditorIcons.dots, {
+        help = "Browse the icons of the game that fit the slot (" .. slot.size .. "x" .. slot.size .. ")",
+        size = group.size * 1.75,
+        position = function(item)
+            item:SetPositionByString("RightCentery")
+            item:Move(-6)
+        end
+    })
+end
+
+--- Writes the icons of the game of the menu into the data.
+--- @param slots table
+function ProjectJobEditor:read_game_icons(slots)
+    for _, slot in ipairs(slots) do
+        local item = self:GetItem("GameIcon_" .. slot.key)
+        local value = item and item:Value() or ""
+        self._data[slot.key] = value ~= "" and value or nil
+    end
+end
+
+ProjectJobEditor.ICON_SLOTS = {
+    {key = "icon_menu_big", text = "Folder icon (game)", suffix = "", size = 392},
+    {key = "icon_menu", text = "List icon (game)", suffix = "_menu", size = 56},
+    {key = "icon_hud", text = "HUD icon (game)", suffix = "_hud", size = 56},
+}
 
 function ProjectJobEditor:photos_dir()
     local af = self._parent:get_module_by_meta("AddFiles")
@@ -197,6 +260,11 @@ function ProjectJobEditor:SelectIconFromDisk()
             FileIO:Delete(icon..".texture")
             FileIO:CopyFile(path, icon..'.'..Path:GetFileExtension(path))
             self._data.icon = nil
+            self._data.icon_menu_big = nil -- the image replaces an icon of the game
+            local item = self:GetItem("GameIcon_icon_menu_big")
+            if item then
+                item:SetValue("")
+            end
             self._parent:save_data_callback()
             BLE.FBD:Hide()
         end
@@ -327,6 +395,7 @@ function ProjectJobEditor:set_data_callback()
     -- stealth_description is the only setting of the menu, the flag follows it
     data.start_in_stealth = data.stealth_description ~= "whisper_info_starts_loud" or nil
     data.icon = self:GetItem("Icon"):Value()
+    self:read_game_icons(self.ICON_SLOTS)
     data.audio_briefing_id = self:GetItemValue("AudioBriefingId")
     data.short_audio_briefing_id = self:GetItemValue("ShortAudioBriefingId")
     data.excluded_continents = self:GetItemValue("ExcludedContinents")
