@@ -29,6 +29,7 @@
             <class file="ProjectLevelEditor.lua"/>
             <class file="ProjectInstanceEditor.lua"/>
             <class file="ProjectJobEditor.lua"/>
+            <class file="ProjectOperationEditor.lua"/>
             <class file="ProjectLocalizationEditor.lua"/>
             <class file="ProjectUpdatesEditor.lua"/>
             <class file="ProjectAddFilesEditor.lua"/>

@@ -23,7 +23,6 @@ function LoadLevelMenu:init(data)
     local third_w = load_options:ItemsWidth() / 3
 	load_options:combobox("Difficulty", nil, difficulty_loc, 1, {items_localized = true, items_pretty = true, w = third_w, offset = 0})
 	load_options:numberbox("MissionFilter", nil, nil, {w = third_w, floats = 0, offset = 0, help = "Set a mission filter to be forced on the level, 0 uses the default filter."})
-	--load_options:tickbox("OneDown", nil, false, {w = third_w, offset = 0})
     load_options:tickbox("Safemode", nil, false, {w = third_w})
     load_options:tickbox("CheckLoadTime", nil, false, {w = third_w})
 	load_options:tickbox("LogSpawnedUnits", nil, false, {w = third_w})
@@ -45,7 +44,6 @@ function LoadLevelMenu:Destroy()
 		custom = filters:GetItemValue("Custom"),
 		jobs = filters:GetItemValue("Jobs"),
 		difficulty = load_options:GetItemValue("Difficulty"),
-		one_down = load_options:GetItemValue("OneDown"),
 		safemode = load_options:GetItemValue("Safemode"),
 		load_time = load_options:GetItemValue("CheckLoadTime"),
 		log_spawned = load_options:GetItemValue("LogSpawnedUnits")
@@ -207,34 +205,34 @@ function LoadLevelMenu:do_load_jobs()
 
 				local _, new_mission = create_job(job_id, txt, texture, rect, color)
 				level_button(job.level_id, job_id, new_mission)
-			else
-				-- TODO: operations
+			elseif job.job_type == OperationsTweakData.JOB_TYPE_OPERATION and job.events_index_template then
+				-- an operation lists the levels of its events, a row of alternatives together
+				local txt = loc:text((job.name_id or ("job_"..job_id))) .." / " .. job_id
+				local texture, rect, color
+				if job.icon_hud or job.icon_menu then
+					local icon_tweak = tweak_data.gui:get_full_gui_data(job.icon_hud or job.icon_menu)
+					texture, rect, color = icon_tweak.texture, icon_tweak.texture_rect, icon_tweak.color
+				end
+				if not texture or not DB:has(texture_ids, texture:id()) then
+					texture, rect = nil, nil
+				end
 
-				-- local holder, new_mission = create_job(job_id, txt, texture, rect, color)
-				-- local has_items
-				-- for i, level in pairs(job.chain) do
-				-- 	if type(level) == "table" then
-				-- 		local id = level.level_id
-				-- 		if id then
-				-- 			level_button(id, job_id, new_mission)
-				-- 			has_items = true
-				-- 		elseif #level > 0 then
-				-- 			local day = new_mission:tholder("Day #"..tostring(i))
-				-- 			for _, grouped_level in pairs(level) do
-				-- 				id = grouped_level.level_id
-				-- 				if id then
-				-- 					level_button(id, job_id, day)
-				-- 					has_items = true
-				-- 				end
-				-- 			end
-				-- 		end
-				-- 	end
-				-- end
-				-- if not has_items then
-				--     holder:Destroy()
-				-- end
-			end
-			
+				local holder, operation = create_job(job_id, txt, texture, rect, color)
+				local has_items
+				for i, row in ipairs(job.events_index_template) do
+					local event_menu = operation:tholder("Event #" .. tostring(i))
+					for _, key in ipairs(row) do
+						local event = job.events and job.events[key]
+						if event and event.level_id and tweak_data.levels[event.level_id] then
+							level_button(event.level_id, event.mission_id or key, event_menu)
+							has_items = true
+						end
+					end
+				end
+				if not has_items then
+					holder:Destroy()
+				end
+			end			
         end
 	end
 
@@ -252,7 +250,6 @@ function LoadLevelMenu:load_level(item)
 
 	local function load()
 		Global.editor_mode = true
-		-- Global.current_mission_filter = filter == 0 and nil or filter
 		Global.editor_loaded_instance = item.instance and item.instance or false
 		Global.editor_return_bookmark = item.return_bookmark
         Global.editor_safe_mode = safe_mode == true
@@ -260,9 +257,8 @@ function LoadLevelMenu:load_level(item)
         Global.editor_log_on_spawn = log_on_spawn == true
         BeardLib.current_level = nil
 		MenuCallbackHandler:play_single_player()
-		if job_id then
-			managers.raid_job:set_selected_job(job_id)
-		end
+		--managers.global_state does not exist in the menu, so the job is applied in EditorState:at_enter
+		Global.editor_job_id = job_id
         Global.game_settings.level_id = level_id
         Global.current_level_id = item.real_id or level_id
         Global.game_settings.mission = "none"
@@ -288,19 +284,6 @@ function LoadLevelMenu:load_level(item)
 end
 
 function LoadLevelMenu:start_the_game()
-	local mutators_manager = managers.mutators
-
-	if mutators_manager and mutators_manager:should_delay_game_start() then
-		if not mutators_manager:_check_all_peers_are_ready() then
-			mutators_manager:use_start_the_game_initial_delay()
-		end
-
-		mutators_manager:send_mutators_notification_to_clients(mutators_manager:delay_lobby_time())
-		managers.menu:open_node("start_the_game_countdown")
-
-		return
-	end
-
 	if MenuCallbackHandler._game_started then
 		return
 	end
