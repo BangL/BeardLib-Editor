@@ -66,10 +66,11 @@ function ProjectJobEditor:build_menu(menu, data)
     menu:numberbox("Xp", up, data.xp or 2000, {max = 1000000, min = 0, floats = 0})
     menu:textbox("MusicId", up, data.music_id)
     menu:textbox("MissionFlag", up, data.mission_flag)
-    menu:tickbox("StartInStealth", up, data.start_in_stealth, {help = "The mission starts in stealth"})
+    menu:tickbox("Consumable", up, data.consumable == true or data.consumable == "true", {help = "An outlaw raid: it is unlocked with the outlaw intel (documents in the levels) and used up when it is played. The intel unlocks a random one, only with the players that can play it in the lobby. Unlocked ones are kept in the profile."})
     local stealth = {"whisper_info_starts_loud", "whisper_info_starts_stealth", "whisper_info_mostly_stealthable", "whisper_info_completely_stealthable"}
     menu:combobox("StealthDescription", up, stealth, table.get_key(stealth, data.stealth_description or (data.start_in_stealth and "whisper_info_starts_stealth" or "whisper_info_starts_loud")) or 1, {
-        help = "Text on the mission selection"
+        text = "Stealth",
+        help = "Text on the mission selection. Starts loud: the mission starts as usual. All others start in stealth, which is what the game does at the player spawn: the player spawns with the melee weapon in hand."
     })
     local presets = {"small", "medium", "large"}
     local preset = tweak_data.operations.dogtag_types[type(data.dogtags) == "string" and data.dogtags or "medium"] or tweak_data.operations.dogtag_types.medium
@@ -321,8 +322,10 @@ function ProjectJobEditor:set_data_callback()
         local value = self:GetItemValue(item)
         data["dogtags_" .. key] = value ~= default and value or nil
     end
-    data.start_in_stealth = self:GetItemValue("StartInStealth") or nil
+    data.consumable = self:GetItemValue("Consumable") or nil
     data.stealth_description = self:GetItem("StealthDescription"):SelectedItem()
+    -- stealth_description is the only setting of the menu, the flag follows it
+    data.start_in_stealth = data.stealth_description ~= "whisper_info_starts_loud" or nil
     data.icon = self:GetItem("Icon"):Value()
     data.audio_briefing_id = self:GetItemValue("AudioBriefingId")
     data.short_audio_briefing_id = self:GetItemValue("ShortAudioBriefingId")
