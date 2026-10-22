@@ -58,7 +58,7 @@ function UHandler:SaveUnitValues(units, action_type)
         self._history_point = nil --no more time traveling
     end
     table.insert(self._history, {action_type = action_type, event_tbl = event_tbl})
-    if #self._history == self._undo_history_size then
+    while #self._history > self._undo_history_size do
         table.remove(self._history, 1)
     end
 end

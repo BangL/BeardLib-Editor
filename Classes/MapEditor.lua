@@ -185,7 +185,6 @@ function Editor:post_init(menu)
     end
     m.particle = ParticleEditor:new(self, menu)
     m.material = MaterialEditor:new(self, menu)
-    --m.preplanning = PreplanningEditor:new(self, menu)
     self._value_info = self._editor_menu:divider("ValueInfo", {
         foreground = Color(1, 0.8, 0.8, 0), 
         visible = false, 
@@ -1071,7 +1070,13 @@ function Editor:update(t, dt)
         if not self.parts.cubemap_creator:creating_cube_map() and not self._partially_disabled then
             for n, manager in pairs(self.parts) do
                 if manager.update and manager:enabled() then
+                    local clock = os.clock()
                     manager:update(t, dt)
+                    local took = os.clock() - clock
+                    if took > 0.2 then
+                        -- helps tracking down the freezes (issue #7)
+                        BLE:log("[WARNING] slow editor part '%s': %.2f seconds", tostring(n), took)
+                    end
                 end
             end
             
@@ -1233,6 +1238,18 @@ function Editor:update_camera(t, dt)
     end
 end
 
+local function is_finite(n)
+    return n == n and math.abs(n) < 1e7
+end
+
+local function is_finite_pos(pos)
+    return is_finite(pos.x) and is_finite(pos.y) and is_finite(pos.z)
+end
+
+local function is_finite_rot(rot)
+    return is_finite(rot:yaw()) and is_finite(rot:pitch()) and is_finite(rot:roll())
+end
+
 function Editor:update_widgets(t, dt)
     if alive(self:widget_unit()) and not self.parts.static._grabbed_unit then
         local widget_pos = self:world_to_screen(self:widget_unit():position())
@@ -1244,6 +1261,10 @@ function Editor:update_widgets(t, dt)
             if self._using_move_widget and self._move_widget:enabled() then
                 local move_rot = self._use_local_move and widget_rot or Rotation()
                 local result_pos = self._move_widget:calculate(self:widget_unit(), move_rot, widget_pos, widget_screen_pos)
+                if not is_finite_pos(result_pos) then
+                    -- e.g. the cursor ray runs parallel to the widget axis, applying that would send the units to NaN
+                    result_pos = self._last_pos or self:widget_unit():position()
+                end
                 if self._last_pos ~= result_pos then
                     self:set_unit_positions(result_pos)
                     self:update_positions()
@@ -1252,6 +1273,9 @@ function Editor:update_widgets(t, dt)
             end
             if self._using_rotate_widget and self._rotate_widget:enabled() then
                 local result_rot = self._rotate_widget:calculate(self:widget_unit(), widget_rot, widget_pos, widget_screen_pos)
+                if not is_finite_rot(result_rot) then
+                    result_rot = self._last_rot or widget_rot
+                end
                 if self._last_rot ~= result_rot then
                     self:set_unit_rotations(result_rot)
                     self:update_positions()
@@ -1581,7 +1605,7 @@ end
 
 function Editor:update_post_effects()
     for _, pe in pairs(self._post_effects) do
-        if pe.enable and BLE.Options:GetValue("Map/PostProcessingEffects") then
+        if pe.enable and BLE.Options:GetValue("Map/PostProcessingEffects") and BLE.Options:GetValue("Map/" .. pe.option) then
             pe.on()
         else
             pe.off()
