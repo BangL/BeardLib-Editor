@@ -97,18 +97,34 @@ function Instance:prepare_mission_data_by_name(name, worlddefinition_id)
 	return mdata
 end
 
-function Instance:register_output_event_element(mission_id, instance_name, instance_output, mission_element)
-	-- FIXME?
-end
+-- The vanilla registry of instance inputs/outputs (used by play tests), guarded: in the editor the manager may not be
+-- initialized yet and an element may lack an id (nil table key).
+for _, key in ipairs({"input", "output_event"}) do
+	local tbl = "_registered_" .. key .. "_elements"
 
-function Instance:unregister_output_event_elements(mission_id)
-	-- FIXME?
-end
+	local register = Instance["register_" .. key .. "_element"]
+	Instance["register_" .. key .. "_element"] = function(self, mission_id, instance_name, event, mission_element)
+		if mission_id == nil or instance_name == nil or event == nil then
+			return
+		end
+		self[tbl] = self[tbl] or {}
+		return register(self, mission_id, instance_name, event, mission_element)
+	end
 
-function Instance:register_input_element(mission_id, instance_name, instance_input, mission_element)
-	-- FIXME?
-end
+	local unregister = Instance["unregister_" .. key .. "_elements"]
+	Instance["unregister_" .. key .. "_elements"] = function(self, mission_id)
+		if mission_id == nil then
+			return
+		end
+		self[tbl] = self[tbl] or {}
+		return unregister(self, mission_id)
+	end
 
-function Instance:unregister_input_elements(mission_id)
-	-- FIXME?
+	local get = Instance["get_registered_" .. key .. "_elements"]
+	Instance["get_registered_" .. key .. "_elements"] = function(self, ...)
+		if not self[tbl] then
+			return nil
+		end
+		return get(self, ...)
+	end
 end
