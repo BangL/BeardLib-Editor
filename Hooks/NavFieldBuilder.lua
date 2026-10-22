@@ -49,3 +49,24 @@ function NavFieldBuilder:_destroy_progress_bar()
 		self._progress_dialog = nil
 	end
 end
+-- The runtime segments of the navigation manager (keyed "[world]_[id]", with a unique_id and without visibility groups)
+-- used to end up in the list of the builder, see NavigationManager:_refresh_data_from_builder. Rebuilding a single segment
+-- crashed on them, so they are removed. The neighbours of a loaded segment are not saved, so they are missing as well.
+function NavFieldBuilder:_ensure_segment_tables()
+	for id, seg in pairs(self._nav_segments or {}) do
+		if seg.unique_id then
+			self._nav_segments[id] = nil
+		else
+			seg.vis_groups = seg.vis_groups or {}
+			seg.neighbours = seg.neighbours or {}
+		end
+	end
+end
+
+Hooks:PostHook(NavFieldBuilder, "load", "BLENavFieldBuilderLoad", function(self)
+	self:_ensure_segment_tables()
+end)
+
+Hooks:PreHook(NavFieldBuilder, "build_nav_segments", "BLENavFieldBuilderBuildNavSegments", function(self)
+	self:_ensure_segment_tables()
+end)

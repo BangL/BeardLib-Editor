@@ -285,7 +285,8 @@ function NavigationManager:_refresh_data_from_builder()
 	self._geog_segment_offset = self._builder._geog_segment_offset
 	self._nr_geog_segments = self._builder._nr_geog_segments
 	self._visibility_groups = self._builder._visibility_groups
-	self._nav_segments = self._builder._nav_segments
+	-- a copy of the list: the runtime segments that _load_nav_data adds right after this must not end up in the builder
+	self._nav_segments = clone(self._builder._nav_segments)
 end
 
 function NavigationManager:_draw_rooms(progress)
