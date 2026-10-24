@@ -121,6 +121,7 @@
         <hook source_file="lib/utils/game_state_machine/gamestatemachine" file="GameStateMachine.lua"/>
         <hook source_file="lib/managers/mission/elementaiglobalevent" file="ElementAiGlobalEvent.lua"/>
         <hook source_file="lib/managers/mission/elementspawncivilian" file="Fixes.lua"/>
+        <hook source_file="lib/managers/mission/elementnavlink" file="Fixes.lua"/>
         <hook source_file="lib/managers/mission/elementspawnenemydummy" file="Fixes.lua"/>
     	<hook source_file="core/lib/managers/mission/coreelementarea" file="Fixes.lua"/>
         <hook source_file="lib/setups/setup" file="Setup.lua"/>

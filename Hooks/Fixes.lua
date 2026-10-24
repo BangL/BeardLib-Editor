@@ -121,6 +121,17 @@ elseif F == "coreelementworldcamera" then
 	function ElementWorldCamera:camera_done()
 		managers.editor:force_editor_state()
 	end
+elseif F == "elementnavlink" then
+	-- destroy runs on shutdown; removing the nav link from the already torn down quad field crashes the engine
+	function ElementNavLink:destroy()
+		ElementNavLink.super.destroy(self)
+		if self._pos_rsrv then
+			for _, unit_rsrv in pairs(self._pos_rsrv) do
+				managers.navigation:unreserve_pos(unit_rsrv)
+			end
+			self._pos_rsrv = nil
+		end
+	end
 elseif F == "levelstweakdata" then
 	Hooks:PostHook(LevelsTweakData, "init", "BLEInstanceFix", function(self)
 		if Global.editor_loaded_instance then
