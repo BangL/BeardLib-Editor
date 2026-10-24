@@ -225,6 +225,7 @@ function BrushLayerEditor:update_massunit()
 	if state == "emptied" then
 		if now >= self._massunit_next then
 			self._massunit_dirty = false
+			self._massunit_cycle_empty = #self:massunit_units() == 0
 			self:write_massunit_file()
 			self._massunit_ids = Idstring(managers.worlddefinition:world_dir() .. self:brush_data().file)
 			PackageManager:reload(Idstring("massunit"), self._massunit_ids)
@@ -235,13 +236,19 @@ function BrushLayerEditor:update_massunit()
 		if now >= self._massunit_next then
 			MassUnitManager:load(self._massunit_ids, Vector3(), Rotation(), {})
 			MassUnitManager:set_visibility(self._visible)
+			self._massunit_empty_shown = self._massunit_cycle_empty
 			self._massunit_state = nil
 			self._pending = nil
 		end
 	elseif self._massunit_dirty and not (self._spraying or self._erasing) and now - (self._last_change or 0) >= 0.5 then
-		MassUnitManager:delete_all_units()
-		self._massunit_state = "emptied"
-		self._massunit_next = now + 0.4
+		if self._massunit_empty_shown and #self:massunit_units() == 0 then
+			-- the empty file is already shown (clearing twice): reloading it again crashed the engine
+			self._massunit_dirty = false
+		else
+			MassUnitManager:delete_all_units()
+			self._massunit_state = "emptied"
+			self._massunit_next = now + 0.4
+		end
 	end
 end
 
