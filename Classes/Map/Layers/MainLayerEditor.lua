@@ -306,7 +306,8 @@ end
 
 function MainLayerEditor:get_all_units_from_continent(continent)
     local units = {}
-    for _, static in pairs(managers.worlddefinition._continent_definitions[continent].statics) do
+    local def = managers.worlddefinition._continent_definitions[continent]
+    for _, static in pairs(def and def.statics or {}) do
         if static.unit_data and static.unit_data.unit_id then
             local unit = managers.worlddefinition:get_unit_on_load(static.unit_data.unit_id)
             if alive(unit) then
