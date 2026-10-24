@@ -365,29 +365,7 @@ function BLE:GeneratePackageData()
 end
 
 function BLE:GenerateBrushData()
-    --Contains units that do not follow the pattern. To reduce the time it takes to search these units.
-    local brush_units = {
-        -- TODO: re-evaluate for raid
-        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_3",
-        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_2",
-        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_01",
-        -- "units/pd2_dlc_holly/mansion/vegetation/lxa_vegetation_bush_small/lxa_vegetation_bush_small_a",
-        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_11",
-        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_02",
-        -- "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_mix_medium",
-        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_7",
-        -- "units/world/props/nick/nick_speedrun",
-        -- "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_green_medium",
-        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_6",
-        -- "units/pd2_dlc_peta/terrain/pta_2_grass_tufts_brown_medium",
-        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_4",
-        -- "units/pd2_dlc_jerry/terrain/jry_rock_03",
-        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_5",
-        -- "units/world/architecture/secret_stash/props/secret_stash_props_trash_1",
-        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_08",
-        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_06",
-        -- "units/pd2_dlc_bph/props/bph_prop_bloodsplatter/bph_prop_blood_handprint_05"
-    }
+    local brush_units = {}
     for unit in pairs(BLE.DBPaths.unit) do
         if unit:match("brush") and blt.asset_db.has_file(unit, "unit") then
             local read = blt.asset_db.read_file(unit, "unit")

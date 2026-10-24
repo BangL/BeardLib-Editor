@@ -90,9 +90,10 @@ UnitSpawnList.BLACKLIST = {
 function UnitSpawnList:do_search_list()
     local loaded_only = self._options:GetItemValue("ShowLoadedUnitsOnly")
     local short_path = BLE.Options:GetValue("Map/ShortUnitPaths")
+    local custom = BLE.DBPackages and BLE.DBPackages.map_assets and BLE.DBPackages.map_assets.unit or {}
     for unit in pairs(BLE.DBPaths.unit) do
         local blacklisted = false
-        for _, bad in pairs(self.BLACKLIST) do
+        for _, bad in pairs(not custom[unit] and self.BLACKLIST or {}) do -- the units of the map are always listed
             if unit:match(bad) then
                 blacklisted = true
                 break

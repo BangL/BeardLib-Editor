@@ -1,0 +1,491 @@
+---Editor for BeardLib job module (a raid: one job = one level).
+---@class ProjectJobEditor : ProjectModuleEditor
+ProjectJobEditor = ProjectJobEditor or class(ProjectModuleEditor)
+ProjectEditor.EDITORS.job = ProjectJobEditor
+ProjectEditor.ACTIONS["CloneJob"] = function(parent, create_data)
+    local jobs = {}
+    for id, job in pairs(tweak_data.operations.missions) do
+        if not job.custom and not job.hidden and job.job_type == OperationsTweakData.JOB_TYPE_RAID and job.level_id then
+            table.insert(jobs, {name = id.." / " .. managers.localization:text(job.name_id or ("job_"..id)), id = id})
+        end
+    end
+    BLE.ListDialog:Show({
+        list = jobs,
+        callback = function(selection)
+            BLE.ListDialog:hide()
+            ProjectJobEditor:new(parent, nil, table.merge({clone_id = selection.id}, create_data))
+        end
+    })
+end
+
+--- A list for a textbox (lists are written as comma separated attributes), strings stay as they are.
+local function join(list)
+    return type(list) == "table" and table.concat(list, ",") or list
+end
+
+--- Name and briefing of a job are localized as job_[ID]_name/_brief (see JobModule), this keeps the strings of the project in sync.
+--- @param func function Gets the string table of the default language file, return true when changed.
+function ProjectJobEditor:edit_localization(func)
+    local path = Path:Combine(self._parent:get_dir(), "loc", "english.txt")
+    if not FileIO:Exists(path) then
+        return
+    end
+    local ok, strings = pcall(json.decode, FileIO:ReadFrom(path))
+    if not ok or type(strings) ~= "table" or not func(strings) then
+        return
+    end
+    local keys = table.map_keys(strings)
+    table.sort(keys)
+    local lines = {}
+    for _, key in ipairs(keys) do
+        table.insert(lines, string.format("\t%s : %s", json.encode(key), json.encode(strings[key])))
+    end
+    FileIO:WriteTo(path, "{\n" .. table.concat(lines, ",\n") .. "\n}")
+end
+
+--- @param menu ProjectEditor
+--- @param data table
+function ProjectJobEditor:build_menu(menu, data)
+    local up = ClassClbk(self, "set_data_callback")
+
+    data.orig_id = data.orig_id or data.id
+    menu:textbox("JobID", up, data.id, {forbidden_chars = ProjectEditor.ID_FORBIDDEN_CHARS})
+
+    local levels = {}
+    for _, mod in pairs(self._parent:get_modules("level")) do
+        table.insert(levels, mod.id)
+    end
+    if data.level_id and not table.contains(levels, data.level_id) then
+        table.insert(levels, data.level_id)
+    end
+    table.sort(levels)
+    menu:combobox("Level", up, levels, table.get_key(levels, data.level_id) or 1, {free_typing = true})
+
+    local regions = tweak_data.operations.regions
+    menu:combobox("Region", up, regions, table.get_key(regions, data.region or "germany") or 1)
+    menu:numberbox("Xp", up, data.xp or 2000, {max = 1000000, min = 0, floats = 0})
+    menu:textbox("MusicId", up, data.music_id)
+    menu:textbox("MissionFlag", up, data.mission_flag)
+    menu:tickbox("Consumable", up, data.consumable == true or data.consumable == "true", {help = "An outlaw raid: it is unlocked with the outlaw intel (documents in the levels) and used up when it is played. The intel unlocks a random one, only with the players that can play it in the lobby. Unlocked ones are kept in the profile."})
+    local stealth = {"whisper_info_starts_loud", "whisper_info_starts_stealth", "whisper_info_mostly_stealthable", "whisper_info_completely_stealthable"}
+    menu:combobox("StealthDescription", up, stealth, table.get_key(stealth, data.stealth_description or (data.start_in_stealth and "whisper_info_starts_stealth" or "whisper_info_starts_loud")) or 1, {
+        text = "Stealth",
+        help = "Text on the mission selection. Starts loud: the mission starts as usual. All others start in stealth, which is what the game does at the player spawn: the player spawns with the melee weapon in hand."
+    })
+    local presets = {"small", "medium", "large"}
+    local preset = tweak_data.operations.dogtag_types[type(data.dogtags) == "string" and data.dogtags or "medium"] or tweak_data.operations.dogtag_types.medium
+    menu:combobox("Dogtags", up, presets, table.get_key(presets, type(data.dogtags) == "string" and data.dogtags or "medium") or 2, {
+        help = "Preset of how many dogtags are placed on the level. The values below override it."
+    })
+    local loot_help = "Leave at the value of the preset to use the preset"
+    menu:numberbox("DogtagsMin", up, tonumber(data.dogtags_min) or preset.min, {min = 0, floats = 0, help = "Minimum dogtag value placed on the level. " .. loot_help})
+    menu:numberbox("DogtagsMax", up, tonumber(data.dogtags_max) or preset.max, {min = 0, floats = 0, help = "Maximum dogtag value placed on the level. " .. loot_help})
+    menu:numberbox("DogtagsDiffBonus", up, tonumber(data.dogtags_diff_bonus) or preset.diff_bonus, {min = 0, floats = 0, help = "Extra dogtag value per difficulty above the first. " .. loot_help})
+    menu:numberbox("DogtagsMinDist", up, tonumber(data.dogtags_min_dist) or 200, {min = 0, floats = 0, help = "Minimum distance between two planted dogtags (cm)"})
+    local greed = JobModule.DEFAULT_GREED_ITEMS
+    menu:numberbox("GreedItemsMin", up, tonumber(data.greed_items_min) or greed.min, {min = 0, floats = 0, help = "Minimum value of greed items (gold) placed on the level"})
+    menu:numberbox("GreedItemsMax", up, tonumber(data.greed_items_max) or greed.max, {min = 0, floats = 0, help = "Maximum value of greed items (gold) placed on the level"})
+    menu:textbox("AudioBriefingId", up, data.audio_briefing_id, {help = "Sound event of the audio briefing (Audio tab). Needs an event that exists in the game."})
+    menu:textbox("ShortAudioBriefingId", up, data.short_audio_briefing_id, {help = "Sound event that plays when the raid is selected. Needs an event that exists in the game."})
+    menu:textbox("ExcludedContinents", up, join(data.excluded_continents), {help = "Continents of the level that are not loaded when it is played as a raid, separated by commas (vanilla raids exclude \"operation\")"})
+    menu:tickbox("Hidden", up, data.hidden, {help = "Hide from the raid selection"})
+
+    local divgroup_opt = {border_position_below_title = true, private = {size = 22}}
+    local icon_group = menu:divgroup("Icon", divgroup_opt)
+    icon_group:button("SelectIconFromDisk", ClassClbk(self, "SelectIconFromDisk"))
+    icon_group:pathbox("Icon", up, data.icon, "texture", {text = "Icon Path"})
+    for _, slot in ipairs(self.ICON_SLOTS) do
+        self:game_icon_box(icon_group, slot, up)
+    end
+    icon_group:divider("IconHelp", {
+        text = "The icons are loaded from assets/guis/textures/mods/icons: job_[ID].png is the folder icon (about 392x392), job_[ID]_menu.png the one in the list and job_[ID]_hud.png the HUD one (both 56x56), or .texture. "
+        .."A missing one is the default icon. The button on top selects the folder icon from disk. The fields below use an icon of the game instead (they win over the images)."
+    })
+    self:build_photos(menu, divgroup_opt, up)
+end
+
+--- Icons of the game that can be used for a slot (key of the job data, e.g. icon_menu): the ones of about the size of the slot.
+--- @param size number Width/height of the slot
+--- @return table list Entries for the ListDialog
+local function game_icons(size)
+    local list = {}
+    for id, icon in pairs(tweak_data.gui.icons) do
+        local rect = type(icon) == "table" and icon.texture_rect
+        if rect and not icon.custom and rect[3] and rect[4] and rect[3] >= size * 0.5 and rect[3] <= size * 1.5 and rect[4] >= size * 0.5 and rect[4] <= size * 1.5 then
+            table.insert(list, {name = string.format("%s (%dx%d)", id, rect[3], rect[4]), id = id})
+        end
+    end
+    return list
+end
+
+--- A textbox for the icon of a slot that points at an icon of the game (instead of an image of the project), with a browse
+--- button. The icons set here win over the images of the project, empty is the image of the project / the default icon.
+--- @param group Item
+--- @param slot table {key, text, size}
+--- @param up function
+function ProjectJobEditor:game_icon_box(group, slot, up)
+    local tb = group:textbox("GameIcon_" .. slot.key, up, self._data[slot.key], {
+        text = slot.text,
+        help = "Id of an icon of the game (tweak_data.gui.icons), it is used instead of the image of the project. Empty: the image job_[ID]" .. slot.suffix .. " of the project, or the default icon.",
+        control_slice = 0.65,
+        textbox_offset = 36
+    })
+    tb:tb_imgbtn("Browse", function()
+        BLE.ListDialog:Show({
+            list = game_icons(slot.size),
+            callback = function(selection)
+                tb:SetValue(selection.id, true)
+                BLE.ListDialog:Hide()
+            end
+        })
+    end, nil, BLE.Utils.EditorIcons.dots, {
+        help = "Browse the icons of the game that fit the slot (" .. slot.size .. "x" .. slot.size .. ")",
+        size = group.size * 1.75,
+        position = function(item)
+            item:SetPositionByString("RightCentery")
+            item:Move(-6)
+        end
+    })
+end
+
+--- Writes the icons of the game of the menu into the data.
+--- @param slots table
+function ProjectJobEditor:read_game_icons(slots)
+    for _, slot in ipairs(slots) do
+        local item = self:GetItem("GameIcon_" .. slot.key)
+        local value = item and item:Value() or ""
+        self._data[slot.key] = value ~= "" and value or nil
+    end
+end
+
+ProjectJobEditor.ICON_SLOTS = {
+    {key = "icon_menu_big", text = "Folder icon (game)", suffix = "", size = 392},
+    {key = "icon_menu", text = "List icon (game)", suffix = "_menu", size = 56},
+    {key = "icon_hud", text = "HUD icon (game)", suffix = "_hud", size = 56},
+}
+
+function ProjectJobEditor:photos_dir()
+    local af = self._parent:get_module_by_meta("AddFiles")
+    return Path:Combine(self._parent:get_dir(), af and af.directory or "assets", "guis/textures/mods/icons")
+end
+
+---Number of the photos of the job (job_[ID]_photo_[N] counting up from 1).
+function ProjectJobEditor:photo_count(id)
+    local count = 0
+    local dir = self:photos_dir()
+    while count < JobModule.MAX_PHOTOS do
+        local base = Path:Combine(dir, "job_" .. (id or self._data.id) .. "_photo_" .. (count + 1))
+        if not (FileIO:Exists(base .. ".png") or FileIO:Exists(base .. ".texture")) then
+            break
+        end
+        count = count + 1
+    end
+    return count
+end
+
+function ProjectJobEditor:read_localization()
+    local path = Path:Combine(self._parent:get_dir(), "loc", "english.txt")
+    local ok, strings = pcall(json.decode, FileIO:Exists(path) and FileIO:ReadFrom(path) or "{}")
+    return ok and type(strings) == "table" and strings or {}
+end
+
+function ProjectJobEditor:build_photos(menu, opt, up)
+    local id = self._data.id
+    local strings = self:read_localization()
+    local group = menu:divgroup("Photos", opt)
+    group:button("AddPhotoFromDisk", ClassClbk(self, "AddPhotoFromDisk"))
+    group:button("RemoveLastPhoto", ClassClbk(self, "RemoveLastPhoto"))
+    for i = 1, self:photo_count() do
+        local key = "job_" .. id .. "_photo_" .. i
+        group:textbox("PhotoTitle" .. i, up, strings[key .. "_title"] or "", {text = "Photo " .. i .. " title"})
+        group:textbox("PhotoDescription" .. i, up, strings[key .. "_description"] or "", {text = "Photo " .. i .. " description"})
+    end
+    group:divider("PhotoHelp", {
+        text = "The intel photos (about 416x288) are loaded from assets/guis/textures/mods/icons as job_[ID]_photo_1.png, job_[ID]_photo_2.png and so on (or .texture). "
+        .."Reopen the job after adding or removing a photo to edit its texts."
+    })
+end
+
+function ProjectJobEditor:AddPhotoFromDisk()
+    if self:photo_count() >= JobModule.MAX_PHOTOS then
+        BLE.Utils:Notify("Error", string.format("A job can have %d photos at most", JobModule.MAX_PHOTOS))
+        return
+    end
+    BLE.FBD:Show({
+        where = Path:Normalize(Application:base_path()),
+        extensions = {"texture", "png"},
+        file_click = function(path)
+            local id = self._data.id
+            local number = self:photo_count() + 1
+            FileIO:CopyFile(path, Path:Combine(self:photos_dir(), "job_" .. id .. "_photo_" .. number) .. "." .. Path:GetFileExtension(path))
+            self:edit_localization(function(strings)
+                local key = "job_" .. id .. "_photo_" .. number
+                strings[key .. "_title"] = strings[key .. "_title"] or ("Photo " .. number)
+                strings[key .. "_description"] = strings[key .. "_description"] or ""
+                return true
+            end)
+            self._parent:save_data_callback()
+            BLE.FBD:Hide()
+        end
+    })
+end
+
+function ProjectJobEditor:RemoveLastPhoto()
+    local id = self._data.id
+    local number = self:photo_count()
+    if number == 0 then
+        return
+    end
+    local base = Path:Combine(self:photos_dir(), "job_" .. id .. "_photo_" .. number)
+    FileIO:Delete(base .. ".png")
+    FileIO:Delete(base .. ".texture")
+    self:edit_localization(function(strings)
+        strings["job_" .. id .. "_photo_" .. number .. "_title"] = nil
+        strings["job_" .. id .. "_photo_" .. number .. "_description"] = nil
+        return true
+    end)
+    self._parent:save_data_callback()
+end
+
+function ProjectJobEditor:SelectIconFromDisk()
+    local base_path = Path:Normalize(Application:base_path())
+
+    BLE.FBD:Show({
+        where = base_path,
+        extensions = {"texture", "png"},
+        file_click = function(path)
+            local af = self._parent:get_module_by_meta("AddFiles")
+            local icon = Path:Combine(self._parent:get_dir(), af and af.directory or "assets", "guis/textures/mods/icons", "job_"..self._data.id)
+            FileIO:Delete(icon..".png")
+            FileIO:Delete(icon..".texture")
+            FileIO:CopyFile(path, icon..'.'..Path:GetFileExtension(path))
+            self._data.icon = nil
+            self._data.icon_menu_big = nil -- the image replaces an icon of the game
+            local item = self:GetItem("GameIcon_icon_menu_big")
+            if item then
+                item:SetValue("")
+            end
+            self._parent:save_data_callback()
+            BLE.FBD:Hide()
+        end
+    })
+end
+
+function ProjectJobEditor:create(create_data)
+    ProjectEditor.AskName(create_data, {
+        title = "Enter a name for the job",
+        yes = "Create",
+        text = create_data.name or "",
+        check_value = function(name)
+            local warn
+            for k in pairs(tweak_data.operations.missions) do
+                if string.lower(k) == name:lower() then
+                    warn = string.format("A job with the id %s already exists! Please use a unique id", k)
+                end
+            end
+            warn = ProjectEditor.InvalidIdReason(name) or warn
+            if warn then
+                BLE.Utils:Notify("Error", warn)
+            end
+            return warn == nil
+        end,
+        no_callback = function()
+            if create_data.final_callback then
+                create_data.final_callback(false)
+            end
+        end,
+        callback = function(name)
+            local template = deep_clone(BLE.MapProject._job_module_template)
+            template.id = name
+            template.level_id = name
+
+            local loc = managers.localization
+            local src = create_data.clone_id and tweak_data.operations.missions[create_data.clone_id]
+            local name_text = src and src.name_id and loc:text(src.name_id) or name
+            local brief_text = src and src.briefing_id and loc:text(src.briefing_id) or ""
+            self:edit_localization(function(strings)
+                strings["job_" .. name .. "_name"] = strings["job_" .. name .. "_name"] or name_text
+                strings["job_" .. name .. "_brief"] = strings["job_" .. name .. "_brief"] or brief_text
+                return true
+            end)
+
+            local clone_id = create_data.clone_id
+            if clone_id then
+                for _, key in ipairs({"region", "xp", "music_id", "mission_flag", "stealth_description", "start_in_stealth", "dogtags", "dogtags_min", "dogtags_max", "dogtags_diff_bonus", "dogtags_min_dist", "greed_items_min", "greed_items_max", "audio_briefing_id", "short_audio_briefing_id", "mission_state"}) do
+                    template[key] = src[key] or template[key]
+                end
+                -- vanilla keeps the loot values in tables, the project in attributes
+                if type(src.dogtags) == "table" then
+                    template.dogtags = nil
+                    for _, key in ipairs({"min", "max", "diff_bonus", "min_dist"}) do
+                        template["dogtags_" .. key] = src.dogtags[key]
+                    end
+                end
+                if type(src.greed_items) == "table" then
+                    template.greed_items_min = src.greed_items.min
+                    template.greed_items_max = src.greed_items.max
+                end
+                template.excluded_continents = join(src.excluded_continents)
+                -- the three icons of the vanilla raid, each slot has its own size (the list one is 56x56, the folder 392x392)
+                template.icon_menu = src.icon_menu
+                template.icon_menu_big = src.icon_menu_big
+                template.icon_hud = src.icon_hud
+
+                --Clone the level of the raid, it gets the same id as the job.
+                ProjectLevelEditor:new(self._parent, nil, {
+                    clone_id = src.level_id,
+                    name = name,
+                    fixed_name = create_data.fixed_name and name or nil,
+                    job = template,
+                    no_reload = true,
+                    final_callback = function()
+                        self:finalize_creation(template, create_data)
+                    end
+                })
+            else
+                self:finalize_creation(template, create_data)
+            end
+        end
+    })
+end
+
+--- The callback function for all items for this menu.
+function ProjectJobEditor:set_data_callback()
+    local data = self._data
+
+    local name_item = self:GetItem("JobID")
+    local new_name = name_item:Value()
+    local title = "Job ID"
+    if data.id ~= new_name then
+        local exists = false
+        for _, mod in pairs(self._parent:get_modules("job")) do
+            if mod.id == new_name then
+                exists = true
+            end
+        end
+        if exists or ProjectEditor.InvalidIdReason(new_name) or (data.orig_id ~= new_name and tweak_data.operations.missions[new_name]) then
+            title = title .. "[Invalid]"
+        else
+            data.id = new_name
+        end
+    end
+    name_item:SetText(title)
+
+    data.level_id = self:GetItem("Level"):SelectedItem()
+    data.region = self:GetItem("Region"):SelectedItem()
+    data.xp = self:GetItemValue("Xp")
+    data.music_id = self:GetItemValue("MusicId")
+    data.mission_flag = self:GetItemValue("MissionFlag")
+    data.hidden = self:GetItemValue("Hidden") or nil
+    local greed = JobModule.DEFAULT_GREED_ITEMS
+    local greed_min, greed_max = self:GetItemValue("GreedItemsMin"), self:GetItemValue("GreedItemsMax")
+    data.greed_items_min = greed_min ~= greed.min and greed_min or nil
+    data.greed_items_max = greed_max ~= greed.max and greed_max or nil
+    local presets = tweak_data.operations.dogtag_types
+    data.dogtags = self:GetItem("Dogtags"):SelectedItem()
+    local preset = presets[data.dogtags] or presets.medium
+    -- only what differs from the preset is written
+    for key, default in pairs({min = preset.min, max = preset.max, diff_bonus = preset.diff_bonus, min_dist = 200}) do
+        local item = ({min = "DogtagsMin", max = "DogtagsMax", diff_bonus = "DogtagsDiffBonus", min_dist = "DogtagsMinDist"})[key]
+        local value = self:GetItemValue(item)
+        data["dogtags_" .. key] = value ~= default and value or nil
+    end
+    data.consumable = self:GetItemValue("Consumable") or nil
+    data.stealth_description = self:GetItem("StealthDescription"):SelectedItem()
+    -- stealth_description is the only setting of the menu, the flag follows it
+    data.start_in_stealth = data.stealth_description ~= "whisper_info_starts_loud" or nil
+    data.icon = self:GetItem("Icon"):Value()
+    self:read_game_icons(self.ICON_SLOTS)
+    data.audio_briefing_id = self:GetItemValue("AudioBriefingId")
+    data.short_audio_briefing_id = self:GetItemValue("ShortAudioBriefingId")
+    data.excluded_continents = self:GetItemValue("ExcludedContinents")
+    -- the texts of the photos live in the localization
+    local photo_count = self:photo_count()
+    if photo_count > 0 and self:GetItem("PhotoTitle1") then
+        self:edit_localization(function(strings)
+            for i = 1, photo_count do
+                local key = "job_" .. data.id .. "_photo_" .. i
+                strings[key .. "_title"] = self:GetItemValue("PhotoTitle" .. i)
+                strings[key .. "_description"] = self:GetItemValue("PhotoDescription" .. i)
+            end
+            return true
+        end)
+    end
+    for _, key in ipairs({"music_id", "mission_flag", "icon", "audio_briefing_id", "short_audio_briefing_id", "excluded_continents"}) do
+        if data[key] == "" then
+            data[key] = nil
+        end
+    end
+end
+
+function ProjectJobEditor:save_data()
+    local job = self._data
+    local orig_id = job.orig_id or job.id -- Job ID has been changed, let's delete the old ID.
+    if orig_id ~= job.id then
+        -- the events of the operations of the project point to the job
+        for _, op in ipairs(self._parent:get_modules("operation")) do
+            for _, event in ipairs(op) do
+                if type(event) == "table" and event._meta == "event" and (event.job or event.id) == orig_id then
+                    event.job = job.id
+                    event.id = nil
+                end
+            end
+        end
+        tweak_data.operations.missions[orig_id] = nil
+        table.delete(tweak_data.operations._raids_index, orig_id)
+
+        self:edit_localization(function(strings)
+            local changed
+            for _, suffix in ipairs({"_name", "_brief"}) do
+                local old_key, new_key = "job_" .. orig_id .. suffix, "job_" .. job.id .. suffix
+                if strings[old_key] and not strings[new_key] then
+                    strings[new_key] = strings[old_key]
+                    strings[old_key] = nil
+                    changed = true
+                end
+            end
+            local prefix = "job_" .. orig_id .. "_photo_"
+            for key, text in pairs(clone(strings)) do
+                if string.begins(key, prefix) then
+                    strings["job_" .. job.id .. "_photo_" .. key:sub(#prefix + 1)] = text
+                    strings[key] = nil
+                    changed = true
+                end
+            end
+            return changed
+        end)
+
+        -- Move old photos
+        for i = 1, JobModule.MAX_PHOTOS do
+            local photo = Path:Combine(self:photos_dir(), "job_")
+            FileIO:MoveTo(photo .. orig_id .. "_photo_" .. i .. ".png", photo .. job.id .. "_photo_" .. i .. ".png")
+            FileIO:MoveTo(photo .. orig_id .. "_photo_" .. i .. ".texture", photo .. job.id .. "_photo_" .. i .. ".texture")
+        end
+
+        local af = self._parent:get_module_by_meta("AddFiles")
+        local icon = Path:Combine(self._parent:get_dir(), af and af.directory or "assets", "guis/textures/mods/icons", "job_")
+
+        -- Move old icon
+        FileIO:MoveTo(icon .. orig_id..".png", icon .. job.id..".png")
+        FileIO:MoveTo(icon .. orig_id..".texture", icon .. job.id..".texture")
+    end
+    job.orig_id = nil
+    return ProjectJobEditor.super.save_data(self)
+end
+
+--- Removes the job from the game data (the lists of the editor read it) and the events that point at it.
+function ProjectJobEditor:delete()
+    local id = self._data.orig_id or self._data.id
+    for _, op in ipairs(self._parent:get_modules("operation")) do
+        for _, event in ipairs(clone(op)) do
+            if type(event) == "table" and event._meta == "event" and (event.job or event.id) == id then
+                table.delete_value(op, event)
+            end
+        end
+    end
+    local job = tweak_data.operations.missions[id]
+    if job and job.custom then
+        tweak_data.operations.missions[id] = nil
+        table.delete(tweak_data.operations._raids_index, id)
+    end
+end

@@ -66,6 +66,9 @@ function EnvTool:build_menu()
 
 	local quick = self._holder:divgroup("Quick actions")
     quick:tickbox("PostProcessingEffects", ClassClbk(self, "set_post_effects_enabled"), self:Val("PostProcessingEffects"))
+    quick:tickbox("PostFXBloom", ClassClbk(self, "set_post_effects_enabled"), self:Val("PostFXBloom"), {help = "Single post effect, only active while Post Processing Effects is on"})
+    quick:tickbox("PostFXSSAO", ClassClbk(self, "set_post_effects_enabled"), self:Val("PostFXSSAO"), {help = "Makes buildings and interiors pitch black in the editor viewport (issue #3), so it is off by default"})
+    quick:tickbox("PostFXAA", ClassClbk(self, "set_post_effects_enabled"), self:Val("PostFXAA"), {help = "Single post effect, only active while Post Processing Effects is on"})
     quick:button("Browse", ClassClbk(self, "open_environment_dialog"))
     quick:button("LoadGameDefault", ClassClbk(self, "database_load_env", "core/environments/default"))
     quick:button("LoadCurrentDefault", ClassClbk(self, "database_load_env", env_path))
@@ -464,7 +467,6 @@ function EnvTool:set_data_path(data_path, handler, value)
     end
 end
 
-local scene_ids = Idstring("scene")
 function EnvTool:feed(handler, viewport, scene)
 
     for postprocessor_name, post_processor in pairs(self._posteffect.post_processors) do

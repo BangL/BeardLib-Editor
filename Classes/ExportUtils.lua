@@ -169,6 +169,7 @@ function Utils:ReadUnit(unit, config, exclude, extra_info)
     local file_ext = unit..".unit"
     if not self.assets_dir then
         self:Log("Importing unit from database to map assets " .. tostring(unit))
+        blt.flush_log()
     end
 
 	local node = self:ParseXml("unit", unit)

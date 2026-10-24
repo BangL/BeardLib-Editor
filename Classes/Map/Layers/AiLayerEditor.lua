@@ -111,31 +111,6 @@ function AiEditor:build_menu()
     graphs:button("SaveNavigationData", ClassClbk(self:part("opt"), "save_nav_data", false))
     graphs:button("CalculateAll", ClassClbk(self, "build_nav_segments", "all"), { size_by_text = true })
     graphs:button("CalculateSelected", ClassClbk(self, "build_nav_segments", "selected"), { size_by_text = true })
-    --[[
-        graphs:button(
-            "CalculateAll",
-            ClassClbk(
-                self,
-                "_calc_graphs",
-                {
-                    vis_graph = true,
-                    build_type = "all"
-                }
-            )
-        )
-
-        graphs:button(
-            "CalculateSelected",
-            ClassClbk(
-                self,
-                "_calc_graphs",
-                {
-                    vis_graph = true,
-                    build_type = "selected"
-                }
-            )
-        )
-    ]]
     graphs:button("ClearAll", ClassClbk(self, "_clear_graphs"), {size_by_text = true})
     graphs:button("ClearSelected", ClassClbk(self, "_clear_selected_nav_segment"), {size_by_text = true})
 
@@ -589,10 +564,6 @@ end
 
 function AiEditor:draw_patrol_path_externaly(name)
     self:_draw_patrol_path(name, managers.ai_data:patrol_path(name))
-end
-
-function AiEditor:_calc_graphs(params)
-    -- TODO
 end
 
 function AiEditor:_clear_graphs()

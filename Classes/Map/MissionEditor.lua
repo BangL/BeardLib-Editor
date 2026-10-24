@@ -121,16 +121,12 @@ function MissionEditor:remove_element_unit(unit)
 end
 
 function MissionEditor:get_editor_class(c)
-    local clss = rawget(_G, c .. "Editor") or rawget(_G, c:gsub("Element", "Editor"))
-    if not clss then
-        EditorActionMessage = EditorActionMessage or class(MissionScriptEditor)
-    end
-    return clss
+    return rawget(_G, c .. "Editor") or rawget(_G, c:gsub("Element", "Editor"))
 end
 
 function MissionEditor:alert_missing_element_editor(c)
     BLE.Utils:QuickDialog({title = "Well that's embarrassing..", no = "No", message = "Seems like there is no editor class for this element, report this to us?"}, {{"Yes", function()
-        local url = "https://github.com/Luffyyy/BeardLib-Editor/issues/new?labels[]=bug&title=No editor class for the element "..c:gsub("Element", "")
+        local url = "https://github.com/diesel-modding/RAID-BeardLib-Editor/issues/new?labels[]=bug&title=No editor class for the element "..c:gsub("Element", "")
         os.execute('start "" "'..url..'"')
     end}})
 end

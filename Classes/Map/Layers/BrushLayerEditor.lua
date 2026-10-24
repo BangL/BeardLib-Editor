@@ -22,7 +22,7 @@ function BrushLayerEditor:init(parent)
 	self._amount_dirty = true
 	self._short_names = true
 
-	self:load_unit_map_from_vector(CoreEditorUtils.layer_type("brush"))
+	-- self:load_unit_map_from_vector(CoreEditorUtils.layer_type("brush"))
 
 	self._place_slot_mask = managers.slot:get_mask("brush_placeable")
 	self._brush_slot_mask = managers.slot:get_mask("brushes")
@@ -39,6 +39,8 @@ function BrushLayerEditor:init(parent)
 	self:load_brushes()
 end
 
+---Brushes are data of this layer: the engine only shows the massunit that is loaded (see BrushLayerEditor:update_massunit),
+---and the file is written by the editor itself (MassunitWriter). A brush has to come from a package the level loads.
 function BrushLayerEditor:save()
 	if not self._needs_saving then
 		return
@@ -46,129 +48,229 @@ function BrushLayerEditor:save()
 		self._needs_saving = false
 	end
 
+	local data = self:brush_data()
+	data.preload_units = {}
+	local added = {}
+	for _, entry in pairs(self:instances()) do
+		if #entry.positions > 0 then
+			local name = type(entry.name) == "string" and entry.name or entry.name:key()
+			if not added[name] then
+				added[name] = true
+				table.insert(data.preload_units, entry.name)
+			end
+		end
+	end
+
+	self:write_massunit_file()
+end
+
+---The brush entry of the world data (a world without brushes has it without a file).
+function BrushLayerEditor:brush_data()
 	local data = self._parent:data()
-	data.brush = data.brush or {file = "massunit"}
-	data.brush.preload_units = {}
+	data.brush = data.brush or {}
+	data.brush.file = data.brush.file or "massunit"
+	return data.brush
+end
 
-	local file = data.brush.file
-	local level_path = BLE.MapProject:current_level_path()
-	local massunit_path = Path:Combine(level_path, file..".massunit")
+function BrushLayerEditor:massunit_file_path()
+	return Path:Combine(BLE.MapProject:current_level_path(), self:brush_data().file .. ".massunit")
+end
 
-	-- If the file doesn't exist, create a dummy one before the tool creates the real one to "fool" the saving function into thinking there's a massunit.
-	if not FileIO:Exists(massunit_path) then
-		FileIO:CopyFile(Path:Combine(BLE.MapProject._templates_directory, "Level/massunit.massunit"), massunit_path)
-	end
-
-	local massunit = {path = Path:Combine(Application:base_path(), massunit_path), units = {}}
-
-	-- Add anything that was already in the massunit manager
+---Loads the instances the engine has (massunit of the level) as data of the layer.
+function BrushLayerEditor:init_instances()
+	self._instances = {}
 	for _, unit_name in ipairs(MassUnitManager:list()) do
-		local rotations = MassUnitManager:unit_rotations(unit_name)
-		local positions = MassUnitManager:unit_positions(unit_name)
-
-		local clean_positions = {}
-		local clean_rotations = {}
-		for _, pos in pairs(positions) do
-			table.insert(clean_positions, {pos.x, pos.y, pos.z})
+		local entry = self:instance_entry(unit_name)
+		for _, pos in ipairs(MassUnitManager:unit_positions(unit_name)) do
+			table.insert(entry.positions, pos)
 		end
-		for _, rot in pairs(rotations) do
-			table.insert(clean_rotations, math.rot_to_quat(rot))
+		for _, rot in ipairs(MassUnitManager:unit_rotations(unit_name)) do
+			table.insert(entry.rotations, rot)
 		end
-
-		local unhashed = BLE.Utils:Unhash(unit_name, "unit")
-		if unhashed then
-			table.insert(data.brush.preload_units, unhashed)
-		else
-			table.insert(data.brush.preload_units, unit_name)
-		end
-
-		table.insert(massunit.units, {
-			path = unit_name:key(),
-			positions = clean_positions,
-			rotations = clean_rotations
-		})
 	end
+end
 
-	-- Save brushes spawned by the editor in this session
-	for _, header in pairs(self._brush_types) do
-		header:check_alive_units()
-
-		local clean_positions = {}
-		local clean_rotations = {}
-		for _, unit in pairs(header._units) do
-			local pos = unit:position()
-			local rot = unit:rotation()
-
-			table.insert(clean_positions, {pos.x, pos.y, pos.z})
-			table.insert(clean_rotations, math.rot_to_quat(rot))
-		end
-
-		table.insert(data.brush.preload_units, header._name)
-		table.insert(massunit.units, {
-			path = header._name:key(),
-			positions = clean_positions,
-			rotations = clean_rotations
-		})
+function BrushLayerEditor:instances()
+	if not self._instances then
+		self:init_instances()
 	end
+	return self._instances
+end
 
-	local tools_path = Path:Combine(BLE.ModPath, "Tools")
-	local temp_massunit = Path:Combine(tools_path, "Temp/massunit.json")
-	FileIO:WriteTo(temp_massunit, json.encode(massunit), "w")
+---@param name string|userdata Name of the unit or its Idstring.
+function BrushLayerEditor:instance_entry(name)
+	if not self._instances then
+		self._instances = {}
+	end
+	local ids = type(name) == "string" and Idstring(name) or name
+	local key = ids:key()
+	local entry = self._instances[key]
+	if not entry then
+		local unhashed = type(name) == "string" and name or BLE.Utils:Unhash(ids, "unit")
+		entry = {key = key, name = unhashed or ids, positions = {}, rotations = {}}
+		self._instances[key] = entry
+	end
+	return entry
+end
 
-	os.execute('start /min '..Path:Combine(tools_path, "MassunitMaker.exe"))
+function BrushLayerEditor:mark_changed()
+	self._amount_dirty = true
+	self._massunit_dirty = true
+	self._last_change = os.clock()
+end
+
+function BrushLayerEditor:add_instance(name, position, rotation)
+	local entry = self:instance_entry(name)
+	table.insert(entry.positions, position)
+	table.insert(entry.rotations, rotation)
+	-- shown as a marker until the engine has them (see update_massunit)
+	self._pending = self._pending or {}
+	table.insert(self._pending, position)
+	self:mark_changed()
+end
+
+function BrushLayerEditor:remove_instances(found)
+	local by_entry = {}
+	for _, item in ipairs(found) do
+		by_entry[item.entry] = by_entry[item.entry] or {}
+		table.insert(by_entry[item.entry], item.index)
+	end
+	for entry, indexes in pairs(by_entry) do
+		table.sort(indexes, function(a, b) return a > b end)
+		for _, index in ipairs(indexes) do
+			table.remove(entry.positions, index)
+			table.remove(entry.rotations, index)
+		end
+	end
+	if #found > 0 then
+		self:mark_changed()
+	end
+end
+
+---The instances in the cylinder of the brush.
+---@param only_selected boolean Only the units of the selected brushes.
+---@return table List of {entry =, index =}
+function BrushLayerEditor:find_instances(base, tip, radius, only_selected)
+	local selected
+	if only_selected then
+		selected = {}
+		for _, unit_name in ipairs(self._brush_names) do
+			selected[Idstring(unit_name):key()] = true
+		end
+	end
+	local axis = tip - base
+	local length_sq = mvector3.length_sq(axis)
+	local found = {}
+	for key, entry in pairs(self:instances()) do
+		if not selected or selected[key] then
+			for index, pos in ipairs(entry.positions) do
+				local t = length_sq > 0 and (pos - base):dot(axis) / length_sq or 0
+				if t >= 0 and t <= 1 and mvector3.distance(pos, base + axis * t) <= radius then
+					table.insert(found, {entry = entry, index = index})
+				end
+			end
+		end
+	end
+	return found
+end
+
+---The list of the massunit writer.
+function BrushLayerEditor:massunit_units()
+	self._quat_cache = self._quat_cache or setmetatable({}, {__mode = "k"})
+	local units = {}
+	for key, entry in pairs(self:instances()) do
+		if #entry.positions > 0 then
+			local positions, rotations = {}, {}
+			for i, pos in ipairs(entry.positions) do
+				positions[i] = {pos.x, pos.y, pos.z}
+				local rot = entry.rotations[i]
+				local quat = self._quat_cache[rot]
+				if not quat then
+					quat = math.rot_to_quat(rot)
+					self._quat_cache[rot] = quat
+				end
+				rotations[i] = quat
+			end
+			table.insert(units, {key = key, positions = positions, rotations = rotations})
+		end
+	end
+	return units
+end
+
+function BrushLayerEditor:write_massunit_file()
+	if not BLE.MapProject:current_level_path() then
+		-- no project level (e.g. a vanilla level): nowhere to write the file to
+		return
+	end
+	local path = self:massunit_file_path()
+	local units = self:massunit_units()
+	if #units == 0 then
+		-- no instance at all: the empty file of the template, the engine does not get a file without a type
+		local stub = FileIO:ReadFrom(Path:Combine(BLE.MapProject._templates_directory, "Level/massunit.massunit"), "rb")
+		FileIO:WriteTo(path, stub, "wb")
+	else
+		MassunitWriter:Write(path, units)
+	end
+end
+
+---Shows the instances: the massunit of the level is loaded again, like the game does when it loads the level. The engine
+---is touched as little as possible (it crashed whenever a massunit was replaced while its instances were alive, or a
+---resource was asked for right after its reload, which is asynchronous):
+---    1. the manager is emptied,  2. a moment later the file is written and reloaded,  3. a moment later it is loaded.
+---This only starts when the brush is not in use (a stroke is shown as markers meanwhile) and the last change is a
+---moment ago, so a stroke costs one cycle.
+function BrushLayerEditor:update_massunit()
+	local now = os.clock()
+	local state = self._massunit_state
+	if state == "emptied" then
+		if now >= self._massunit_next then
+			self._massunit_dirty = false
+			self:write_massunit_file()
+			self._massunit_ids = Idstring(managers.worlddefinition:world_dir() .. self:brush_data().file)
+			PackageManager:reload(Idstring("massunit"), self._massunit_ids)
+			self._massunit_state = "reloaded"
+			self._massunit_next = now + 1
+		end
+	elseif state == "reloaded" then
+		if now >= self._massunit_next then
+			MassUnitManager:load(self._massunit_ids, Vector3(), Rotation(), {})
+			MassUnitManager:set_visibility(self._visible)
+			self._massunit_state = nil
+			self._pending = nil
+		end
+	elseif self._massunit_dirty and not (self._spraying or self._erasing) and now - (self._last_change or 0) >= 0.5 then
+		MassUnitManager:delete_all_units()
+		self._massunit_state = "emptied"
+		self._massunit_next = now + 0.4
+	end
 end
 
 function BrushLayerEditor:unit_positions(name)
-	local positions = MassUnitManager:unit_positions(name:id())
-	local header = self._brush_types[name]
-	if header then
-		for _, unit in pairs(header._units) do
-			if alive(unit) then
-				table.insert(positions, unit:position())
-			end
-		end
-	end
-	return positions
+	return clone(self:instance_entry(name).positions)
 end
 
 function BrushLayerEditor:unit_rotations(name)
-	local rotations = MassUnitManager:unit_rotations(name:id())
-	local header = self._brush_types[name]
-	if header then
-		for _, unit in pairs(header._units) do
-			if alive(unit) then
-				table.insert(rotations, unit:rotation())
-			end
-		end
-	end
-	return rotations
+	return clone(self:instance_entry(name).rotations)
 end
 
 function BrushLayerEditor:delete_units(name)
-	MassUnitManager:delete_units(name:id())
-	local header = self._brush_types[name]
-	if header then
-		for _, unit in pairs(header._units) do
-			if alive(unit) then
-				World:delete_unit(unit)
-			end
-		end
+	local entry = self:instance_entry(name)
+	if #entry.positions > 0 then
+		entry.positions, entry.rotations = {}, {}
+		self:mark_changed()
 	end
-	self._brush_types[name] = nil
 end
 
 function BrushLayerEditor:reposition_all()
 	managers.editor:output("Reposition all brushes:")
 
-	for _, name in pairs(self._brush_units) do
-		local name_ids = name:id()
+	for _, entry in pairs(self:instances()) do
+		local positions, rotations = entry.positions, entry.rotations
+		local name = type(entry.name) == "string" and entry.name or entry.name:key()
 		local nudged_units = 0
-		local positions = self:unit_positions(name)
 
 		if #positions > 0 then
-			local rotations = self:unit_rotations(name)
-
-			self:delete_units(name)
+			entry.positions, entry.rotations = {}, {}
 
 			for counter = 1, #positions do
 				local rot = rotations[counter]
@@ -179,39 +281,28 @@ function BrushLayerEditor:reposition_all()
 				local ray = managers.editor:select_unit_by_raycast(self._place_slot_mask, ray_type, from, to)
 
 				if ray then
-					local brush_header = self:add_brush_header(name)
-					local correct_pos = brush_header:spawn_brush(ray.position, rotations[counter])
-					self._amount_dirty = true
-					local nudge_length = (ray.position - correct_pos):length()
-
-					if nudge_length > 0.05 then
+					table.insert(entry.positions, ray.position)
+					table.insert(entry.rotations, rot)
+					if (ray.position - pos):length() > 0.05 then
 						nudged_units = nudged_units + 1
 					end
 				else
-					managers.editor:output(" * Lost one of type " .. name .. " - it was too alone at: " .. pos)
+					managers.editor:output(" * Lost one of type " .. name .. " - it was too alone at: " .. tostring(pos))
 				end
 			end
+			self:mark_changed()
 		end
 
 		if nudged_units > 0 then
 			managers.editor:output(" * Nudged " .. nudged_units .. " units of type " .. name)
 		end
-		self._amount_dirty = true
 	end
 end
 
 function BrushLayerEditor:clear_all()
     BLE.Utils:YesNoQuestion("This will delete all brushes in this level, are you sure?", function()
-		MassUnitManager:delete_all_units()
-        for _, header in pairs(self._brush_types) do
-			for _, unit in pairs(header._units) do
-				if alive(unit) then
-					World:delete_unit(unit)
-				end
-			end
-        end
-		self._brush_types = {}
-        self._amount_dirty = true
+		self._instances = {}
+		self:mark_changed()
     end)
 end
 
@@ -220,27 +311,18 @@ function BrushLayerEditor:clear_unit()
         for _, name in ipairs(self._brush_names) do
             self:delete_units(name)
         end
-
-        self._amount_more_dirty = true
     end)
 end
 
 function BrushLayerEditor:_on_amount_updated()
-	local brush_stats, total = self:get_brush_stats()
-
-	local total_amount = total.amount
-	local unique = 0
-	for _, header in pairs(self._brush_types) do
-		header:check_alive_units()
-		local unit_count = #header._units
-		if unit_count > 0 then
-			unique = unique + 1
-			total_amount = total_amount + #header._units
-		end
+	if not self._debug_units_total then
+		return -- the menu is not built yet
 	end
 
-	self._debug_units_total:SetText("Total Units: " .. total_amount)
-	self._debug_units_unique:SetText("Unique Units: " .. total.unique + unique)
+	local _, total = self:get_brush_stats()
+
+	self._debug_units_total:SetText("Total Units: " .. total.amount)
+	self._debug_units_unique:SetText("Unique Units: " .. total.unique)
 
 	if self._debug_list and self._debug_list:visible() then
 		self._debug_list:fill_unit_list()
@@ -305,6 +387,9 @@ function BrushLayerEditor:is_my_unit()
 end
 
 function BrushLayerEditor:update(time, rel_time)
+	-- the picture of the brushes is updated even if another tab is open
+	self:update_massunit()
+
 	if not self:active() then
 		return
 	end
@@ -351,9 +436,9 @@ function BrushLayerEditor:update(time, rel_time)
 	end
 
 	if self._spraying and ray or self._erasing then
-		local units = World:find_units_quick("cylinder", base, tip, self._brush_size, self._brush_slot_mask)
+		local found = self:find_instances(base, tip, self._brush_size)
 		local area = math.pi * math.pow(self._brush_size / 100, 2)
-		local density = #units / area
+		local density = #found / area
 
 		if self._spraying then
 			local created = 0
@@ -366,51 +451,34 @@ function BrushLayerEditor:update(time, rel_time)
 				self:create_brush(place_ray)
 
 				created = created + 1
-				density = (#units + created) / area
+				density = (#found + created) / area
 			end
 
 			if self._brush_density == 0 then
 				self:spray_units_release()
 			end
 		elseif self._erasing then
-			if self._erase_with_pressure and ray then
-				local removed = 0
-
-				while removed < self._brush_pressure and removed < #units do
-					removed = removed + 1
-					local found = true
-
-					if self._erase_with_units then
-						found = false
-
-						while not found and removed <= #units do
-							if self:brush_names_contain(units[removed]:name()) then
-								found = true
-							else
-								removed = removed + 1
-							end
-						end
-					end
-
-					if found then
-						World:delete_unit(units[removed])
-
-						self._amount_dirty = true
-					end
-				end
-
-				if self._brush_density == 0 then
-					self:erase_units_release()
-				end
-			else
-				for _, brush in ipairs(units) do
-					if not self._erase_with_units or self._erase_with_units and self:brush_names_contain(brush:name()) then
-						World:delete_unit(brush)
-
-						self._amount_dirty = true
-					end
-				end
+			if self._erase_with_units then
+				found = self:find_instances(base, tip, self._brush_size, true)
 			end
+			if self._erase_with_pressure and ray then
+				local removed = {}
+				for i = 1, math.min(self._brush_pressure, #found) do
+					removed[i] = found[i]
+				end
+				found = removed
+			end
+			self:remove_instances(found)
+
+			if self._erase_with_pressure and self._brush_density == 0 then
+				self:erase_units_release()
+			end
+		end
+	end
+
+	if self._pending then
+		for _, position in ipairs(self._pending) do
+			Application:draw_sphere(position, 4, 0, 1, 0)
 		end
 	end
 
@@ -421,8 +489,11 @@ end
 
 function BrushLayerEditor:brush_names_contain(name)
 	for _, unit_name in pairs(self._brush_names) do
-		return unit_name:id() == name
+		if unit_name:id() == name then
+			return true
+		end
 	end
+	return false
 end
 
 function BrushLayerEditor:_draw_unit_orientations()
@@ -452,6 +523,10 @@ end
 function BrushLayerEditor:create_brush(ray)
 	if #self._brush_names > 0 and ray then
 		local name = self._brush_names[math.floor(1 + math.rand(#self._brush_names))]
+		-- a brush that no package of the level has cannot be shown (see ensure_package), loading it can crash the engine
+		if not MassUnitManager:can_spawn_unit(Idstring(name)) then
+			return
+		end
 
 		self:add_brush_header(name)
 
@@ -481,9 +556,9 @@ function BrushLayerEditor:create_brush(ray)
 			at = up:cross(right)
 		end
 
-		brush_type:spawn_brush(ray.position + up * self._offset, Rotation(right, at, up))
-
-		self._amount_dirty = true
+		local rotation = Rotation(right, at, up)
+		local position = ray.position + up * self._offset
+		self:add_instance(name, position + rotation:z() * brush_type:get_spawn_dist(), rotation)
 	end
 end
 
@@ -648,6 +723,21 @@ function BrushLayerEditor:load_brushes()
 	end
 end
 
+--- Brushes only work from the packages the level loads (the massunit manager only knows their units). Offers to add a package that has the
+--- brush if it is not available yet.
+function BrushLayerEditor:ensure_package(name)
+	if MassUnitManager:can_spawn_unit(Idstring(name)) then
+		return true
+	end
+	BLE.Utils:YesNoQuestion(string.format("The brush %s is not in any package this level loads, so it cannot be used. Choose a package that has it to add it to the level?", name), function()
+		managers.editor.parts.assets:find_package(name, "unit", true, function()
+			-- the package is loaded now, the brush is selected again to make sure it is ready
+			self:search_units()
+		end)
+	end)
+	return false
+end
+
 function BrushLayerEditor:select_unit(item)
 	local name = item.name
 	self._unit_name = name
@@ -658,6 +748,7 @@ function BrushLayerEditor:select_unit(item)
 		table.delete(self._selected_unit_names, name)
 	else
 		table.insert(self._selected_unit_names, name)
+		self:ensure_package(name)
 	end
 	for _, unit_item in pairs(self._unit_list:Items()) do
 		unit_item:SetBorder({left = table.contains(self._selected_unit_names, unit_item.name)})
@@ -685,15 +776,17 @@ function BrushLayerEditor:select_hovered_units()
 	local base = ray.position - ray.normal * 40 - ray.normal * self._offset
 	local tip = ray.position + ray.normal * self._brush_height + ray.normal * self._offset
 
-	local units = World:find_units_quick("cylinder", base, tip, self._brush_size, self._brush_slot_mask)
-	if #units == 0 then
+	local found = self:find_instances(base, tip, self._brush_size)
+	if #found == 0 then
 		return
 	end
-	
-	for _, unit in ipairs(units) do
-		local name = BLE.Utils:Unhash(unit:name(), "unit")
-		
-		if table.contains(self._selected_unit_names, name) then
+
+	for _, item in ipairs(found) do
+		local name = type(item.entry.name) == "string" and item.entry.name
+
+		if not name then
+			-- the name is not known
+		elseif table.contains(self._selected_unit_names, name) then
 			table.delete(self._selected_unit_names, name)
 		else
 			table.insert(self._selected_unit_names, name)
@@ -734,20 +827,18 @@ function BrushLayerEditor:get_brush_stats()
 		amount = 0
 	}
 
-	for _, unit_name in ipairs(MassUnitManager:list()) do
-		local rotations = MassUnitManager:unit_rotations(unit_name)
-		local positions = MassUnitManager:unit_positions(unit_name)
-		local stats = {
-			unit_name = unit_name,
-			amount = #rotations,
-			positions = positions,
-			rotations = rotations
-		}
-
-		table.insert(brush_stats, stats)
-
-		total.amount = total.amount + #rotations
-		total.unique = total.unique + 1
+	for _, entry in pairs(self:instances()) do
+		local amount = #entry.positions
+		if amount > 0 then
+			table.insert(brush_stats, {
+				unit_name = entry.name,
+				amount = amount,
+				positions = entry.positions,
+				rotations = entry.rotations
+			})
+			total.amount = total.amount + amount
+			total.unique = total.unique + 1
+		end
 	end
 
 	return brush_stats, total
@@ -800,17 +891,6 @@ BrushHeader = BrushHeader or class()
 function BrushHeader:init()
 	self._name = ""
 	self._distance = 0
-	self._units = {}
-end
-
-function BrushHeader:check_alive_units()
-	local new_units = {}
-	for _, unit in pairs(self._units) do
-		if alive(unit) then
-			table.insert(new_units, unit)
-		end
-	end
-	self._units = new_units
 end
 
 function BrushHeader:set_name(name)
@@ -830,7 +910,7 @@ function BrushHeader:setup_brush_distance()
 		if node then
 			for data in node:children() do
 				if data:name() == "brush" then
-					self._distance = tonumber(data:parameter("distance"))
+					self._distance = tonumber(data:parameter("distance")) or 0
 				end
 			end
 		end
@@ -839,23 +919,4 @@ end
 
 function BrushHeader:get_spawn_dist()
 	return self._distance
-end
-
-function BrushHeader:spawn_brush(position, rotation)
-	local assets = managers.editor.parts.assets
-
-	position = position + rotation:z() * self:get_spawn_dist()
-
-	local function start_spawning()
-		-- Massunit spawn function DOES NOT work properly. Glitches easily.
-		table.insert(self._units, safe_spawn_unit(Idstring(self._name), position, rotation))
-	end
-
-	if assets:is_asset_loaded("unit", self._name) then
-		start_spawning()
-	else
-		assets:quick_load_from_db("unit", self._name, start_spawning)
-	end
-
-	return position
 end

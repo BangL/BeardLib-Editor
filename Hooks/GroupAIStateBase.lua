@@ -13,6 +13,20 @@ if F == "groupaistatebase" then
         self._enemies_killed_lifetime = 0
     end)
 
+    -- A play test player may not have a criminal record (e.g. after the preview respawned it),
+    -- which makes the vanilla code crash on the final death. Treat that as the end of the play test.
+    local on_player_criminal_death = GroupAIStateBase.on_player_criminal_death
+    function GroupAIStateBase:on_player_criminal_death(peer_id, ...)
+        local peer = managers.network:session():peer(peer_id)
+        local unit = peer and peer:unit()
+        if not unit or not self._criminals[unit:key()] then
+            Global.editor_player_died = true
+            managers.raid_job:external_end_mission(false, true)
+            return
+        end
+        return on_player_criminal_death(self, peer_id, ...)
+    end
+
     Hooks:PostHook(GroupAIStateBase, "update", "EditorGroupAISpawns", function(self, use_last)
         if not self._task_data then
             return

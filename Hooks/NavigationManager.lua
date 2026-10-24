@@ -2,7 +2,6 @@ if not Global.editor_mode then
 	return
 end
 
-local mvec3_cpy = mvector3.copy
 --[[function NavigationManager:init()
 	self._debug = SystemInfo:platform() == Idstring("WIN32")
 	self._builder = NavFieldBuilder:new()
@@ -93,7 +92,8 @@ end
 function NavigationManager:update(t, dt)
 	if self._debug then
 		self._builder:update(t, dt)
-		if self._draw_enabled then
+		-- no drawing while the data is built, it is drawn again with its completion (the rooms change with every step)
+		if self._draw_enabled and not self._builder._building then
 			local options = self._draw_enabled
 			local data = self._draw_data
 			if data and type(options) == "table" then
@@ -285,7 +285,8 @@ function NavigationManager:_refresh_data_from_builder()
 	self._geog_segment_offset = self._builder._geog_segment_offset
 	self._nr_geog_segments = self._builder._nr_geog_segments
 	self._visibility_groups = self._builder._visibility_groups
-	self._nav_segments = self._builder._nav_segments
+	-- a copy of the list: the runtime segments that _load_nav_data adds right after this must not end up in the builder
+	self._nav_segments = clone(self._builder._nav_segments)
 end
 
 function NavigationManager:_draw_rooms(progress)
@@ -327,6 +328,195 @@ function NavigationManager:_draw_rooms(progress)
 	end
 end
 
+function NavigationManager:_draw_room(room, instant)
+	local draw, brushes, offsets
+
+	if instant then
+		offsets = {
+			Vector3(-1, -1),
+			Vector3(-1, 1),
+			Vector3(1, -1),
+			Vector3(1, 1)
+		}
+	else
+		draw = self._draw_data
+		brushes = draw and draw.brush
+		offsets = draw and draw.offsets
+	end
+
+	local borders = room.borders
+	local height = room.height
+	local my_center = self._builder:_calculate_room_center(room)
+	local xp_yp_draw = Vector3(borders.x_pos + offsets[1].x, borders.y_pos + offsets[1].y, height.xp_yp)
+	local xp_yn_draw = Vector3(borders.x_pos + offsets[2].x, borders.y_neg + offsets[2].y, height.xp_yn)
+	local xn_yp_draw = Vector3(borders.x_neg + offsets[3].x, borders.y_pos + offsets[3].y, height.xn_yp)
+	local xn_yn_draw = Vector3(borders.x_neg + offsets[4].x, borders.y_neg + offsets[4].y, height.xn_yn)
+
+	if instant then
+		Application:draw_line(xp_yp_draw, xp_yn_draw, 0.5, 0.5, 0.5)
+		Application:draw_line(xn_yp_draw, xn_yn_draw, 0.5, 0.5, 0.5)
+		Application:draw_line(xp_yp_draw, xn_yp_draw, 0.5, 0.5, 0.5)
+		Application:draw_line(xp_yn_draw, xn_yn_draw, 0.5, 0.5, 0.5)
+		Application:draw_line(xp_yp_draw, xn_yn_draw, 0.5, 0.5, 0)
+		Application:draw_line(xn_yp_draw, xp_yn_draw, 0.5, 0.5, 0)
+	else
+		local brush = brushes.room_border
+
+		brush:line(xp_yp_draw, xp_yn_draw)
+		brush:line(xn_yp_draw, xn_yn_draw)
+		brush:line(xp_yp_draw, xn_yp_draw)
+		brush:line(xp_yn_draw, xn_yn_draw)
+
+		local nsi = room.vis_group and self:get_nav_seg_from_i_vis_group(room.vis_group)
+
+		local ns = nsi and self._nav_segments[nsi]
+
+		if ns and ns.disabled then
+			brush = brushes.room_diag_disabled
+		else
+			brush = brushes.room_diag
+		end
+
+		if room.obstructed then
+			brush = brushes.room_diag_obstructed
+		end
+
+		brush:line(xp_yp_draw, xn_yn_draw)
+		brush:line(xn_yp_draw, xp_yn_draw)
+
+		if ns and ns.disabled then
+			brushes.room_fill_disabled:quad(xp_yp_draw, xp_yn_draw, xn_yn_draw, xn_yp_draw)
+		elseif room.obstructed then
+			brushes.room_fill_obstructed:quad(xp_yp_draw, xp_yn_draw, xn_yn_draw, xn_yp_draw)
+		else
+			brushes.room_fill:quad(xp_yp_draw, xp_yn_draw, xn_yn_draw, xn_yp_draw)
+		end
+	end
+
+	local expansion = room.expansion
+
+	if expansion then
+		for dir_str, side_expansion in pairs(expansion) do
+			for obstacle_type, obstacle_segments in pairs(side_expansion) do
+				local color, rad
+
+				if obstacle_type == "walls" then
+					rad = 3
+					color = Vector3(1, 0, 0)
+				elseif obstacle_type == "spaces" then
+					rad = 2.2
+					color = Vector3(0, 1, 0)
+				elseif obstacle_type == "stairs" then
+					rad = 1, 8
+					color = Vector3(1, 0.4, 0)
+				elseif obstacle_type == "cliffs" then
+					rad = 1, 6
+					color = Vector3(0.2, 0.1, 0)
+				else
+					rad = 1
+					color = Vector3(0.5, 0.5, 0.5)
+				end
+
+				for i_obs_seg, obstacle_segment in pairs(obstacle_segments) do
+					Application:draw_cone(obstacle_segment[1], obstacle_segment[2], rad, color.x, color.y, color.z)
+				end
+			end
+		end
+	end
+
+	if room.expansion_segments then
+		for dir_str, seg_list in pairs(room.expansion_segments) do
+			local color, rad
+
+			if self._builder._neg_dir_str_map[dir_str] then
+				rad = 3.5
+				color = Vector3(0.5, 0.5, 0.5)
+			else
+				rad = 4
+				color = Vector3(1, 1, 1)
+			end
+
+			for i_seg, seg in pairs(seg_list) do
+				Application:draw_cylinder(seg[1], seg[2], rad, color.x, color.y, color.z)
+			end
+		end
+	end
+
+	if room.neighbours then
+		for side, neighbour_list in pairs(room.neighbours) do
+			local color, rad
+
+			if self._builder._neg_dir_str_map[side] then
+				rad = 3.2
+				color = Vector3(0, 0.5, 0.5)
+			else
+				rad = 4
+				color = Vector3(0, 1, 1)
+			end
+
+			for i_neighbour, neighbour_data in pairs(neighbour_list) do
+				Application:draw_cylinder(neighbour_data.overlap[1], neighbour_data.overlap[2], rad, color.x, color.y, color.z)
+				Application:draw_line(my_center, (neighbour_data.overlap[1] + neighbour_data.overlap[2]) * 0.5, color.x, color.y, color.z)
+			end
+		end
+	end
+end
+
+function NavigationManager:_draw_visibility_groups(progress)
+	local selected_seg = self._selected_segment
+
+	if not selected_seg or not self._nav_segments[selected_seg] then
+		return
+	end
+
+	local selected_vis_groups = self._nav_segments[selected_seg].vis_groups
+	local nr_vis_groups = #selected_vis_groups
+
+	if nr_vis_groups == 0 then
+		return
+	end
+
+	local all_vis_groups = self._visibility_groups
+	local all_rooms = self._rooms
+	local builder = self._builder
+	local draw_data = self._draw_data
+	local brush_node = draw_data.brush.vis_graph_node
+	local brush_rooms = draw_data.brush.vis_graph_rooms
+	local brush_links = draw_data.brush.vis_graph_links
+	local i_vis_group = draw_data.next_draw_i_vis
+	local wanted_index = math.clamp(math.floor(nr_vis_groups * progress), 0, nr_vis_groups)
+
+	while wanted_index > 0 and i_vis_group <= wanted_index do
+		local vis_group = all_vis_groups[selected_vis_groups[i_vis_group]]
+
+		brush_node:sphere(vis_group.pos, 30)
+
+		for i_vis_room, _ in pairs(vis_group.rooms) do
+			local room_c = builder:_calculate_room_center(all_rooms[i_vis_room])
+
+			brush_rooms:line(vis_group.pos, room_c)
+		end
+
+		for i_neigh_group, _ in pairs(vis_group.vis_groups) do
+			local neigh_group = all_vis_groups[i_neigh_group]
+
+			brush_links:cylinder(vis_group.pos, neigh_group.pos, 2)
+
+			if neigh_group.seg ~= selected_seg then
+				brush_links:sphere(neigh_group.pos, 20)
+			end
+		end
+
+		i_vis_group = i_vis_group + 1
+	end
+
+	if progress == 1 then
+		draw_data.next_draw_i_vis = 1
+	else
+		draw_data.next_draw_i_vis = i_vis_group
+	end
+end
+
 function NavigationManager:_draw_coarse_graph()
 	local all_nav_segments = self._nav_segments
 	local all_doors = self._room_doors
@@ -364,4 +554,15 @@ function NavigationManager:_draw_coarse_graph()
 			Application:draw_cone(pos, pos + cone_height, 40, unpack(color))
 		end
 	end
+end
+
+-- Application:editor() is false in BeardLib-Editor, so the vanilla set_load_data does not keep the loaded data and
+-- get_save_data would write an empty nav_manager_data (every save of a map destroyed its nav data).
+local set_load_data = NavigationManager.set_load_data
+function NavigationManager:set_load_data(data, world_id, translation, yaw, appendage, ...)
+	local result = set_load_data(self, data, world_id, translation, yaw, appendage, ...)
+	if not appendage then
+		self._load_data = deep_clone(self._data and self._data[world_id] or data)
+	end
+	return result
 end

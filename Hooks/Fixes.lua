@@ -83,6 +83,14 @@ elseif civ or F == "elementspawnenemydummy" then
 		if (not params or not params.name) and (not enemy or not PackageManager:has(UnitIds, enemy:id())) then
 			return
 		end
+		-- the units crash on spawning without navigation data (nav tracker of the movement)
+		if Global.editor_mode and not managers.navigation:is_data_ready() then
+			if not C._nav_warned then
+				C._nav_warned = true
+				BLE.Utils:Notify("Navigation data missing", "An enemy/civilian spawn element was skipped: the map has no navigation data (AI-graph). Build it in the AI tab (Calculate All, then Save).")
+			end
+			return
+		end
 		return orig(self, params, ...)
 	end
 elseif F == "coreelementworldcamera" then
@@ -113,6 +121,17 @@ elseif F == "coreelementworldcamera" then
 	function ElementWorldCamera:camera_done()
 		managers.editor:force_editor_state()
 	end
+elseif F == "elementnavlink" then
+	-- destroy runs on shutdown; removing the nav link from the already torn down quad field crashes the engine
+	function ElementNavLink:destroy()
+		ElementNavLink.super.destroy(self)
+		if self._pos_rsrv then
+			for _, unit_rsrv in pairs(self._pos_rsrv) do
+				managers.navigation:unreserve_pos(unit_rsrv)
+			end
+			self._pos_rsrv = nil
+		end
+	end
 elseif F == "levelstweakdata" then
 	Hooks:PostHook(LevelsTweakData, "init", "BLEInstanceFix", function(self)
 		if Global.editor_loaded_instance then
@@ -136,6 +155,55 @@ elseif F == "raidjobmanager" then
 	-- 	end
 	-- 	return {Global.current_mission_filter} or self:current_stage_data().mission_filter
 	-- end
+
+	-- There is no camp/mission world point to return to in the editor (the level is the root world),
+	-- so a mission end would hang in the camp loading screen. Go back to the editor instead.
+	local external_end_mission = RaidJobManager.external_end_mission
+	function RaidJobManager:external_end_mission(...)
+		if not Global.editor_mode then
+			return external_end_mission(self, ...)
+		end
+		managers.game_play_central:set_restarting(false)
+		managers.worldcollection.level_transition_in_progress = false
+
+		-- The gameover check re-arms itself every few seconds as long as its condition holds,
+		-- so clear the "disabled"/"dead" records, or it would end the next play test as well.
+		local groupai = managers.groupai:state()
+		for _, record in pairs(groupai._criminals) do
+			record.status = nil
+		end
+		managers.enemy:remove_delayed_clbk("_gameover_clbk")
+		groupai._gameover_clbk = nil
+
+		local editor = managers.editor
+		-- _enabled is false while play testing. In the editor itself there is nothing more to do,
+		-- toggling there would send us back into the preview.
+		if not editor or editor._enabled then
+			return
+		end
+
+		-- Revive, so the downed state (and its effects) is not carried back into the editor/preview.
+		-- A player that died for good is deleted by the bleed out state right after this, nothing to revive.
+		local player = managers.player:player_unit()
+		local player_died = Global.editor_player_died or not alive(player)
+		Global.editor_player_died = nil
+		if not player_died then
+			local damage = player:character_damage()
+			if damage:need_revive() then
+				-- every down costs a revive, so refill them: repeated downs while testing must not end in a real death
+				damage:force_set_revives(damage:get_max_revives())
+				damage:revive(true)
+			end
+		end
+		-- stop the queued/ongoing "downed" voicelines
+		managers.dialog:quit_dialog(true)
+		managers.subtitle:set_enabled(true)
+		editor:toggle_playtesting()
+		if player_died then
+			-- the next play test has to spawn a new player
+			editor._before_state = "ingame_waiting_for_players"
+		end
+	end
 
 	Hooks:PostHook(RaidJobManager, "stop_sounds", "EditorUnmuteWanted", function(self)
 		if managers.editor then

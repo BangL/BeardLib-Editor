@@ -12,8 +12,33 @@ function NavFieldBuilder:_create_build_progress_bar(title, num_divistions)
 	end
 end
 
+-- The build is a task that does one small step per call. The game calls it once per frame (so a room per frame, and a
+-- frame costs a lot more than the step: drawing, gui), the editor runs as many steps as fit into the budget instead.
+NavFieldBuilder.STEP_TIME_BUDGET = 0.04 -- seconds per frame spent on the build
+NavFieldBuilder.PROGRESS_TEXT_INTERVAL = 0.1 -- seconds between two updates of the text of the progress dialog
+
+function NavFieldBuilder:update(t, dt)
+	if not self._building then
+		return
+	end
+	local start = os.clock()
+	repeat
+		if self._progress_dialog_cancel then
+			self._progress_dialog_cancel = nil
+			self:clear()
+			self:_destroy_progress_bar()
+			self._building = nil
+			return
+		end
+		self._building.task_clbk(self)
+	until not self._building or os.clock() - start >= self.STEP_TIME_BUDGET
+end
+
 function NavFieldBuilder:_update_progress_bar(percent_complete, title)
-	if self._progress_dialog then
+	-- the step runs many times per frame, the text of a gui item is not cheap
+	local now = os.clock()
+	if self._progress_dialog and (not self._progress_text_t or now - self._progress_text_t >= self.PROGRESS_TEXT_INTERVAL) then
+		self._progress_text_t = now
 		self._progress_dialog:GetItem("Sub"):SetText(title)
 	end
 end
@@ -24,3 +49,24 @@ function NavFieldBuilder:_destroy_progress_bar()
 		self._progress_dialog = nil
 	end
 end
+-- The runtime segments of the navigation manager (keyed "[world]_[id]", with a unique_id and without visibility groups)
+-- used to end up in the list of the builder, see NavigationManager:_refresh_data_from_builder. Rebuilding a single segment
+-- crashed on them, so they are removed. The neighbours of a loaded segment are not saved, so they are missing as well.
+function NavFieldBuilder:_ensure_segment_tables()
+	for id, seg in pairs(self._nav_segments or {}) do
+		if seg.unique_id then
+			self._nav_segments[id] = nil
+		else
+			seg.vis_groups = seg.vis_groups or {}
+			seg.neighbours = seg.neighbours or {}
+		end
+	end
+end
+
+Hooks:PostHook(NavFieldBuilder, "load", "BLENavFieldBuilderLoad", function(self)
+	self:_ensure_segment_tables()
+end)
+
+Hooks:PreHook(NavFieldBuilder, "build_nav_segments", "BLENavFieldBuilderBuildNavSegments", function(self)
+	self:_ensure_segment_tables()
+end)

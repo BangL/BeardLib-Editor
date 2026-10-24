@@ -324,7 +324,7 @@ function HUDCombatDebug:update(t, dt)
         self:build_menu()
     end
 
-    self._current_phase_timer = 0 + dt
+    self._current_phase_timer = (self._current_phase_timer or 0) + dt
 
 	if self._is_shown == false or not self._combat_debug_panel then
 		return
@@ -406,7 +406,7 @@ function HUDCombatDebug:update(t, dt)
 	-- end
 
     local music_state = Global.music_manager.current_event or "none"
-    music_state = music_state:gsub("music_heist_", "")
+    music_state = music_state:gsub("music_job_", "")
     if self._music_state_val:text() ~= music_state then
         self._music_state_val:set_text(tostring(music_state))
         self._music_state_val:stop()

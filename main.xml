@@ -5,7 +5,7 @@
 		image="textures/editor_logo"
 		color="Color(0.8,0.8,0.8)"
 		auto_image_color="true"
-		min_lib_ver="4.5"
+		min_lib_ver="5.1.0.0"
 		core_class="Core.lua"
 	>
     <AssetUpdates provider="github" custom_name="GitHub Update" branch="master" id="RAIDModding/BeardLib-Editor" dont_delete="true"/>
@@ -14,6 +14,7 @@
     <Classes directory="Classes">
 		<class file="Utils.lua"/>
 		<class file="ExportUtils.lua"/>
+		<class file="MassunitWriter.lua"/>
 		<class file="MenuUIExt.lua"/>
 		<class file="EditorMenu.lua"/>
 		<class file="EditorPart.lua"/>
@@ -28,7 +29,8 @@
             <class file="ProjectModuleEditor.lua"/>
             <class file="ProjectLevelEditor.lua"/>
             <class file="ProjectInstanceEditor.lua"/>
-            <class file="ProjectNarrativeEditor.lua"/>
+            <class file="ProjectJobEditor.lua"/>
+            <class file="ProjectOperationEditor.lua"/>
             <class file="ProjectLocalizationEditor.lua"/>
             <class file="ProjectUpdatesEditor.lua"/>
             <class file="ProjectAddFilesEditor.lua"/>
@@ -119,6 +121,7 @@
         <hook source_file="lib/utils/game_state_machine/gamestatemachine" file="GameStateMachine.lua"/>
         <hook source_file="lib/managers/mission/elementaiglobalevent" file="ElementAiGlobalEvent.lua"/>
         <hook source_file="lib/managers/mission/elementspawncivilian" file="Fixes.lua"/>
+        <hook source_file="lib/managers/mission/elementnavlink" file="Fixes.lua"/>
         <hook source_file="lib/managers/mission/elementspawnenemydummy" file="Fixes.lua"/>
     	<hook source_file="core/lib/managers/mission/coreelementarea" file="Fixes.lua"/>
         <hook source_file="lib/setups/setup" file="Setup.lua"/>
@@ -127,6 +130,7 @@
         <hook source_file="lib/managers/navigationmanager" file="NavigationManager.lua"/>
         <hook source_file="lib/managers/navfieldbuilder" file="NavFieldBuilder.lua"/>
         <hook source_file="core/lib/managers/viewport/environment/coreenvironmentmanager" file="EnvironmentManager.lua"/>
+        <hook source_file="core/lib/managers/coreenvironmentcontrollermanager" file="EnvironmentControllerManager.lua"/>
     	<hook source_file="lib/tweak_data/levelstweakdata" file="Fixes.lua"/>
     	<hook source_file="lib/managers/raidjobmanager" file="Fixes.lua"/>
         <hook source_file="lib/managers/menu/raid_menu/raidmenuscenemanager" file="Fixes.lua"/>
@@ -139,6 +143,11 @@
         <hook source_file="lib/managers/menu/raid_menu/raidmainmenugui" file="RaidMainMenuGui.lua"/>
         <hook source_file="lib/managers/objectivesmanager" file="ObjectivesManager.lua"/>
         <hook source_file="lib/managers/gameplaycentralmanager" file="GamePlayCentralManager.lua"/>
+        <hook source_file="lib/managers/savefilemanager" file="ProfileGuard.lua"/>
+        <hook source_file="lib/managers/statisticsmanager" file="ProfileGuard.lua"/>
+        <hook source_file="lib/managers/raidexperiencemanager" file="ProfileGuard.lua"/>
+        <hook source_file="lib/managers/greedmanager" file="ProfileGuard.lua"/>
+        <hook source_file="lib/managers/challenges/challengetasks" file="ProfileGuard.lua"/>
         <hook source_file="lib/managers/menu/raid_menu/raidmenucallbackhandler" file="RaidMenuCallbackHandler.lua"/>
     </Hooks>
     <Options build_menu="false" early_post_init="true">
@@ -261,6 +270,9 @@
                 <option type="boolean" default_value="true" name="DrawPatrolPaths"/>
                 <option type="boolean" default_value="true" name="FastAIDrawing"/>
                 <option type="boolean" default_value="true" name="PostProcessingEffects"/>
+                <option type="boolean" default_value="true" name="PostFXBloom"/>
+                <option type="boolean" default_value="false" name="PostFXSSAO"/>
+                <option type="boolean" default_value="true" name="PostFXAA"/>
                 <option type="boolean" default_value="true" name="ShowHints"/>
                 <option type="boolean" default_value="true" name="RotationInfo"/>
                 <option type="boolean" default_value="true" name="AllowMultiWidgets"/>
@@ -317,44 +329,25 @@
         <value_node value="ElementRelativeTeleportTarget"/>
         
         <!--Normal-->
-        <value_node value="ElementSideJobAward"/>
-        <value_node value="ElementSideJobFilter"/>
-        <value_node value="ElementTangoAward"/>
-        <value_node value="ElementTangoFilter"/>
         <value_node value="ElementInstanceParams"/>
-        <value_node value="ElementChangeVanSkin"/>
         <value_node value="ElementCharacterDamage"/>
-        <value_node value="ElementCheckDLC"/>
         <value_node value="ElementInvulnerable"/>
-        <value_node value="ElementCustomSafehouseFilter"/>
-        <value_node value="ElementCustomSafehouseTrophyFilter"/>
-        <value_node value="ElementCustomSafehouseAwardTrophy"/>
         <value_node value="ElementEnableSoundEnvironment"/>
-        <value_node value="ElementLoadDelayed"/>
-        <value_node value="ElementLootPile"/>
-        <value_node value="ElementPlayerCharacterTrigger"/>
         <value_node value="ElementTeamAICommands"/>
-        <value_node value="ElementUnitDamage"/>
-        <value_node value="ElementUnloadStatic"/>
         <value_node value="ElementVariableGet"/>
         <value_node value="ElementVariableSet"/>
         <value_node value="ElementActivateScript"/>
         <value_node value="ElementDebug"/>
         <value_node value="ElementExecuteInOtherMission"/>
         <value_node value="ElementMusic"/>
-        <value_node value="ElementAIForceAttention"/>
-        <value_node value="ElementAIForceAttentionOperator"/>
         <value_node value="ElementStatisticsJobs"/>
-        <value_node value="ElementStatisticsContact"/>
         <value_node value="ElementPhysicsPush"/>
         <value_node value="ElementOverlayEffect"/>
         <value_node value="ElementGlobalEventTrigger"/>
         <value_node value="ElementInstanceInput"/>
         <value_node value="ElementInstanceInputEvent"/>
-        <value_node value="ElementRandomInstanceInputEvent"/>
         <value_node value="ElementInstanceOutput"/>
         <value_node value="ElementInstanceOutputEvent"/>
-        <value_node value="ElementRandomInstanceOutputEvent"/>
         <value_node value="ElementInstancePoint"/>
         <value_node value="ElementInstanceSetParams"/>
         <value_node value="ElementShape"/>
@@ -362,10 +355,6 @@
         <value_node value="ElementCounterOperator"/>
         <value_node value="ElementCounterTrigger"/>
         <value_node value="ElementCounterFilter"/>
-        <value_node value="ElementStopwatch"/>
-        <value_node value="ElementStopwatchOperator"/>
-        <value_node value="ElementStopwatchTrigger"/>
-        <value_node value="ElementStopwatchFilter"/>
         <value_node value="ElementOperator"/>
         <value_node value="ElementEnemyPreferedAdd"/>
         <value_node value="ElementEnemyPreferedRemove"/>
@@ -373,34 +362,24 @@
         <value_node value="ElementAccessCamera"/>
         <value_node value="ElementAccessCameraOperator"/>
         <value_node value="ElementAccessCameraTrigger"/>
-        <value_node value="ElementActionMessage"/>
         <value_node value="ElementAIArea"/>
         <value_node value="ElementAIAttention"/>
         <value_node value="ElementAiGlobalEvent"/>
         <value_node value="ElementAIGraph"/>
         <value_node value="ElementAIRemove"/>
-        <value_node value="ElementAlertTrigger"/>
         <value_node value="ElementAreaMinPoliceForce"/>
         <value_node value="ElementAreaTrigger"/>
         <value_node value="ElementAreaReportTrigger"/>
         <value_node value="ElementAreaOperator"/>
-        <value_node value="ElementAssetTrigger"/>
         <value_node value="ElementAwardAchievment"/>
-        <value_node value="ElementBainState"/>
-        <value_node value="ElementEndscreenVariant"/>
-        <value_node value="ElementFailureVariant"/>
-        <value_node value="ElementBlackscreenVariant"/>
         <value_node value="ElementBlurZone"/>
         <value_node value="ElementCarry"/>
         <value_node value="ElementCharacterOutline"/>
         <value_node value="ElementCharacterSequence"/>
         <value_node value="ElementCharacterTeam"/>
-        <value_node value="ElementDangerZone"/>
         <value_node value="ElementUnitSequenceTrigger"/>
         <value_node value="ElementDialogue"/>
         <value_node value="ElementDifficulty"/>
-        <value_node value="ElementDifficultyLevelCheck"/>
-        <value_node value="ElementDisableShout"/>
         <value_node value="ElementDisableUnit"/>
         <value_node value="ElementDropinState"/>
         <value_node value="ElementEnableUnit"/>
@@ -409,60 +388,38 @@
         <value_node value="ElementExperience"/>
         <value_node value="ElementExplosion"/>
         <value_node value="ElementExplosionDamage"/>
-        <value_node value="ElementFadeToBlack"/>
-        <value_node value="ElementFakeAssaultState"/>
         <value_node value="ElementFeedback"/>
         <value_node value="ElementFilter"/>
-        <value_node value="ElementFlashlight"/>
         <value_node value="ElementFleePoint"/>
-        <value_node value="ElementGameDirection"/>
-        <value_node value="ElementHeat"/>
         <value_node value="ElementHint"/>
         <value_node value="ElementInstigator"/>
         <value_node value="ElementInstigatorRule"/>
         <value_node value="ElementInteraction"/>
-        <value_node value="ElementInventoryDummy"/>
-        <value_node value="ElementJobStageAlternative"/>
         <value_node value="ElementJobValue"/>
         <value_node value="ElementUnitSequence"/>
         <value_node value="ElementKillZone"/>
         <value_node value="ElementLookAtTrigger"/>
         <value_node value="ElementLootBag"/>
-        <value_node value="ElementLootSecuredTrigger"/>
-        <value_node value="ElementMandatoryBags"/>
         <value_node value="ElementMissionEnd"/>
-        <value_node value="ElementMissionFilter"/>
         <value_node value="ElementModifyPlayer"/>
-        <value_node value="ElementMoney"/>
         <value_node value="ElementNavObstacle"/>
         <value_node value="ElementObjective"/>
         <value_node value="ElementPickup"/>
-        <value_node value="ElementPlayerNumberCheck"/>
         <value_node value="ElementPlayerSpawner"/>
         <value_node value="ElementPlayerState"/>
         <value_node value="ElementPlayerStateTrigger"/>
         <value_node value="ElementPlaySound"/>
-        <value_node value="ElementPlayerStyle"/>
         <value_node value="ElementPointOfNoReturn"/>
-        <value_node value="ElementPrePlanning"/>
         <value_node value="ElementLogicChance"/>
         <value_node value="ElementLogicChanceOperator"/>
         <value_node value="ElementLogicChanceTrigger"/>
         <value_node value="MissionScriptElement"/>
-        <value_node value="ElementPressure"/>
-        <value_node value="ElementProfileFilter"/>
-        <value_node value="ElementScenarioEvent"/>
-        <value_node value="ElementSecurityCamera"/>
-        <value_node value="ElementSequenceCharacter"/>
         <value_node value="ElementSetOutline"/>
         <value_node value="ElementSlowMotion"/>
         <value_node value="ElementSmokeGrenade"/>
         <value_node value="ElementSpawnCivilian"/>
-        <value_node value="ElementSpawnCivilianGroup"/>
-        <value_node value="ElementSpawnDeployable"/>
         <value_node value="ElementSpawnEnemyDummy"/>
         <value_node value="ElementSpawnEnemyGroup"/>
-        <value_node value="ElementSpawnGageAssignment"/>
         <value_node value="ElementSpawnGrenade"/>
         <value_node value="ElementSpecialObjective"/>
         <value_node value="ElementSpecialObjectiveGroup"/>
@@ -475,7 +432,6 @@
         <value_node value="ElementTimer"/>
         <value_node value="ElementTimerOperator"/>
         <value_node value="ElementTimerTrigger"/>
-        <value_node value="ElementTeammateComment"/>
         <value_node value="ElementTeamRelation"/>
         <value_node value="ElementVehicleOperator"/>
         <value_node value="ElementVehicleSpawner"/>
@@ -487,18 +443,9 @@
         <value_node value="ElementStopEffect"/>
         <value_node value="ElementLootBagTrigger"/>
 	    <value_node value="ElementCounterReset"/>
-	    <value_node value="ElementTerminateAssault"/>
 	    <value_node value="ElementEnvironmentOperator"/>
-	    <value_node value="ElementVehicleBoarding"/>
-	    <value_node value="ElementPrePlanningExecuteGroup"/>
-	    <value_node value="ElementPickupCriminalDeployables"/>
 	    <value_node value="ElementInstigatorOperator"/>
 	    <value_node value="ElementInstigatorTrigger"/>
-	    <value_node value="ElementHeistTimer"/>
-	    <value_node value="ElementAreaDespawn"/>
-        <value_node value="ElementSpawnTeamAI"/>
-        <value_node value="ElementForceEndAssaultState"/>
-        <value_node value="ElementClock"/>
         <value_node value="ElementWorldCamera"/>
         <value_node value="ElementWorldCameraTrigger"/>
         <value_node value="ElementBarrage"/>
@@ -516,7 +463,21 @@
         <value_node value="ElementNavigationStitcher"/>
         <value_node value="ElementNavLink"/>
         <value_node value="ElementWorldOperator"/>
-	    <!-- <value_node value="ElementAIGroupType"/> FIXME? -->
+        <value_node value="ElementDropPoint"/>
+        <value_node value="ElementDropPointGroup"/>
+        <value_node value="ElementEnvironmentEffect"/>
+        <value_node value="ElementEnvironmentAreaOperator"/>
+        <value_node value="ElementGameEventIsDone"/>
+        <value_node value="ElementGameEventSet"/>
+        <value_node value="ElementMetalDetector"/>
+        <value_node value="ElementMotionpathMarker"/>
+        <value_node value="ElementMotionPathOperator"/>
+        <value_node value="ElementMotionPathTrigger"/>
+        <value_node value="ElementPlayerCharacterFilter"/>
+        <value_node value="ElementRopeOperator"/>
+        <value_node value="ElementRopeTrigger"/>
+        <value_node value="ElementSoundSwitch"/>
+        <value_node value="ElementTimerHud"/>
     </MissionElements>
     <AutoClassElements>
     </AutoClassElements>

@@ -23,7 +23,7 @@ function MainLayerEditor:build_menu()
     if not BeardLib.current_level then
         local s = "Preview mode"
         s = s .. "\nSaving the map will not clone the map, it'll just save it."
-        s = s .. "\nIf you wish to clone it please use the 'Clone Existing Heist' feature in projects menu."
+        s = s .. "\nIf you wish to clone it please use the 'Clone Existing Job' feature in projects menu."
         self._holder:alert(s)
     end
 
@@ -306,7 +306,8 @@ end
 
 function MainLayerEditor:get_all_units_from_continent(continent)
     local units = {}
-    for _, static in pairs(managers.worlddefinition._continent_definitions[continent].statics) do
+    local def = managers.worlddefinition._continent_definitions[continent]
+    for _, static in pairs(def and def.statics or {}) do
         if static.unit_data and static.unit_data.unit_id then
             local unit = managers.worlddefinition:get_unit_on_load(static.unit_data.unit_id)
             if alive(unit) then

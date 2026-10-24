@@ -270,8 +270,15 @@ function WorldDef:_create_massunit(data, offset)
 
 	MassUnitManager:delete_all_units()
 
+	-- the editor passes a position, the game ({pos =, rot =}, e.g. when the simulation ends) a table: the engine
+	-- crashes on anything but a Vector3 here
+	local position, rotation = offset, Rotation()
+	if type(offset) == "table" then
+		position, rotation = offset.pos, offset.rot or rotation
+	end
+
 	if PackageManager:has(Idstring("massunit"), path:id()) then
-		MassUnitManager:load(path:id(), offset, Rotation(), self._massunit_replace_names)
+		MassUnitManager:load(path:id(), position or Vector3(), rotation, self._massunit_replace_names)
 	end
 end
 
@@ -917,7 +924,10 @@ end
 function WorldDef:prepare_for_spawn_instance(instance)
 	self:try_loading_custom_instance(instance.folder)
 	local package_data = managers.world_instance:packages_by_instance(instance)
-	if self._init_done then
+	-- _init_done is only set for worlds of the world collection, never for the root world of the editor: then the loaded
+	-- callback of the units stayed on and the engine crashed reading the sequence data of a unit that is still loading
+	local editing = self._init_done or (managers.editor and managers.editor:enabled())
+	if editing then
 		PackageManager:set_resource_loaded_clbk(Idstring("unit"), nil)
 	else
 		local s = "Loading Instance Package: %s"
@@ -934,7 +944,7 @@ function WorldDef:prepare_for_spawn_instance(instance)
 		end
 	end
 
-	if self._init_done then
+	if editing then
 		self:spawn_quick()
 		PackageManager:set_resource_loaded_clbk(Idstring("unit"), _G.ClassClbk(managers.sequence, "clbk_pkg_manager_unit_loaded"))
 		self:report_stuff()

@@ -335,8 +335,9 @@ function ItemExt:pathbox(name, callback, value, typ, o)
 			list = list,
 			sort = o.sort_func == nil,
 			callback = function(path)
-				local assets = managers.editor.parts.assets
-				if not assets:is_asset_loaded(typ, path) then
+				-- outside of a map (the project menu of the main menu) there is no editor to load the asset into
+				local assets = managers.editor and managers.editor.parts and managers.editor.parts.assets
+				if assets and not assets:is_asset_loaded(typ, path) then
 					assets:quick_load_from_db(typ, path, nil, o.exclude, o.extra_info and clone(o.extra_info))
 				end
 				tb:SetValue(path, true)

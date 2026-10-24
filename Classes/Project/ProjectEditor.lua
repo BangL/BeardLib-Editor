@@ -9,6 +9,38 @@ ProjectEditor.ACTIONS = ProjectEditor.ACTIONS or {}
 local XML = BeardLib.Utils.XML
 local CXML = "custom_xml"
 
+--- Characters the id of a level, job or operation must not have: the ones of file names (folders and files of the project
+--- are named after it) and whitespace (the multiplayer handshake sends the ids separated by spaces).
+ProjectEditor.ID_FORBIDDEN_CHARS = {':','*','?','"','<','>','|',' ','\t'}
+
+--- Why an id of a level, job or operation is not valid (nil if it is fine), the check of the textboxes and the name dialogs.
+--- @param name string
+--- @return string?
+function ProjectEditor.InvalidIdReason(name)
+    if name == "" then
+        return "Id cannot be empty!"
+    elseif name:find("%s") then
+        return "The id cannot contain spaces!"
+    end
+    for _, c in ipairs(ProjectEditor.ID_FORBIDDEN_CHARS) do
+        if name:find(c, 1, true) then
+            return "The id cannot contain " .. c
+        end
+    end
+end
+
+--- Asks for the id of a new module. With create_data.fixed_name the id is taken without asking (cloning a whole operation
+--- creates a lot of modules).
+--- @param create_data table
+--- @param opts table Options of the input dialog.
+function ProjectEditor.AskName(create_data, opts)
+    if create_data.fixed_name then
+        opts.callback(create_data.fixed_name)
+    else
+        BLE.InputDialog:Show(opts)
+    end
+end
+
 --- @param parent Menu
 --- @param mod ModCore
 function ProjectEditor:init(parent, mod, previous_project_data)
@@ -94,7 +126,7 @@ function ProjectEditor:build_modules()
     end
 end
 
---- Searches a module by ID and meta, used to find levels from a narrative chain at the moment.
+--- Searches a module by ID and meta, used to find levels of a job.
 --- @param id string
 --- @param meta string
 --- @return table
@@ -107,7 +139,7 @@ function ProjectEditor:get_module(id, meta)
     end
 end
 
---- Searches a module meta, used to find levels from a narrative chain at the moment.
+--- Searches a module meta, used to find levels of a job.
 --- @param meta string
 --- @return table
 function ProjectEditor:get_module_by_meta(meta)

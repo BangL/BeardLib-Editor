@@ -11,16 +11,15 @@ function EditorState:at_enter()
 	 
 	managers.editor:set_enabled(true)
     managers.achievment.award = function() end
-	local job_id = managers.raid_job:current_job_id()
-    if job_id then
-		--[[
-	    tweak_data.operations.missions[job_id].contract_cost = {0,0,0,0,0,0,0}
-	    tweak_data.operations.missions[job_id].payout = {0,0,0,0,0,0,0}
-		tweak_data.operations.missions[job_id].contract_visuals = {}
-	    tweak_data.operations.missions[job_id].contract_visuals.min_mission_xp = {0,0,0,0,0,0,0}
-	    tweak_data.operations.missions[job_id].contract_visuals.max_mission_xp = {0,0,0,0,0,0,0}
-		]]
-	end
+    --Fake the job start: the full flow (stats, sync, objectives) is not wanted in the editor
+    if Global.editor_job_id and tweak_data.operations.missions[Global.editor_job_id] then
+        managers.raid_job._current_job = tweak_data.operations:mission_data(Global.editor_job_id)
+    end
+    --no rewards while editing (on the copy of the running job, the tweak data stays as it is)
+    local job = managers.raid_job._current_job
+    if job then
+        job.xp = 0
+    end
 end
 
 function EditorState:at_exit(new_state)

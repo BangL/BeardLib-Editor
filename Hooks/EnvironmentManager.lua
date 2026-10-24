@@ -121,3 +121,16 @@ EnvironmentManager._deprecated_data_path_map = {}
 for _, data_path in ipairs(deprecated_data_path_list) do
 	EnvironmentManager._deprecated_data_path_map[data_path] = true
 end
+
+-- Like SSAO (see EnvironmentControllerManager.lua), the bloom feeder switches the bloom effect itself every time
+-- an environment is applied, which would undo the editor's PostFXBloom/PostProcessingEffects options.
+local PostBloomIntensityFeeder = CoreEnvironmentFeeder.PostBloomIntensityFeeder
+local bloom_apply = PostBloomIntensityFeeder.apply
+function PostBloomIntensityFeeder:apply(handler, viewport, scene, ...)
+	bloom_apply(self, handler, viewport, scene, ...)
+	local editor = _G.managers.editor
+	local options = _G.BLE.Options
+	if editor and editor:enabled() and not (options:GetValue("Map/PostProcessingEffects") and options:GetValue("Map/PostFXBloom")) then
+		viewport:set_post_processor_effect("World", _G.Idstring("bloom_combine_post_processor"), _G.Idstring("bloom_combine_empty"))
+	end
+end
