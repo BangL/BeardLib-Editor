@@ -1,5 +1,5 @@
 EnvironmentLayerEditor = EnvironmentLayerEditor or class(LayerEditor)
-local sky_rot_key = Idstring("sky_orientation/rotation"):key()
+local sky_rot_key = Idstring("others/sky_rotation"):key()
 local DEFAULT_CUBEMAP_RESOLUTION = 512
 local EnvLayer = EnvironmentLayerEditor
 function EnvLayer:init(parent)
@@ -273,7 +273,7 @@ function EnvLayer:build_menu()
     local environment_group = self._holder:group("Environment")
 	environment_group:pathbox("Environment", ClassClbk(self, "change_environment"), environment_values.environment, "environment", {not_close = true})
     local sky = self._holder:group("Sky")
-    sky:slider("SkyRotation", ClassClbk(self, "change_sky_rotation"), environment_values.sky_rot, {min = 0, max = 360})
+    sky:slider("SkyRotation", ClassClbk(self, "change_sky_rotation"), environment_values.sky_rot, {min = 0, max = 359})
     -- local colors = {
     --     "color_off",
     --     "color_payday",
@@ -625,7 +625,7 @@ end
 function EnvLayer:change_sky_rotation(item)
  	self:data().environment_values.sky_rot = item:Value()
 	self:save()
-	managers.viewport:first_active_viewport()._env_handler:editor_set_value(sky_rot_key, item:Value()) -- I guess this works
+	managers.viewport:first_active_viewport()._env_handler:editor_set_value(sky_rot_key, item:Value())
 end
 
 function EnvLayer:kill_effect(unit)
