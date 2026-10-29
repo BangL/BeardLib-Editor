@@ -25,6 +25,7 @@ function EnvLayer:init(parent)
 	self._effect_unit = "core/units/effect/effect"
 	self._dome_occ_shape_unit = "core/units/dome_occ_shape/dome_occ_shape"
 	self._cubemap_unit = "core/units/cubemap_gizmo/cubemap_gizmo"
+	self._pen = Draw:pen("green")
 end
 
 function EnvLayer:set_visible(visible)
@@ -191,8 +192,8 @@ function EnvLayer:save()
 end
 
 function EnvLayer:reset_selected_units()
-	for k, unit in ipairs(clone(self._created_units)) do
-		if not alive(unit) then
+	for k = #self._created_units, 1, -1 do
+		if not alive(self._created_units[k]) then
 			table.remove(self._created_units, k)
 		end
 	end
