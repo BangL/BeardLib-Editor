@@ -227,6 +227,7 @@ function ProjectEditor:save_data_callback()
     local dir = self:get_dir()
     data.orig_id = nil
 
+    BLE.MapProject:merge_external_main_xml(Path:Combine(dir, "main.xml"), data) -- keep what was added to the file outside of the editor
     FileIO:WriteTo(Path:Combine(dir, "main.xml"), FileIO:ConvertToScriptData(data, CXML, true)) -- Update main.xml
 
     if id ~= data.name then -- Project name has been changed, let's move the map folder.

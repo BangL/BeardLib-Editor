@@ -128,6 +128,38 @@ function ProjectManager:maps_path()
     return BeardLib.current_level._level_dir
 end
 
+--- Top level nodes the editor manages itself. They are never brought back from disk, so deleting one in the editor sticks.
+local MANAGED_NODES = {job = true, level = true, operation = true, instance = true}
+
+local function merge_missing(dst, src, is_root)
+    for k, v in pairs(src) do
+        if type(k) ~= "number" then
+            if dst[k] == nil then
+                if not (is_root and MANAGED_NODES[k]) then
+                    dst[k] = deep_clone(v)
+                end
+            elseif type(dst[k]) == "table" and type(v) == "table" then
+                merge_missing(dst[k], v, false)
+            end
+        end
+    end
+end
+
+--- The editor works on the main.xml it read when the project was loaded. Anything that was added to the file afterwards
+--- (by hand, by a script, by an other tool) would be thrown away when the editor saves, for example an AssetUpdates node or
+--- the loading node of the job. This puts everything the editor does not know about, but the file on disk has, back into data.
+--- @param path string Full path of the main.xml on disk.
+--- @param data table The main.xml data the editor is about to write.
+function ProjectManager:merge_external_main_xml(path, data)
+    if not FileIO:Exists(path) then
+        return
+    end
+    local disk = FileIO:ReadScriptData(path, CXML, true)
+    if type(disk) == "table" and type(data) == "table" then
+        merge_missing(data, disk, true)
+    end
+end
+
 --- Saves the main.xml of the current loaded level.
 --- @param data table
 --- @param no_reload boolean
@@ -151,6 +183,10 @@ function ProjectManager:save_main_xml(data, no_reload, addfiles_include)
             end
         end
         data.AddFiles = new_add
+    end
+    local mod = self:current_mod()
+    if mod then
+        self:merge_external_main_xml(mod:GetRealFilePath(Path:Combine(mod.ModPath, "main.xml")), data)
     end
     self:save_xml("main.xml", data)
     if not no_reload then
